@@ -107,51 +107,87 @@ const SOLID_COLORS = [
 const PERSPECTIVES = [
   { 
     id: 'front', 
-    name: 'Front Flat', 
-    desc: 'Classic 2D Studio', 
+    name: 'Flat 2D', 
+    desc: 'Classic Flat Studio', 
     icon: Square,
+    rx: 0,
+    ry: 0,
+    rz: 0,
+    depth: 1200,
     transform: '', 
     previewTransform: 'rotateX(0deg) rotateY(0deg)' 
   },
   { 
     id: 'isometric-left', 
-    name: 'Isometric Left', 
-    desc: 'Dynamic 3D Tilt', 
+    name: 'Iso Left', 
+    desc: 'Dynamic Left Tilt', 
     icon: Box,
+    rx: 15,
+    ry: -20,
+    rz: 2,
+    depth: 1200,
     transform: 'perspective(1200px) rotateX(15deg) rotateY(-20deg) rotateZ(2deg)',
     previewTransform: 'perspective(200px) rotateX(15deg) rotateY(-20deg) rotateZ(2deg)'
   },
   { 
     id: 'isometric-right', 
-    name: 'Isometric Right', 
-    desc: 'Reverse 3D Angle', 
+    name: 'Iso Right', 
+    desc: 'Reverse Right Angle', 
     icon: Box,
+    rx: 15,
+    ry: 20,
+    rz: -2,
+    depth: 1200,
     transform: 'perspective(1200px) rotateX(15deg) rotateY(20deg) rotateZ(-2deg)',
     previewTransform: 'perspective(200px) rotateX(15deg) rotateY(20deg) rotateZ(-2deg)'
   },
   { 
     id: 'elevated', 
     name: 'Hero Float', 
-    desc: 'Forward Showcase', 
+    desc: 'Forward Elevation', 
     icon: Layers,
+    rx: 24,
+    ry: 0,
+    rz: 0,
+    depth: 1200,
     transform: 'perspective(1200px) rotateX(24deg) rotateY(0deg) rotateZ(0deg)',
     previewTransform: 'perspective(200px) rotateX(24deg) rotateY(0deg)'
   },
   { 
     id: 'skew-left', 
-    name: 'Dramatic Skew', 
-    desc: 'Ultra Dynamic Edge', 
+    name: 'Deep Skew', 
+    desc: 'Cinematic Depth', 
     icon: RotateCw,
+    rx: 8,
+    ry: -32,
+    rz: 4,
+    depth: 900,
     transform: 'perspective(900px) rotateX(8deg) rotateY(-32deg) rotateZ(4deg)',
     previewTransform: 'perspective(200px) rotateX(8deg) rotateY(-32deg)'
   },
   { 
     id: 'subtle', 
     name: 'Subtle Tilt', 
-    desc: 'Modern Gentle Angle', 
+    desc: 'Gentle Studio Angle', 
     icon: Sparkles,
+    rx: 8,
+    ry: -10,
+    rz: 1,
+    depth: 1200,
     transform: 'perspective(1200px) rotateX(8deg) rotateY(-10deg) rotateZ(1deg)',
     previewTransform: 'perspective(200px) rotateX(8deg) rotateY(-10deg)'
+  },
+  { 
+    id: 'flat-lay', 
+    name: 'Tabletop', 
+    desc: 'Top-Down Angled Lay', 
+    icon: Monitor,
+    rx: 40,
+    ry: 0,
+    rz: 0,
+    depth: 900,
+    transform: 'perspective(900px) rotateX(40deg) rotateY(0deg) rotateZ(0deg)',
+    previewTransform: 'perspective(200px) rotateX(40deg) rotateY(0deg)'
   },
 ];
 
@@ -333,6 +369,39 @@ const renderPlatformIcon = (platform: string, size = 12) => {
   }
 };
 
+const renderAspectBox = (aspect: string) => {
+  if (aspect === 'auto') {
+    return (
+      <div className="w-3.5 h-3.5 border border-dashed border-current rounded-[2px] opacity-70 flex items-center justify-center shrink-0">
+        <div className="w-1 h-1 bg-current rounded-full opacity-60" />
+      </div>
+    );
+  }
+  const parts = aspect.split('/');
+  const w = parseFloat(parts[0]);
+  const h = parseFloat(parts[1] || '1');
+  if (isNaN(w) || isNaN(h) || w <= 0 || h <= 0) {
+    return <div className="w-3.5 h-3.5 border border-current rounded-[2px] opacity-70 shrink-0" />;
+  }
+
+  let boxW = 15;
+  let boxH = 15;
+  if (w >= h) {
+    boxW = 16;
+    boxH = Math.max(5, Math.min(16, Math.round(16 * (h / w))));
+  } else {
+    boxH = 16;
+    boxW = Math.max(5, Math.min(16, Math.round(16 * (w / h))));
+  }
+
+  return (
+    <div 
+      className="border border-current rounded-[2px] opacity-80 shrink-0" 
+      style={{ width: `${boxW}px`, height: `${boxH}px` }} 
+    />
+  );
+};
+
 export default function StudioPage() {
   const [image, setImage] = useState<string | null>(null);
   const [imageDimensions, setImageDimensions] = useState({ w: 0, h: 0 });
@@ -343,6 +412,8 @@ export default function StudioPage() {
   const [shadow, setShadow] = useState(25);
   const [scale, setScale] = useState(100);
   const [aspectRatio, setAspectRatio] = useState('auto');
+  const [customWidth, setCustomWidth] = useState<number>(1920);
+  const [customHeight, setCustomHeight] = useState<number>(1080);
   const [showRatioMenu, setShowRatioMenu] = useState(false);
   const [showMacOsBar, setShowMacOsBar] = useState(false);
   const [glassBorder, setGlassBorder] = useState(false);
@@ -355,7 +426,19 @@ export default function StudioPage() {
     return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '255, 255, 255';
   };
 
-  // Drag state
+  // Canvas Viewport Zoom & Pan (Figma-style smooth workspace navigation)
+  const [viewportZoom, setViewportZoom] = useState(1);
+  const [viewportPan, setViewportPan] = useState({ x: 0, y: 0 });
+  const [isPanningWorkspace, setIsPanningWorkspace] = useState(false);
+  const [isSpacePressed, setIsSpacePressed] = useState(false);
+  const workspacePanRef = useRef<{ startX: number, startY: number, initialPanX: number, initialPanY: number } | null>(null);
+
+  const viewportZoomRef = useRef(viewportZoom);
+  viewportZoomRef.current = viewportZoom;
+  const viewportPanRef = useRef(viewportPan);
+  viewportPanRef.current = viewportPan;
+
+  // Screenshot element drag state
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -381,15 +464,47 @@ export default function StudioPage() {
   const [filter, setFilter] = useState('none');
   const [view, setView] = useState('default');
   const [perspective, setPerspective] = useState('front');
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
+  const [rotateZ, setRotateZ] = useState(0);
+  const [perspectiveDepth, setPerspectiveDepth] = useState(1200);
+
   const [watermark, setWatermark] = useState('');
   const [watermarkPlatform, setWatermarkPlatform] = useState<'x' | 'github' | 'instagram' | 'linkedin' | 'globe' | 'none'>('x');
   const [watermarkPosition, setWatermarkPosition] = useState<'bottom-right' | 'bottom-left' | 'bottom-center' | 'top-right'>('bottom-right');
   const [watermarkTarget, setWatermarkTarget] = useState<'screenshot' | 'canvas'>('screenshot');
   const [watermarkOpacity, setWatermarkOpacity] = useState<number>(65);
   
+  // Collapsible sidebar accordion sections
+  const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({
+    perspectives: true,
+    themes: true,
+    templates: false,
+    filters: false,
+  });
+
+  const toggleSection = (key: string) => {
+    setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const applyPerspectivePreset = (p: typeof PERSPECTIVES[0]) => {
+    setPerspective(p.id);
+    setRotateX(p.rx);
+    setRotateY(p.ry);
+    setRotateZ(p.rz);
+    setPerspectiveDepth(p.depth);
+  };
+
+  const reset3D = () => {
+    setPerspective('front');
+    setRotateX(0);
+    setRotateY(0);
+    setRotateZ(0);
+    setPerspectiveDepth(1200);
+  };
+  
   // Navigation tabs
   const [leftTab, setLeftTab] = useState<'layout' | 'background' | 'effects'>('layout');
-  const [rightTab, setRightTab] = useState<'perspectives' | 'presets' | 'filters'>('perspectives');
   
   // Export states
   const [exportFormat, setExportFormat] = useState<'png' | 'jpeg' | 'webp'>('png');
@@ -425,22 +540,116 @@ export default function StudioPage() {
   const canvasRef = useRef<HTMLDivElement>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
 
-  // Wheel zoom workspace
+  // Spacebar key listener for canvas panning
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
+        setIsSpacePressed(true);
+      }
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        setIsSpacePressed(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  // Cursor-Anchored Wheel Zoom for Canvas Workspace
   useEffect(() => {
     const workspace = workspaceRef.current;
     if (!workspace) return;
 
     const handleWheel = (e: WheelEvent) => {
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-        const delta = e.deltaY > 0 ? -5 : 5;
-        setScale((prev) => Math.min(Math.max(prev + delta, 20), 300));
-      }
+      e.preventDefault();
+      
+      const rect = workspace.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      const currentZoom = viewportZoomRef.current;
+      const currentPan = viewportPanRef.current;
+
+      const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
+      const newZoom = Math.min(Math.max(currentZoom * zoomFactor, 0.2), 4.0);
+
+      const pointX = (mouseX - currentPan.x) / currentZoom;
+      const pointY = (mouseY - currentPan.y) / currentZoom;
+
+      const newPanX = mouseX - pointX * newZoom;
+      const newPanY = mouseY - pointY * newZoom;
+
+      setViewportZoom(newZoom);
+      setViewportPan({ x: newPanX, y: newPanY });
     };
 
     workspace.addEventListener('wheel', handleWheel, { passive: false });
     return () => workspace.removeEventListener('wheel', handleWheel);
   }, []);
+
+  const handleWorkspacePointerDown = (e: React.PointerEvent) => {
+    if (e.button === 1 || isSpacePressed || e.target === workspaceRef.current || (e.target as HTMLElement).getAttribute('data-workspace-bg') === 'true') {
+      setIsPanningWorkspace(true);
+      workspacePanRef.current = {
+        startX: e.clientX,
+        startY: e.clientY,
+        initialPanX: viewportPan.x,
+        initialPanY: viewportPan.y,
+      };
+      (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+    }
+  };
+
+  const handleWorkspacePointerMove = (e: React.PointerEvent) => {
+    if (!isPanningWorkspace || !workspacePanRef.current) return;
+    const dx = e.clientX - workspacePanRef.current.startX;
+    const dy = e.clientY - workspacePanRef.current.startY;
+    setViewportPan({
+      x: workspacePanRef.current.initialPanX + dx,
+      y: workspacePanRef.current.initialPanY + dy,
+    });
+  };
+
+  const handleWorkspacePointerUp = (e: React.PointerEvent) => {
+    if (isPanningWorkspace) {
+      setIsPanningWorkspace(false);
+      workspacePanRef.current = null;
+      try {
+        (e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
+      } catch {}
+    }
+  };
+
+  const resetViewport = () => {
+    setViewportZoom(1);
+    setViewportPan({ x: 0, y: 0 });
+  };
+
+  const zoomCanvasAtCenter = (factor: number) => {
+    const workspace = workspaceRef.current;
+    if (!workspace) return;
+    const rect = workspace.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const currentZoom = viewportZoomRef.current;
+    const currentPan = viewportPanRef.current;
+
+    const pointX = (centerX - currentPan.x) / currentZoom;
+    const pointY = (centerY - currentPan.y) / currentZoom;
+
+    const newZoom = Math.min(Math.max(currentZoom * factor, 0.2), 4.0);
+    const newPanX = centerX - pointX * newZoom;
+    const newPanY = centerY - pointY * newZoom;
+
+    setViewportZoom(newZoom);
+    setViewportPan({ x: newPanX, y: newPanY });
+  };
 
   // Corner resize handling
   useEffect(() => {
@@ -680,13 +889,20 @@ export default function StudioPage() {
     return baseFilter;
   };
 
-  const activeRatioData = FLAT_RATIOS.find(r => r.id === aspectRatio) || FLAT_RATIOS[0];
-  const aspectStyle = activeRatioData.id === 'auto' 
-    ? (imageDimensions.w && imageDimensions.h ? `${imageDimensions.w}/${imageDimensions.h}` : 'auto')
-    : activeRatioData.aspect;
+  const activeRatioData = aspectRatio === 'custom'
+    ? { id: 'custom', aspect: `${customWidth}/${customHeight}`, name: `Custom (${customWidth}×${customHeight})`, desc: `${customWidth}×${customHeight}`, icon: Scaling }
+    : (FLAT_RATIOS.find(r => r.id === aspectRatio) || FLAT_RATIOS[0]);
+
+  const aspectStyle = aspectRatio === 'custom'
+    ? `${customWidth}/${customHeight}`
+    : (activeRatioData.id === 'auto' 
+        ? (imageDimensions.w && imageDimensions.h ? `${imageDimensions.w}/${imageDimensions.h}` : 'auto')
+        : activeRatioData.aspect);
     
   const glassRgb = hexToRgb(glassBorderColor);
-  const activePerspectiveTransform = PERSPECTIVES.find(p => p.id === perspective)?.transform || '';
+  const activePerspectiveTransform = (rotateX !== 0 || rotateY !== 0 || rotateZ !== 0)
+    ? `perspective(${perspectiveDepth}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`
+    : (PERSPECTIVES.find(p => p.id === perspective)?.transform || '');
   const bgUrlMatch = background.match(/^url\(['"]?(.*?)['"]?\)$/);
   const bgImageUrl = bgUrlMatch ? bgUrlMatch[1] : null;
 
@@ -1114,47 +1330,98 @@ export default function StudioPage() {
       <main className="flex-grow flex flex-col bg-bg-dark h-full relative overflow-hidden">
         {/* Top Control Bar */}
         <header className="h-16 border-b border-border bg-panel flex items-center justify-between px-6 z-30 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-accent to-purple-500 flex items-center justify-center shadow-md">
-              <Sparkles size={16} className="text-white" />
-            </div>
-            <div>
-              <h1 className="font-bold text-sm leading-tight text-white">NoiceSS Studio</h1>
-              <p className="text-[10px] text-text-muted leading-tight">Pro Screenshot & Mockup Creator</p>
-            </div>
+          <div className="flex items-center">
+            <span className="font-bold text-sm tracking-[0.22em] text-white uppercase select-none">
+              NOICESS
+            </span>
           </div>
 
           {/* Aspect Ratio Selector */}
           <div className="relative">
             <button
               onClick={() => setShowRatioMenu(!showRatioMenu)}
-              className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg border border-border bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20 text-xs font-medium transition-all shadow-inner text-zinc-200 hover:text-white"
+              className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-border bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20 text-xs font-medium transition-all shadow-inner text-zinc-200 hover:text-white"
             >
-              <LayoutTemplate size={13} className="text-blue-400" />
-              <span className="text-zinc-400">Ratio:</span>
+              <div className="w-4 h-4 flex items-center justify-center text-blue-400 shrink-0">
+                {renderAspectBox(aspectStyle)}
+              </div>
               <span className="font-semibold text-white">{activeRatioData.name}</span>
               <ChevronDown size={14} className={`text-zinc-400 transition-transform duration-200 ${showRatioMenu ? 'rotate-180' : ''}`} />
             </button>
 
             {showRatioMenu && (
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 bg-[#1C1C1E] border border-white/10 rounded-xl p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150 max-h-96 overflow-y-auto">
-                {ASPECT_CATEGORIES.map((cat, idx) => (
-                  <div key={idx} className="mb-2 last:mb-0">
-                    <span className="text-[10px] font-bold text-text-muted/60 uppercase tracking-wider px-2 py-1 block">{cat.name}</span>
-                    <div className="grid grid-cols-2 gap-1">
-                      {cat.ratios.map((r) => (
-                        <button
-                          key={r.id}
-                          onClick={() => { setAspectRatio(r.id); setShowRatioMenu(false); }}
-                          className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-left text-xs transition-colors ${aspectRatio === r.id ? 'bg-blue-600 text-white font-semibold shadow-sm' : 'text-zinc-400 hover:bg-white/[0.06] hover:text-white'}`}
-                        >
-                          <r.icon size={13} />
-                          <span className="truncate">{r.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 bg-[#1C1C1E] border border-white/10 rounded-2xl p-2.5 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
+                
+                {/* Minimal Custom Dimensions Row */}
+                <div className="flex items-center gap-2 p-2 bg-black/40 rounded-xl border border-white/10 mb-2.5">
+                  <input
+                    type="number"
+                    min={100}
+                    max={8000}
+                    value={customWidth}
+                    onChange={(e) => {
+                      setCustomWidth(Math.max(1, parseInt(e.target.value) || 1));
+                      setAspectRatio('custom');
+                    }}
+                    className="w-16 h-7 px-2 bg-black/60 border border-white/10 rounded-lg text-center text-xs font-mono text-white focus:outline-none focus:border-blue-500"
+                    placeholder="1920"
+                  />
+                  <span className="text-zinc-500 text-xs font-mono">×</span>
+                  <input
+                    type="number"
+                    min={100}
+                    max={8000}
+                    value={customHeight}
+                    onChange={(e) => {
+                      setCustomHeight(Math.max(1, parseInt(e.target.value) || 1));
+                      setAspectRatio('custom');
+                    }}
+                    className="w-16 h-7 px-2 bg-black/60 border border-white/10 rounded-lg text-center text-xs font-mono text-white focus:outline-none focus:border-blue-500"
+                    placeholder="1080"
+                  />
+                  <button
+                    onClick={() => {
+                      setAspectRatio('custom');
+                      setShowRatioMenu(false);
+                    }}
+                    className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-sm transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
+
+                {/* Clean Standard Ratios Grid */}
+                <div className="grid grid-cols-2 gap-1.5">
+                  {[
+                    { id: 'auto', name: 'Auto Fit', ratio: 'auto' },
+                    { id: 'standard-1-1', name: '1:1 Square', ratio: '1/1' },
+                    { id: 'tw-post', name: '16:9 Landscape', ratio: '16/9' },
+                    { id: 'tk-video', name: '9:16 Portrait', ratio: '9/16' },
+                    { id: 'ig-portrait', name: '4:5 Feed', ratio: '4/5' },
+                    { id: 'standard-4-3', name: '4:3 Classic', ratio: '4/3' },
+                    { id: 'standard-3-2', name: '3:2 Landscape', ratio: '3/2' },
+                    { id: 'tw-header', name: '3:1 Banner', ratio: '3/1' },
+                  ].map((r) => {
+                    const isSelected = aspectRatio === r.id;
+                    return (
+                      <button
+                        key={r.id}
+                        onClick={() => { setAspectRatio(r.id); setShowRatioMenu(false); }}
+                        className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs transition-all border ${
+                          isSelected 
+                            ? 'bg-blue-600 text-white font-semibold shadow-sm border-blue-500' 
+                            : 'bg-white/[0.02] border-white/5 text-zinc-300 hover:bg-white/[0.06] hover:text-white hover:border-white/10'
+                        }`}
+                      >
+                        <div className={`w-4 h-4 flex items-center justify-center shrink-0 ${isSelected ? 'text-white' : 'text-blue-400'}`}>
+                          {renderAspectBox(r.ratio)}
+                        </div>
+                        <span className="truncate">{r.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
               </div>
             )}
           </div>
@@ -1194,15 +1461,33 @@ export default function StudioPage() {
           </div>
         </header>
 
-        {/* Canvas Workspace */}
+        {/* Canvas Workspace (Figma / Canva style zoom & pan viewport) */}
         <div 
           ref={workspaceRef}
-          className="flex-grow flex items-center justify-center p-8 overflow-auto relative"
+          data-workspace-bg="true"
+          className={`flex-grow flex items-center justify-center overflow-hidden relative select-none ${isSpacePressed || isPanningWorkspace ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
+          onPointerDown={handleWorkspacePointerDown}
+          onPointerMove={handleWorkspacePointerMove}
+          onPointerUp={handleWorkspacePointerUp}
+          onClick={(e) => {
+            if (e.target === workspaceRef.current || (e.target as HTMLElement).getAttribute('data-workspace-bg') === 'true') {
+              setImageSelected(false);
+            }
+          }}
         >
-          <div 
-            ref={canvasRef}
-            className="relative flex items-center justify-center shadow-2xl"
-            onClick={() => setImageSelected(false)}
+          {/* Transformed Canvas Viewport */}
+          <div
+            className="flex items-center justify-center pointer-events-auto"
+            style={{
+              transform: `translate(${viewportPan.x}px, ${viewportPan.y}px) scale(${viewportZoom})`,
+              transformOrigin: '0 0',
+              transition: isPanningWorkspace ? 'none' : 'transform 0.05s cubic-bezier(0,0,0.2,1)',
+            }}
+          >
+            <div 
+              ref={canvasRef}
+              className="relative flex items-center justify-center shadow-2xl shrink-0"
+              onClick={() => setImageSelected(false)}
             style={{
               aspectRatio: aspectStyle,
               ...(aspectStyle !== 'auto' ? (
@@ -1563,93 +1848,247 @@ export default function StudioPage() {
             )}
           </div>
         </div>
-      </main>
 
-      {/* Right Sidebar - Multi-Variant Preview & 3D Perspectives */}
-      <aside className="w-[300px] min-w-[300px] bg-panel border-l border-border flex flex-col p-4 gap-5 overflow-y-auto z-20 shadow-lg">
-        {/* Navigation Tabs */}
-        <div className="grid grid-cols-3 bg-black/40 p-1 rounded-xl border border-white/5 relative">
-          <button 
-            className={`py-2 text-xs font-semibold rounded-lg transition-all text-center ${rightTab === 'perspectives' ? 'bg-blue-600/20 text-blue-400 shadow-sm border border-blue-500/30' : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'}`}
-            onClick={() => setRightTab('perspectives')}
+        {/* Floating Viewport Zoom HUD Controls (Bottom Center) */}
+        <div 
+          data-no-export="true"
+          className="no-export absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-[#1C1C1E]/90 border border-white/15 backdrop-blur-md rounded-xl px-2 py-1 shadow-2xl z-40"
+        >
+          <button
+            onClick={() => zoomCanvasAtCenter(0.85)}
+            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/10 text-zinc-300 hover:text-white transition-colors"
+            title="Zoom Out (Scroll Down)"
           >
-            3D View
+            <ZoomOut size={14} />
           </button>
-          <button 
-            className={`py-2 text-xs font-semibold rounded-lg transition-all text-center ${rightTab === 'presets' ? 'bg-blue-600/20 text-blue-400 shadow-sm border border-blue-500/30' : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'}`}
-            onClick={() => setRightTab('presets')}
+          <button
+            onClick={resetViewport}
+            className="px-2 py-1 text-[11px] font-mono font-medium text-zinc-300 hover:text-white hover:bg-white/10 rounded-md transition-colors"
+            title="Reset Zoom to 100%"
           >
-            Themes
+            {Math.round(viewportZoom * 100)}%
           </button>
-          <button 
-            className={`py-2 text-xs font-semibold rounded-lg transition-all text-center ${rightTab === 'filters' ? 'bg-blue-600/20 text-blue-400 shadow-sm border border-blue-500/30' : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'}`}
-            onClick={() => setRightTab('filters')}
+          <button
+            onClick={() => zoomCanvasAtCenter(1.15)}
+            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/10 text-zinc-300 hover:text-white transition-colors"
+            title="Zoom In (Scroll Up)"
           >
-            Filters
+            <ZoomIn size={14} />
+          </button>
+          <div className="w-px h-4 bg-white/15 mx-1" />
+          <button
+            onClick={resetViewport}
+            className="px-2 py-1 text-[11px] font-medium text-blue-400 hover:text-blue-300 hover:bg-blue-600/10 rounded-md transition-colors"
+            title="Reset View"
+          >
+            Reset
           </button>
         </div>
+      </div>
+    </main>
 
-        {/* Tab 1: 3D Perspectives */}
-        {rightTab === 'perspectives' && (
-          <div className="animate-in fade-in slide-in-from-right-2 duration-200 flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs uppercase tracking-wider text-text-muted font-semibold">Camera Angles</h3>
-              <span className="text-[10px] text-blue-400 font-mono">Live 3D</span>
+      {/* Right Sidebar - 3D Camera, Studio Presets & Collapsible Studio Controls */}
+      <aside className="w-[320px] min-w-[320px] bg-panel border-l border-border flex flex-col p-4 gap-4 overflow-y-auto z-20 shadow-lg select-none">
+        
+        {/* Accordion 1: 3D Angles & XYZ Orbit */}
+        <div className="flex flex-col gap-3">
+          <button 
+            onClick={() => toggleSection('perspectives')}
+            className="flex items-center justify-between w-full py-1 text-xs uppercase tracking-wider font-semibold text-text-main hover:text-white transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Box size={14} className="text-blue-400" />
+              <span>3D Camera & XYZ Angles</span>
             </div>
+            <div className="flex items-center gap-2">
+              {(rotateX !== 0 || rotateY !== 0 || rotateZ !== 0) && (
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-blue-600/20 text-blue-400 border border-blue-500/30">
+                  Custom
+                </span>
+              )}
+              <ChevronDown size={14} className={`text-text-muted transition-transform duration-200 ${expandedSections.perspectives ? 'rotate-180' : ''}`} />
+            </div>
+          </button>
 
-            <div className="grid grid-cols-2 gap-2.5">
-              {PERSPECTIVES.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => setPerspective(p.id)}
-                  className={`flex flex-col p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group ${perspective === p.id ? 'bg-blue-600/15 border-blue-500 ring-1 ring-blue-500/30 text-white shadow-md' : 'bg-black/30 border-border hover:border-white/20 hover:bg-white/[0.04] text-zinc-400 hover:text-zinc-200'}`}
-                >
-                  {/* Live Mini Preview Canvas */}
-                  <div className="w-full h-20 rounded-lg bg-[#141416] border border-white/5 flex items-center justify-center overflow-hidden mb-2 relative p-2 shadow-inner">
-                    {image ? (
-                      <div 
-                        className="w-3/4 h-3/4 flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
-                        style={{
-                          transform: p.previewTransform,
-                          transformStyle: 'preserve-3d'
+          {expandedSections.perspectives && (
+            <div className="flex flex-col gap-3.5 pt-1 animate-in fade-in slide-in-from-top-1 duration-150">
+              {/* Perspective Quick Preset Chips */}
+              <div className="grid grid-cols-4 gap-1.5">
+                {PERSPECTIVES.map((p) => {
+                  const isActive = perspective === p.id && rotateX === p.rx && rotateY === p.ry && rotateZ === p.rz;
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => applyPerspectivePreset(p)}
+                      className={`py-1.5 px-1 rounded-lg text-center border transition-all text-[11px] font-medium flex flex-col items-center gap-1 ${
+                        isActive 
+                          ? 'bg-blue-600/20 border-blue-500 text-blue-400 shadow-sm' 
+                          : 'bg-black/30 border-white/5 hover:border-white/20 text-zinc-400 hover:text-white'
+                      }`}
+                      title={p.desc}
+                    >
+                      <p.icon size={13} className={isActive ? 'text-blue-400' : 'text-zinc-400'} />
+                      <span className="truncate w-full text-[10px]">{p.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* XYZ Controls Box */}
+              <div className="flex flex-col gap-3 bg-black/25 p-3 rounded-xl border border-white/5">
+                {/* Rotate X (Tilt / Pitch) */}
+                <div>
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <label className="text-text-muted font-medium flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-red-400/80" />
+                      <span>X-Axis (Pitch / Tilt)</span>
+                    </label>
+                    <div className="flex items-center gap-1">
+                      <input 
+                        type="text"
+                        inputMode="numeric"
+                        value={rotateX}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          if (!isNaN(val)) setRotateX(Math.max(-60, Math.min(60, Math.round(val))));
+                          else if (e.target.value === '' || e.target.value === '-') setRotateX(0);
                         }}
-                      >
-                        <img 
-                          src={image} 
-                          alt={p.name} 
-                          className="max-w-full max-h-full object-contain rounded shadow-lg border border-white/10" 
-                        />
-                      </div>
-                    ) : (
-                      <div 
-                        className="w-12 h-8 rounded bg-gradient-to-tr from-blue-500/30 to-indigo-500/30 border border-white/20 shadow-md flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
-                        style={{
-                          transform: p.previewTransform,
-                          transformStyle: 'preserve-3d'
-                        }}
-                      >
-                        <p.icon size={14} className="text-white/70" />
-                      </div>
-                    )}
+                        className="w-10 h-5 px-1 bg-black/50 border border-white/10 rounded text-center text-[11px] font-mono text-zinc-300 focus:text-white focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                      <span className="text-[10px] text-text-muted">°</span>
+                    </div>
                   </div>
-                  
-                  <span className="text-xs font-semibold text-white truncate">{p.name}</span>
-                  <span className="text-[10px] text-text-muted opacity-70 truncate">{p.desc}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+                  <Slider 
+                    min={-60} 
+                    max={60} 
+                    step={1} 
+                    value={[rotateX]} 
+                    onValueChange={(v) => {
+                      setRotateX(Array.isArray(v) ? v[0] : v as number);
+                      setPerspective('custom');
+                    }} 
+                  />
+                </div>
 
-        {/* Tab 2: Curated Magic Presets */}
-        {rightTab === 'presets' && (
-          <div className="animate-in fade-in slide-in-from-right-2 duration-200 flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs uppercase tracking-wider text-text-muted font-semibold">Studio Themes</h3>
-              <span className="text-[10px] text-blue-400 font-medium">1-Click</span>
-            </div>
+                {/* Rotate Y (Pan / Yaw) */}
+                <div>
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <label className="text-text-muted font-medium flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-green-400/80" />
+                      <span>Y-Axis (Yaw / Angle)</span>
+                    </label>
+                    <div className="flex items-center gap-1">
+                      <input 
+                        type="text"
+                        inputMode="numeric"
+                        value={rotateY}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          if (!isNaN(val)) setRotateY(Math.max(-60, Math.min(60, Math.round(val))));
+                          else if (e.target.value === '' || e.target.value === '-') setRotateY(0);
+                        }}
+                        className="w-10 h-5 px-1 bg-black/50 border border-white/10 rounded text-center text-[11px] font-mono text-zinc-300 focus:text-white focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                      <span className="text-[10px] text-text-muted">°</span>
+                    </div>
+                  </div>
+                  <Slider 
+                    min={-60} 
+                    max={60} 
+                    step={1} 
+                    value={[rotateY]} 
+                    onValueChange={(v) => {
+                      setRotateY(Array.isArray(v) ? v[0] : v as number);
+                      setPerspective('custom');
+                    }} 
+                  />
+                </div>
 
-            <div className="flex flex-col gap-2.5">
+                {/* Rotate Z (Roll) */}
+                <div>
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <label className="text-text-muted font-medium flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-blue-400/80" />
+                      <span>Z-Axis (Roll / Skew)</span>
+                    </label>
+                    <div className="flex items-center gap-1">
+                      <input 
+                        type="text"
+                        inputMode="numeric"
+                        value={rotateZ}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          if (!isNaN(val)) setRotateZ(Math.max(-45, Math.min(45, Math.round(val))));
+                          else if (e.target.value === '' || e.target.value === '-') setRotateZ(0);
+                        }}
+                        className="w-10 h-5 px-1 bg-black/50 border border-white/10 rounded text-center text-[11px] font-mono text-zinc-300 focus:text-white focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                      <span className="text-[10px] text-text-muted">°</span>
+                    </div>
+                  </div>
+                  <Slider 
+                    min={-45} 
+                    max={45} 
+                    step={1} 
+                    value={[rotateZ]} 
+                    onValueChange={(v) => {
+                      setRotateZ(Array.isArray(v) ? v[0] : v as number);
+                      setPerspective('custom');
+                    }} 
+                  />
+                </div>
+
+                {/* Perspective Depth */}
+                <div>
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <label className="text-text-muted font-medium">Camera Depth</label>
+                    <span className="text-text-muted font-mono text-[11px]">{perspectiveDepth}px</span>
+                  </div>
+                  <Slider 
+                    min={500} 
+                    max={2500} 
+                    step={50} 
+                    value={[perspectiveDepth]} 
+                    onValueChange={(v) => {
+                      setPerspectiveDepth(Array.isArray(v) ? v[0] : v as number);
+                      setPerspective('custom');
+                    }} 
+                  />
+                </div>
+
+                {/* Reset 3D Button */}
+                {(rotateX !== 0 || rotateY !== 0 || rotateZ !== 0) && (
+                  <button
+                    onClick={reset3D}
+                    className="w-full py-1 px-2 text-[11px] font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 flex items-center justify-center gap-1.5 transition-colors mt-0.5"
+                  >
+                    <RefreshCw size={12} />
+                    <span>Reset 3D to Flat (0, 0, 0)</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Accordion 2: Studio Themes */}
+        <div className="border-t border-border pt-4 flex flex-col gap-3">
+          <button 
+            onClick={() => toggleSection('themes')}
+            className="flex items-center justify-between w-full py-1 text-xs uppercase tracking-wider font-semibold text-text-main hover:text-white transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Sparkles size={14} className="text-blue-400" />
+              <span>Studio Themes</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-zinc-400 font-mono">{PRESETS.length} Themes</span>
+              <ChevronDown size={14} className={`text-text-muted transition-transform duration-200 ${expandedSections.themes ? 'rotate-180' : ''}`} />
+            </div>
+          </button>
+
+          {expandedSections.themes && (
+            <div className="flex flex-col gap-2.5 pt-1 animate-in fade-in slide-in-from-top-1 duration-150">
               {PRESETS.map((preset) => (
                 <button
                   key={preset.id}
@@ -1657,7 +2096,12 @@ export default function StudioPage() {
                     setBackground(preset.config.background);
                     setShowMacOsBar(preset.config.showMacOsBar);
                     setView(preset.config.view);
-                    setPerspective(preset.config.perspective);
+                    const foundP = PERSPECTIVES.find(p => p.id === preset.config.perspective);
+                    if (foundP) applyPerspectivePreset(foundP);
+                    else {
+                      setPerspective(preset.config.perspective);
+                      setRotateX(0); setRotateY(0); setRotateZ(0); setPerspectiveDepth(1200);
+                    }
                     setGlassBorder(preset.config.glassBorder);
                     if (preset.config.glassBorderWidth) setGlassBorderWidth(preset.config.glassBorderWidth);
                     if (preset.config.glassBorderOpacity) setGlassBorderOpacity(preset.config.glassBorderOpacity);
@@ -1669,61 +2113,163 @@ export default function StudioPage() {
                     setNoiseIntensity(preset.config.noiseIntensity);
                     setGrainIntensity(preset.config.grainIntensity);
                   }}
-                  className="flex items-center gap-3 p-2.5 rounded-xl border border-border bg-black/30 hover:bg-white/[0.04] hover:border-white/20 text-left transition-all group"
+                  className="flex flex-col rounded-xl border border-white/5 bg-black/30 hover:bg-white/[0.04] hover:border-white/20 text-left transition-all overflow-hidden group shadow-sm"
                 >
-                  {/* Miniature Preset Thumbnail */}
+                  {/* Full-width High-Fidelity Preview Box */}
                   <div 
-                    className="w-16 h-14 rounded-lg flex items-center justify-center shrink-0 overflow-hidden relative border border-white/10 shadow-md"
+                    className="w-full h-24 flex items-center justify-center relative overflow-hidden p-3"
                     style={{
                       background: preset.config.background.startsWith('url(') ? preset.config.background : preset.config.background,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
-                      filter: preset.config.bgBlur ? `blur(${preset.config.bgBlur / 4}px)` : 'none'
                     }}
                   >
+                    {/* Simulated scaled mockup */}
                     {image ? (
-                      <img 
-                        src={image} 
-                        alt={preset.name} 
-                        className="w-3/4 h-3/4 object-contain rounded-sm shadow-md"
+                      <div 
+                        className="w-3/4 h-full flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
                         style={{
-                          transform: preset.config.perspective === 'isometric-left' ? 'perspective(100px) rotateX(15deg) rotateY(-20deg)' : 'none'
+                          transform: preset.config.perspective === 'isometric-left' ? 'perspective(200px) rotateX(15deg) rotateY(-20deg)' : 'none'
                         }}
-                      />
+                      >
+                        <img 
+                          src={image} 
+                          alt={preset.name} 
+                          className="max-w-full max-h-full object-contain rounded shadow-lg border border-white/10" 
+                        />
+                      </div>
                     ) : (
-                      <preset.icon size={16} className="text-white drop-shadow" />
+                      <div className="flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-full border border-white/10 backdrop-blur-md">
+                        <preset.icon size={13} className="text-white" />
+                        <span className="text-xs font-semibold text-white">{preset.name}</span>
+                      </div>
                     )}
                   </div>
 
-                  <div className="flex flex-col flex-grow min-w-0">
-                    <span className="text-xs font-semibold text-white group-hover:text-blue-400 transition-colors">
-                      {preset.name}
+                  <div className="flex items-center justify-between p-2.5 bg-[#141416]/90 border-t border-white/5">
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-semibold text-white group-hover:text-blue-400 transition-colors">
+                        {preset.name}
+                      </span>
+                      <span className="text-[10px] text-text-muted opacity-80 truncate">{preset.desc}</span>
+                    </div>
+                    <span className="text-[10px] font-medium text-blue-400 bg-blue-600/10 px-2 py-0.5 rounded border border-blue-500/20 group-hover:bg-blue-600/20 transition-colors shrink-0">
+                      Apply
                     </span>
-                    <span className="text-[10px] text-text-muted opacity-80 mt-0.5 truncate">{preset.desc}</span>
                   </div>
                 </button>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* Tab 3: Color Grading & Filters */}
-        {rightTab === 'filters' && (
-          <div className="animate-in fade-in slide-in-from-right-2 duration-200 flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs uppercase tracking-wider text-text-muted font-semibold">Filter Profiles</h3>
-              <span className="text-[10px] text-text-muted font-mono">{FILTERS.length} Profiles</span>
+        {/* Accordion 3: Window Templates */}
+        <div className="border-t border-border pt-4 flex flex-col gap-3">
+          <button 
+            onClick={() => toggleSection('templates')}
+            className="flex items-center justify-between w-full py-1 text-xs uppercase tracking-wider font-semibold text-text-main hover:text-white transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <LayoutTemplate size={14} className="text-blue-400" />
+              <span>Window Templates</span>
             </div>
+            <ChevronDown size={14} className={`text-text-muted transition-transform duration-200 ${expandedSections.templates ? 'rotate-180' : ''}`} />
+          </button>
 
-            <div className="grid grid-cols-2 gap-2.5">
+          {expandedSections.templates && (
+            <div className="flex flex-col gap-2 pt-1 animate-in fade-in slide-in-from-top-1 duration-150">
+              <button 
+                onClick={() => { setView('default'); setShowMacOsBar(true); setGlassBorder(false); }}
+                className={`flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all ${view === 'default' && showMacOsBar && !glassBorder ? 'bg-blue-600/15 border-blue-500 text-white' : 'bg-black/30 border-white/5 hover:border-white/20 text-zinc-300'}`}
+              >
+                <div className="w-9 h-9 rounded-lg bg-black/50 border border-white/10 flex items-center justify-center shrink-0">
+                  <Laptop size={16} className="text-blue-400" />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs font-semibold text-white">Default macOS Studio</span>
+                  <span className="text-[10px] text-text-muted">Window dots + clean frame</span>
+                </div>
+              </button>
+
+              <button 
+                onClick={() => { setView('browser'); setShowMacOsBar(true); setGlassBorder(false); }}
+                className={`flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all ${view === 'browser' ? 'bg-blue-600/15 border-blue-500 text-white' : 'bg-black/30 border-white/5 hover:border-white/20 text-zinc-300'}`}
+              >
+                <div className="w-9 h-9 rounded-lg bg-black/50 border border-white/10 flex items-center justify-center shrink-0">
+                  <Globe size={16} className="text-green-400" />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs font-semibold text-white">Web Browser</span>
+                  <span className="text-[10px] text-text-muted">Safari bar with address URL</span>
+                </div>
+              </button>
+
+              <button 
+                onClick={() => { setView('minimal'); setShowMacOsBar(false); setGlassBorder(false); }}
+                className={`flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all ${view === 'minimal' && !showMacOsBar && !glassBorder ? 'bg-blue-600/15 border-blue-500 text-white' : 'bg-black/30 border-white/5 hover:border-white/20 text-zinc-300'}`}
+              >
+                <div className="w-9 h-9 rounded-lg bg-black/50 border border-white/10 flex items-center justify-center shrink-0">
+                  <Square size={16} className="text-purple-400" />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs font-semibold text-white">Minimalist</span>
+                  <span className="text-[10px] text-text-muted">Zero chrome, frameless focus</span>
+                </div>
+              </button>
+
+              <button 
+                onClick={() => { 
+                  setView('default'); 
+                  setShowMacOsBar(true); 
+                  setGlassBorder(true); 
+                  setGlassBorderWidth(10); 
+                  setGlassBorderOpacity(40); 
+                  setPerspective('isometric-left');
+                  setRotateX(15);
+                  setRotateY(-20);
+                  setRotateZ(2);
+                  setPerspectiveDepth(1200);
+                }}
+                className={`flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all ${glassBorder ? 'bg-blue-600/15 border-blue-500 text-white' : 'bg-black/30 border-white/5 hover:border-white/20 text-zinc-300'}`}
+              >
+                <div className="w-9 h-9 rounded-lg bg-black/50 border border-white/10 flex items-center justify-center shrink-0">
+                  <Sparkles size={16} className="text-amber-400" />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs font-semibold text-white">3D Frosted Glass</span>
+                  <span className="text-[10px] text-text-muted">Glass border + 3D isometric tilt</span>
+                </div>
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Accordion 4: Color Grading & Filters */}
+        <div className="border-t border-border pt-4 flex flex-col gap-3">
+          <button 
+            onClick={() => toggleSection('filters')}
+            className="flex items-center justify-between w-full py-1 text-xs uppercase tracking-wider font-semibold text-text-main hover:text-white transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Filter size={14} className="text-blue-400" />
+              <span>Color Profiles</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-zinc-400 font-mono">{FILTERS.length} Profiles</span>
+              <ChevronDown size={14} className={`text-text-muted transition-transform duration-200 ${expandedSections.filters ? 'rotate-180' : ''}`} />
+            </div>
+          </button>
+
+          {expandedSections.filters && (
+            <div className="grid grid-cols-2 gap-2 pt-1 animate-in fade-in slide-in-from-top-1 duration-150">
               {FILTERS.map((f) => (
                 <button
                   key={f.id}
                   onClick={() => setFilter(f.id)}
-                  className={`flex flex-col p-2.5 rounded-xl border text-left transition-all group ${filter === f.id ? 'bg-blue-600/15 border-blue-500 ring-1 ring-blue-500/30 text-white shadow-md' : 'bg-black/30 border-border hover:border-white/20 hover:bg-white/[0.04] text-zinc-400 hover:text-zinc-200'}`}
+                  className={`flex flex-col p-2 rounded-xl border text-left transition-all group ${filter === f.id ? 'bg-blue-600/15 border-blue-500 ring-1 ring-blue-500/30 text-white shadow-md' : 'bg-black/30 border-white/5 hover:border-white/20 text-zinc-400 hover:text-zinc-200'}`}
                 >
-                  {/* Live Thumbnail Preview */}
-                  <div className="w-full h-16 rounded-lg bg-[#141416] border border-white/5 flex items-center justify-center overflow-hidden mb-2 relative p-1 shadow-inner">
+                  {/* Miniature Filter Preview Box */}
+                  <div className="w-full h-14 rounded-lg bg-[#141416] border border-white/5 flex items-center justify-center overflow-hidden mb-1.5 relative p-1 shadow-inner">
                     {image ? (
                       <img 
                         src={image} 
@@ -1733,19 +2279,20 @@ export default function StudioPage() {
                       />
                     ) : (
                       <div 
-                        className="w-12 h-8 rounded bg-gradient-to-r from-blue-400 to-indigo-600"
+                        className="w-10 h-7 rounded bg-gradient-to-r from-blue-400 to-indigo-600"
                         style={{ filter: f.filterStyle }}
                       />
                     )}
                   </div>
 
-                  <span className="text-xs font-semibold text-white truncate">{f.name}</span>
-                  <span className="text-[10px] text-text-muted opacity-70 truncate">{f.desc}</span>
+                  <span className="text-[11px] font-semibold text-white truncate">{f.name}</span>
+                  <span className="text-[9px] text-text-muted opacity-70 truncate">{f.desc}</span>
                 </button>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
+
       </aside>
 
       {/* Export Quality & Format Panel (Modal) */}
