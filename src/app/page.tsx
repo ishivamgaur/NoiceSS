@@ -1460,13 +1460,13 @@ export default function StudioPage() {
                             }`}
                           >
                             <div 
-                              className="px-3 py-1 rounded-full text-[11px] font-medium tracking-wide flex items-center gap-1.5 transition-all shadow-md"
+                              className="px-3.5 py-1.5 rounded-full text-[11px] font-medium tracking-wide flex items-center gap-1.5 transition-all shadow-md"
                               style={{
-                                backgroundColor: `rgba(18, 18, 22, ${Math.max(0.15, (watermarkOpacity / 100) * 0.65)})`,
-                                backdropFilter: !isExporting ? 'blur(16px)' : 'none',
-                                WebkitBackdropFilter: !isExporting ? 'blur(16px)' : 'none',
-                                border: `1px solid rgba(255, 255, 255, ${Math.max(0.1, (watermarkOpacity / 100) * 0.25)})`,
-                                color: `rgba(255, 255, 255, ${Math.max(0.6, watermarkOpacity / 100)})`,
+                                background: `rgba(255, 255, 255, ${(watermarkOpacity / 100) * 0.25})`,
+                                border: `1px solid rgba(255, 255, 255, ${watermarkOpacity / 100})`,
+                                backdropFilter: 'blur(20px)',
+                                WebkitBackdropFilter: 'blur(20px)',
+                                color: '#ffffff',
                               }}
                             >
                               {renderPlatformIcon(watermarkPlatform, 11)}
@@ -1547,13 +1547,13 @@ export default function StudioPage() {
                 }`}
               >
                 <div 
-                  className="px-3.5 py-1.5 rounded-full text-xs font-medium tracking-wide flex items-center gap-1.5 transition-all shadow-md"
+                  className="px-4 py-2 rounded-full text-xs font-medium tracking-wide flex items-center gap-1.5 transition-all shadow-md"
                   style={{
-                    backgroundColor: `rgba(18, 18, 22, ${Math.max(0.15, (watermarkOpacity / 100) * 0.65)})`,
-                    backdropFilter: !isExporting ? 'blur(16px)' : 'none',
-                    WebkitBackdropFilter: !isExporting ? 'blur(16px)' : 'none',
-                    border: `1px solid rgba(255, 255, 255, ${Math.max(0.1, (watermarkOpacity / 100) * 0.25)})`,
-                    color: `rgba(255, 255, 255, ${Math.max(0.6, watermarkOpacity / 100)})`,
+                    background: `rgba(255, 255, 255, ${(watermarkOpacity / 100) * 0.25})`,
+                    border: `1px solid rgba(255, 255, 255, ${watermarkOpacity / 100})`,
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    color: '#ffffff',
                   }}
                 >
                   {renderPlatformIcon(watermarkPlatform, 12)}
