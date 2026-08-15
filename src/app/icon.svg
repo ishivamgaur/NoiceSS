@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="50%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181B"/>
+      <stop offset="100%" stop-color="#09090B"/>
+    </linearGradient>
+  </defs>
+  <!-- Background squircle -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#bg)" stroke="url(#g1)" stroke-width="2.5"/>
+  
+  <!-- Stylized Viewfinder frame corners -->
+  <path d="M16 25V20C16 17.7909 17.7909 16 20 16H25" stroke="#3B82F6" stroke-width="3" stroke-linecap="round"/>
+  <path d="M48 25V20C48 17.7909 46.2091 16 44 16H39" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round"/>
+  <path d="M16 39V44C16 46.2091 17.7909 48 20 48H25" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round"/>
+  <path d="M48 39V44C48 46.2091 46.2091 48 44 48H39" stroke="#EC4899" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- Center Sparkle -->
+  <path d="M32 23C32 28 37 32 41 32C37 32 32 36 32 41C32 36 27 32 23 32C27 32 32 28 32 23Z" fill="url(#g1)"/>
+  <circle cx="32" cy="32" r="2.5" fill="#FFFFFF"/>
+</svg>
