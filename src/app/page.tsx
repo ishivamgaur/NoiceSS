@@ -1212,32 +1212,43 @@ export default function StudioPage() {
               ) : (image ? { width: '800px', maxHeight: '800px' } : { width: '800px', height: '600px' }))
             }}
           >
-            {/* Background Layer (Strictly Clipped, 0 padding, perfectly scaled to fill all edges with blur) */}
-            <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none">
-              {bgImageUrl ? (
-                <div className="absolute inset-0 w-full h-full pointer-events-none flex items-center justify-center overflow-hidden">
-                  <img 
-                    src={bgImageUrl} 
-                    alt="" 
-                    draggable={false}
-                    className="w-full h-full object-cover pointer-events-none"
+            {/* Background Layer (Strictly Clipped, 0 padding) */}
+            <div 
+              className="absolute inset-0 overflow-hidden z-0 pointer-events-none"
+              style={{
+                ...(bgBlur === 0 ? (
+                  background.startsWith('url(') 
+                    ? { backgroundImage: background, backgroundSize: 'cover', backgroundPosition: 'center' }
+                    : { background: background }
+                ) : {})
+              }}
+            >
+              {bgBlur > 0 && (
+                bgImageUrl ? (
+                  <div className="absolute inset-0 w-full h-full pointer-events-none flex items-center justify-center overflow-hidden">
+                    <img 
+                      src={bgImageUrl} 
+                      alt="" 
+                      draggable={false}
+                      className="w-full h-full object-cover pointer-events-none"
+                      style={{
+                        filter: `blur(${bgBlur}px)`,
+                        transform: 'scale(1.25)',
+                        transformOrigin: 'center center',
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div 
+                    className="absolute inset-0 w-full h-full pointer-events-none"
                     style={{
-                      filter: bgBlur > 0 ? `blur(${bgBlur}px)` : 'none',
-                      transform: bgBlur > 0 ? 'scale(1.25)' : 'none',
+                      background: background,
+                      filter: `blur(${bgBlur}px)`,
+                      transform: 'scale(1.25)',
                       transformOrigin: 'center center',
                     }}
                   />
-                </div>
-              ) : (
-                <div 
-                  className="absolute inset-0 w-full h-full pointer-events-none"
-                  style={{
-                    background: background,
-                    filter: bgBlur > 0 ? `blur(${bgBlur}px)` : 'none',
-                    transform: bgBlur > 0 ? 'scale(1.25)' : 'none',
-                    transformOrigin: 'center center',
-                  }}
-                />
+                )
               )}
 
               {/* Background Noise & Grain Layer */}
@@ -1379,7 +1390,7 @@ export default function StudioPage() {
                       : `0 ${shadow}px ${shadow * 2}px rgba(0,0,0,0.35)`,
                     border: glassBorder ? `1px solid rgba(${glassRgb}, ${glassBorderOpacity / 100})` : 'none',
                     background: glassBorder ? `rgba(${glassRgb}, ${(glassBorderOpacity / 100) * 0.25})` : 'transparent',
-                    backdropFilter: glassBorder ? 'blur(20px)' : 'none',
+                    backdropFilter: glassBorder && !isExporting ? 'blur(20px)' : 'none',
                     padding: glassBorder ? `${glassBorderWidth}px` : '0',
                   } : {}}
                   onClick={(e) => { if (image) { e.stopPropagation(); setImageSelected(true); } }}
@@ -1452,8 +1463,8 @@ export default function StudioPage() {
                               className="px-3 py-1 rounded-full text-[11px] font-medium tracking-wide flex items-center gap-1.5 transition-all shadow-md"
                               style={{
                                 backgroundColor: `rgba(18, 18, 22, ${Math.max(0.15, (watermarkOpacity / 100) * 0.65)})`,
-                                backdropFilter: 'blur(16px)',
-                                WebkitBackdropFilter: 'blur(16px)',
+                                backdropFilter: !isExporting ? 'blur(16px)' : 'none',
+                                WebkitBackdropFilter: !isExporting ? 'blur(16px)' : 'none',
                                 border: `1px solid rgba(255, 255, 255, ${Math.max(0.1, (watermarkOpacity / 100) * 0.25)})`,
                                 color: `rgba(255, 255, 255, ${Math.max(0.6, watermarkOpacity / 100)})`,
                               }}
@@ -1539,8 +1550,8 @@ export default function StudioPage() {
                   className="px-3.5 py-1.5 rounded-full text-xs font-medium tracking-wide flex items-center gap-1.5 transition-all shadow-md"
                   style={{
                     backgroundColor: `rgba(18, 18, 22, ${Math.max(0.15, (watermarkOpacity / 100) * 0.65)})`,
-                    backdropFilter: 'blur(16px)',
-                    WebkitBackdropFilter: 'blur(16px)',
+                    backdropFilter: !isExporting ? 'blur(16px)' : 'none',
+                    WebkitBackdropFilter: !isExporting ? 'blur(16px)' : 'none',
                     border: `1px solid rgba(255, 255, 255, ${Math.max(0.1, (watermarkOpacity / 100) * 0.25)})`,
                     color: `rgba(255, 255, 255, ${Math.max(0.6, watermarkOpacity / 100)})`,
                   }}
