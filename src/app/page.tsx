@@ -8,7 +8,7 @@ import {
   Wand2, Box, Eye, Sparkle, RefreshCw, Sun, Moon, Laptop, Globe, CheckCircle2,
   Loader2, Aperture, SlidersHorizontal, Droplets, Droplet, Tv, Radio, Film, 
   Focus, Pipette, Paintbrush, Flame, Zap, SunMedium, Type, Scan, Scaling, 
-  AppWindow, Gauge, EyeOff, SlidersVertical, X
+  AppWindow, Gauge, EyeOff, SlidersVertical, X, Lock, Unlock
 } from 'lucide-react';
 import { toPng, toJpeg, toBlob } from 'html-to-image';
 import { Slider } from "@/components/ui/slider";
@@ -17,39 +17,41 @@ import { Input } from "@/components/ui/input";
 
 const ASPECT_CATEGORIES = [
   {
-    name: 'General & Photo',
+    name: 'Standards & General',
     ratios: [
       { id: 'auto', aspect: 'auto', name: 'Auto Fit', desc: 'Freeform', icon: Maximize },
-      { id: 'standard-1-1', aspect: '1/1', name: 'Square', desc: '1:1', icon: Square },
-      { id: 'standard-4-3', aspect: '4/3', name: 'Classic', desc: '4:3', icon: ImageIcon },
-      { id: 'standard-3-2', aspect: '3/2', name: 'Landscape', desc: '3:2', icon: ImageIcon },
+      { id: 'standard-1-1', aspect: '1/1', name: '1:1 Square', desc: 'Square', icon: Square },
+      { id: 'standard-16-9', aspect: '16/9', name: '16:9 Landscape', desc: 'Widescreen', icon: Monitor },
+      { id: 'standard-9-16', aspect: '9/16', name: '9:16 Portrait', desc: 'Vertical', icon: Smartphone },
+      { id: 'standard-4-3', aspect: '4/3', name: '4:3 Classic', desc: 'Classic', icon: ImageIcon },
+      { id: 'standard-3-2', aspect: '3/2', name: '3:2 Landscape', desc: 'Photo', icon: ImageIcon },
     ]
   },
   {
     name: 'Social Posts',
     ratios: [
-      { id: 'ig-post', aspect: '1/1', name: 'Instagram', desc: 'Post (1:1)', icon: Square },
-      { id: 'ig-portrait', aspect: '4/5', name: 'IG Portrait', desc: 'Feed (4:5)', icon: LayoutTemplate },
-      { id: 'tw-post', aspect: '16/9', name: 'Twitter (X)', desc: 'Post (16:9)', icon: Monitor },
-      { id: 'li-post', aspect: '4/5', name: 'LinkedIn', desc: 'Post (4:5)', icon: LayoutTemplate },
+      { id: 'ig-post', aspect: '1/1', name: 'Instagram Post', desc: '1:1 Square', icon: Square },
+      { id: 'ig-portrait', aspect: '4/5', name: 'Instagram Feed', desc: '4:5 Feed', icon: LayoutTemplate },
+      { id: 'tw-post', aspect: '16/9', name: 'X / Twitter Post', desc: '16:9 Landscape', icon: Monitor },
+      { id: 'li-post', aspect: '4/5', name: 'LinkedIn Post', desc: '4:5 Feed', icon: LayoutTemplate },
     ]
   },
   {
     name: 'Stories & Video',
     ratios: [
-      { id: 'tk-video', aspect: '9/16', name: 'TikTok', desc: 'Video (9:16)', icon: Smartphone },
-      { id: 'ig-story', aspect: '9/16', name: 'IG Story', desc: 'Reels (9:16)', icon: Smartphone },
-      { id: 'yt-thumb', aspect: '16/9', name: 'YouTube', desc: 'Video (16:9)', icon: Monitor },
-      { id: 'yt-shorts', aspect: '9/16', name: 'YT Shorts', desc: 'Video (9:16)', icon: Smartphone },
+      { id: 'tk-video', aspect: '9/16', name: 'TikTok Video', desc: '9:16 Vertical', icon: Smartphone },
+      { id: 'ig-story', aspect: '9/16', name: 'IG Reels & Story', desc: '9:16 Story', icon: Smartphone },
+      { id: 'yt-thumb', aspect: '16/9', name: 'YouTube Video', desc: '16:9 1080p', icon: Monitor },
+      { id: 'yt-shorts', aspect: '9/16', name: 'YouTube Shorts', desc: '9:16 Shorts', icon: Smartphone },
     ]
   },
   {
     name: 'Banners & Covers',
     ratios: [
-      { id: 'tw-header', aspect: '3/1', name: 'Twitter (X)', desc: 'Header (3:1)', icon: LayoutTemplate },
-      { id: 'yt-banner', aspect: '16/9', name: 'YouTube', desc: 'Channel Art', icon: Monitor },
-      { id: 'li-banner', aspect: '4/1', name: 'LinkedIn', desc: 'Banner (4:1)', icon: LayoutTemplate },
-      { id: 'fb-cover', aspect: '2.62/1', name: 'Facebook', desc: 'Cover', icon: LayoutTemplate },
+      { id: 'tw-header', aspect: '3/1', name: 'Twitter Header', desc: '3:1 Banner', icon: LayoutTemplate },
+      { id: 'yt-banner', aspect: '16/9', name: 'YouTube Banner', desc: 'Channel Art', icon: Monitor },
+      { id: 'li-banner', aspect: '4/1', name: 'LinkedIn Banner', desc: '4:1 Cover', icon: LayoutTemplate },
+      { id: 'fb-cover', aspect: '2.62/1', name: 'Facebook Cover', desc: '2.62:1 Cover', icon: LayoutTemplate },
     ]
   }
 ];
@@ -406,14 +408,15 @@ export default function StudioPage() {
   const [image, setImage] = useState<string | null>(null);
   const [imageDimensions, setImageDimensions] = useState({ w: 0, h: 0 });
   const [imageSelected, setImageSelected] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [padding, setPadding] = useState(64);
   const [radius, setRadius] = useState(16);
   const [shadow, setShadow] = useState(25);
   const [scale, setScale] = useState(100);
   const [aspectRatio, setAspectRatio] = useState('auto');
-  const [customWidth, setCustomWidth] = useState<number>(1920);
-  const [customHeight, setCustomHeight] = useState<number>(1080);
+  const [customRatioW, setCustomRatioW] = useState<number>(16);
+  const [customRatioH, setCustomRatioH] = useState<number>(9);
   const [showRatioMenu, setShowRatioMenu] = useState(false);
   const [showMacOsBar, setShowMacOsBar] = useState(false);
   const [glassBorder, setGlassBorder] = useState(false);
@@ -593,7 +596,13 @@ export default function StudioPage() {
   }, []);
 
   const handleWorkspacePointerDown = (e: React.PointerEvent) => {
-    if (e.button === 1 || isSpacePressed || e.target === workspaceRef.current || (e.target as HTMLElement).getAttribute('data-workspace-bg') === 'true') {
+    // Check if the event originated inside the screenshot image frame or floating controls
+    const isInsideScreenshotFrame = imageFrameRef.current?.contains(e.target as Node);
+    
+    if (isLocked || !isInsideScreenshotFrame || isSpacePressed || e.button === 1) {
+      if (!isInsideScreenshotFrame) {
+        setImageSelected(false);
+      }
       setIsPanningWorkspace(true);
       workspacePanRef.current = {
         startX: e.clientX,
@@ -601,7 +610,7 @@ export default function StudioPage() {
         initialPanX: viewportPan.x,
         initialPanY: viewportPan.y,
       };
-      (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+      (workspaceRef.current as HTMLElement)?.setPointerCapture?.(e.pointerId);
     }
   };
 
@@ -834,6 +843,7 @@ export default function StudioPage() {
   };
 
   const handleResizeDown = (e: React.PointerEvent, corner: string) => {
+    if (isLocked) return;
     e.stopPropagation();
     e.preventDefault();
     if (!imageFrameRef.current) return;
@@ -847,6 +857,7 @@ export default function StudioPage() {
   };
 
   const handleRotateDown = (e: React.PointerEvent) => {
+    if (isLocked) return;
     e.stopPropagation();
     e.preventDefault();
     if (!imageFrameRef.current) return;
@@ -860,6 +871,7 @@ export default function StudioPage() {
   };
 
   const handlePointerDown = (e: React.PointerEvent) => {
+    if (isLocked) return;
     setIsDragging(true);
     setDragStart({ 
       x: e.clientX - pos.x, 
@@ -890,11 +902,11 @@ export default function StudioPage() {
   };
 
   const activeRatioData = aspectRatio === 'custom'
-    ? { id: 'custom', aspect: `${customWidth}/${customHeight}`, name: `Custom (${customWidth}×${customHeight})`, desc: `${customWidth}×${customHeight}`, icon: Scaling }
+    ? { id: 'custom', aspect: `${customRatioW}/${customRatioH}`, name: `Custom (${customRatioW}:${customRatioH})`, desc: `${customRatioW}:${customRatioH}`, icon: Scaling }
     : (FLAT_RATIOS.find(r => r.id === aspectRatio) || FLAT_RATIOS[0]);
 
   const aspectStyle = aspectRatio === 'custom'
-    ? `${customWidth}/${customHeight}`
+    ? `${customRatioW}/${customRatioH}`
     : (activeRatioData.id === 'auto' 
         ? (imageDimensions.w && imageDimensions.h ? `${imageDimensions.w}/${imageDimensions.h}` : 'auto')
         : activeRatioData.aspect);
@@ -978,6 +990,24 @@ export default function StudioPage() {
                   </div>
                   <Slider min={0} max={360} step={1} value={[rotation]} onValueChange={(v) => setRotation(Array.isArray(v) ? v[0] : v as number)} />
                 </div>
+
+                {/* Lock Canvas Position Toggle */}
+                <button
+                  onClick={() => setIsLocked(!isLocked)}
+                  className={`flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-medium transition-all border mt-1 ${
+                    isLocked
+                      ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 shadow-sm'
+                      : 'bg-black/20 border-white/5 text-zinc-400 hover:bg-white/[0.04] hover:text-white hover:border-white/10'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {isLocked ? <Lock size={13} className="text-amber-400" /> : <Unlock size={13} />}
+                    <span>Lock Position on Canvas</span>
+                  </div>
+                  <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${isLocked ? 'bg-amber-500/30 text-amber-300' : 'bg-white/5 text-zinc-400'}`}>
+                    {isLocked ? 'LOCKED' : 'UNLOCKED'}
+                  </span>
+                </button>
               </div>
             </div>
 
@@ -1350,78 +1380,85 @@ export default function StudioPage() {
             </button>
 
             {showRatioMenu && (
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 bg-[#1C1C1E] border border-white/10 rounded-2xl p-2.5 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-80 min-w-[310px] bg-[#1C1C1E] border border-white/15 rounded-2xl p-3 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150 max-h-[480px] overflow-y-auto">
                 
-                {/* Minimal Custom Dimensions Row */}
-                <div className="flex items-center gap-2 p-2 bg-black/40 rounded-xl border border-white/10 mb-2.5">
-                  <input
-                    type="number"
-                    min={100}
-                    max={8000}
-                    value={customWidth}
-                    onChange={(e) => {
-                      setCustomWidth(Math.max(1, parseInt(e.target.value) || 1));
-                      setAspectRatio('custom');
-                    }}
-                    className="w-16 h-7 px-2 bg-black/60 border border-white/10 rounded-lg text-center text-xs font-mono text-white focus:outline-none focus:border-blue-500"
-                    placeholder="1920"
-                  />
-                  <span className="text-zinc-500 text-xs font-mono">×</span>
-                  <input
-                    type="number"
-                    min={100}
-                    max={8000}
-                    value={customHeight}
-                    onChange={(e) => {
-                      setCustomHeight(Math.max(1, parseInt(e.target.value) || 1));
-                      setAspectRatio('custom');
-                    }}
-                    className="w-16 h-7 px-2 bg-black/60 border border-white/10 rounded-lg text-center text-xs font-mono text-white focus:outline-none focus:border-blue-500"
-                    placeholder="1080"
-                  />
+                {/* Top Section: Manual Ratio Input (e.g. 16 : 9, 21 : 9, 4 : 3) */}
+                <div className="p-2.5 bg-black/40 rounded-xl border border-white/10 mb-3 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 flex-1">
+                    <span className="text-[11px] font-medium text-zinc-400 mr-1">Ratio:</span>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={customRatioW}
+                      onChange={(e) => {
+                        const val = Math.max(1, parseInt(e.target.value) || 1);
+                        setCustomRatioW(val);
+                        setAspectRatio('custom');
+                      }}
+                      className="w-12 h-7 px-1 bg-black/60 border border-white/15 rounded-lg text-center text-xs font-mono text-white focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      placeholder="16"
+                    />
+                    <span className="text-zinc-500 text-xs font-bold">:</span>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={customRatioH}
+                      onChange={(e) => {
+                        const val = Math.max(1, parseInt(e.target.value) || 1);
+                        setCustomRatioH(val);
+                        setAspectRatio('custom');
+                      }}
+                      className="w-12 h-7 px-1 bg-black/60 border border-white/15 rounded-lg text-center text-xs font-mono text-white focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      placeholder="9"
+                    />
+                  </div>
+
                   <button
                     onClick={() => {
                       setAspectRatio('custom');
                       setShowRatioMenu(false);
                     }}
-                    className="flex-1 h-7 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-sm transition-colors"
+                    className="px-3 h-7 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-sm transition-colors shrink-0"
                   >
                     Apply
                   </button>
                 </div>
 
-                {/* Clean Standard Ratios Grid */}
-                <div className="grid grid-cols-2 gap-1.5">
-                  {[
-                    { id: 'auto', name: 'Auto Fit', ratio: 'auto' },
-                    { id: 'standard-1-1', name: '1:1 Square', ratio: '1/1' },
-                    { id: 'tw-post', name: '16:9 Landscape', ratio: '16/9' },
-                    { id: 'tk-video', name: '9:16 Portrait', ratio: '9/16' },
-                    { id: 'ig-portrait', name: '4:5 Feed', ratio: '4/5' },
-                    { id: 'standard-4-3', name: '4:3 Classic', ratio: '4/3' },
-                    { id: 'standard-3-2', name: '3:2 Landscape', ratio: '3/2' },
-                    { id: 'tw-header', name: '3:1 Banner', ratio: '3/1' },
-                  ].map((r) => {
-                    const isSelected = aspectRatio === r.id;
-                    return (
-                      <button
-                        key={r.id}
-                        onClick={() => { setAspectRatio(r.id); setShowRatioMenu(false); }}
-                        className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs transition-all border ${
-                          isSelected 
-                            ? 'bg-blue-600 text-white font-semibold shadow-sm border-blue-500' 
-                            : 'bg-white/[0.02] border-white/5 text-zinc-300 hover:bg-white/[0.06] hover:text-white hover:border-white/10'
-                        }`}
-                      >
-                        <div className={`w-4 h-4 flex items-center justify-center shrink-0 ${isSelected ? 'text-white' : 'text-blue-400'}`}>
-                          {renderAspectBox(r.ratio)}
-                        </div>
-                        <span className="truncate">{r.name}</span>
-                      </button>
-                    );
-                  })}
+                {/* Platform & Standard Ratio Categories */}
+                <div className="flex flex-col gap-3">
+                  {ASPECT_CATEGORIES.map((cat, idx) => (
+                    <div key={idx} className="flex flex-col gap-1.5">
+                      <span className="text-[10px] font-bold text-text-muted/70 uppercase tracking-wider px-1">
+                        {cat.name}
+                      </span>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {cat.ratios.map((r) => {
+                          const isSelected = aspectRatio === r.id;
+                          return (
+                            <button
+                              key={r.id}
+                              onClick={() => { setAspectRatio(r.id); setShowRatioMenu(false); }}
+                              className={`flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left text-xs transition-all border ${
+                                isSelected 
+                                  ? 'bg-blue-600/20 border-blue-500 text-white font-semibold shadow-sm' 
+                                  : 'bg-black/20 border-white/5 text-zinc-400 hover:bg-white/[0.06] hover:text-white hover:border-white/10'
+                              }`}
+                            >
+                              {/* Visual Ratio Box */}
+                              <div className={`w-5 h-5 flex items-center justify-center shrink-0 ${isSelected ? 'text-blue-400' : 'text-zinc-400'}`}>
+                                {renderAspectBox(r.aspect)}
+                              </div>
+                              <div className="flex flex-col min-w-0">
+                                <span className="truncate text-xs font-medium text-white">{r.name}</span>
+                                <span className="text-[10px] text-text-muted opacity-80 truncate">{r.desc}</span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-
               </div>
             )}
           </div>
@@ -1465,7 +1502,7 @@ export default function StudioPage() {
         <div 
           ref={workspaceRef}
           data-workspace-bg="true"
-          className={`flex-grow flex items-center justify-center overflow-hidden relative select-none ${isSpacePressed || isPanningWorkspace ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
+          className={`flex-grow flex items-center justify-center overflow-hidden relative select-none ${isPanningWorkspace ? 'cursor-grabbing' : 'cursor-grab'}`}
           onPointerDown={handleWorkspacePointerDown}
           onPointerMove={handleWorkspacePointerMove}
           onPointerUp={handleWorkspacePointerUp}
@@ -1486,7 +1523,7 @@ export default function StudioPage() {
           >
             <div 
               ref={canvasRef}
-              className="relative flex items-center justify-center shadow-2xl shrink-0"
+              className={`relative flex items-center justify-center shadow-2xl shrink-0 ${isPanningWorkspace ? 'cursor-grabbing' : 'cursor-grab'}`}
               onClick={() => setImageSelected(false)}
             style={{
               aspectRatio: aspectStyle,
@@ -1562,7 +1599,7 @@ export default function StudioPage() {
               {/* Image Frame inside content container */}
               <div 
                 ref={imageFrameRef}
-                className={`relative group z-10 pointer-events-auto ${isRotating || isDragging || isResizing ? 'transition-none' : 'transition-all duration-200 ease-out'} flex flex-col justify-center items-center ${!image ? 'w-full h-full' : ''}`}
+                className={`relative group z-10 pointer-events-auto ${isRotating || isDragging || isResizing ? 'transition-none' : 'transition-all duration-200 ease-out'} flex flex-col justify-center items-center ${!image ? 'w-full h-full' : ''} ${isDragging ? 'cursor-grabbing' : (image ? (isLocked ? 'cursor-default' : 'cursor-move') : 'cursor-default')}`}
                 style={{
                   transform: `translate(${pos.x}px, ${pos.y}px) ${activePerspectiveTransform} ${rotation !== 0 ? `rotate(${rotation}deg)` : ''} scale(${scale / 100})`,
                   transformStyle: 'preserve-3d',
@@ -1656,6 +1693,18 @@ export default function StudioPage() {
                     </button>
                     <div className="w-px h-4 bg-white/15 mx-0.5" />
                     <button
+                      className={`flex items-center justify-center w-7 h-7 rounded-md transition-colors ${
+                        isLocked 
+                          ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30' 
+                          : 'hover:bg-white/10 text-white/80 hover:text-white'
+                      }`}
+                      title={isLocked ? "Unlock Position (Currently Locked)" : "Lock Position on Canvas"}
+                      onClick={() => setIsLocked(!isLocked)}
+                    >
+                      {isLocked ? <Lock size={14} className="text-amber-400" /> : <Unlock size={14} />}
+                    </button>
+                    <div className="w-px h-4 bg-white/15 mx-0.5" />
+                    <button
                       className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-colors"
                       title="Remove image"
                       onClick={() => { setImage(null); setImageSelected(false); setRotation(0); setPos({ x: 0, y: 0 }); }}
@@ -1737,7 +1786,7 @@ export default function StudioPage() {
                         {/* Watermark Overlay on Screenshot */}
                         {watermark && watermarkTarget === 'screenshot' && (
                           <div 
-                            className={`absolute pointer-events-none z-20 transition-all ${
+                            className={`absolute pointer-events-none z-20 w-fit inline-flex ${
                               watermarkPosition === 'bottom-right' ? 'bottom-3 right-3' :
                               watermarkPosition === 'bottom-left' ? 'bottom-3 left-3' :
                               watermarkPosition === 'bottom-center' ? 'bottom-3 left-1/2 -translate-x-1/2' :
@@ -1745,17 +1794,20 @@ export default function StudioPage() {
                             }`}
                           >
                             <div 
-                              className="px-3.5 py-1.5 rounded-full text-[11px] font-medium tracking-wide flex items-center gap-1.5 transition-all shadow-md"
+                              className="px-3.5 py-1.5 rounded-full text-[11px] font-medium tracking-wide inline-flex items-center gap-1.5 whitespace-nowrap overflow-hidden leading-none select-none shrink-0"
                               style={{
                                 background: `rgba(255, 255, 255, ${(watermarkOpacity / 100) * 0.25})`,
                                 border: `1px solid rgba(255, 255, 255, ${watermarkOpacity / 100})`,
-                                backdropFilter: 'blur(20px)',
-                                WebkitBackdropFilter: 'blur(20px)',
+                                backdropFilter: !isExporting ? 'blur(20px)' : 'none',
+                                WebkitBackdropFilter: !isExporting ? 'blur(20px)' : 'none',
                                 color: '#ffffff',
+                                boxSizing: 'border-box',
                               }}
                             >
-                              {renderPlatformIcon(watermarkPlatform, 11)}
-                              <span>{watermarkPlatform === 'x' && !watermark.startsWith('@') ? `@${watermark}` : watermark}</span>
+                              <div className="shrink-0 flex items-center justify-center">
+                                {renderPlatformIcon(watermarkPlatform, 11)}
+                              </div>
+                              <span className="leading-none">{watermarkPlatform === 'x' && !watermark.startsWith('@') ? `@${watermark}` : watermark}</span>
                             </div>
                           </div>
                         )}
@@ -1777,41 +1829,56 @@ export default function StudioPage() {
                       className={`no-export absolute inset-0 pointer-events-none transition-opacity duration-200 z-50 ${isResizing || isRotating || imageSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                     >
                       {/* Outline box */}
-                      <div className="absolute inset-0 border-2 border-blue-500/90 pointer-events-none shadow-sm" style={{ borderRadius: `${radius}px` }} />
-
-                      {/* Corner Resize Handles */}
                       <div 
-                        className="absolute -top-2 -left-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-blue-500 pointer-events-auto cursor-nwse-resize hover:scale-125 active:scale-110 transition-transform z-50" 
-                        onPointerDown={(e) => handleResizeDown(e, 'tl')} 
-                        title="Drag to minimize / maximize size" 
-                      />
-                      <div 
-                        className="absolute -top-2 -right-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-blue-500 pointer-events-auto cursor-nesw-resize hover:scale-125 active:scale-110 transition-transform z-50" 
-                        onPointerDown={(e) => handleResizeDown(e, 'tr')} 
-                        title="Drag to minimize / maximize size" 
-                      />
-                      <div 
-                        className="absolute -bottom-2 -left-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-blue-500 pointer-events-auto cursor-nesw-resize hover:scale-125 active:scale-110 transition-transform z-50" 
-                        onPointerDown={(e) => handleResizeDown(e, 'bl')} 
-                        title="Drag to minimize / maximize size" 
-                      />
-                      <div 
-                        className="absolute -bottom-2 -right-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-blue-500 pointer-events-auto cursor-nwse-resize hover:scale-125 active:scale-110 transition-transform z-50" 
-                        onPointerDown={(e) => handleResizeDown(e, 'br')} 
-                        title="Drag to minimize / maximize size" 
+                        className={`absolute inset-0 border-2 pointer-events-none shadow-sm transition-colors ${isLocked ? 'border-amber-500/70 border-dashed' : 'border-blue-500/90'}`} 
+                        style={{ borderRadius: `${radius}px` }} 
                       />
 
-                      {/* Top Rotation Stalk & Knob */}
-                      <div className="absolute -top-9 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-auto z-50">
-                        <div 
-                          className="w-6 h-6 rounded-full bg-white text-black shadow-lg border border-black/20 flex items-center justify-center cursor-grab active:cursor-grabbing hover:scale-115 transition-transform"
-                          title="Drag to rotate (Hold Shift for 15° snap)"
-                          onPointerDown={handleRotateDown}
-                        >
-                          <RotateCw size={12} className="text-black/80" />
+                      {/* Locked Badge Pill */}
+                      {isLocked && (
+                        <div className="absolute top-2 right-2 bg-black/80 border border-amber-500/50 text-amber-300 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg z-50 pointer-events-none">
+                          <Lock size={10} className="text-amber-400" />
+                          <span>LOCKED</span>
                         </div>
-                        <div className="w-0.5 h-3 bg-blue-500" />
-                      </div>
+                      )}
+
+                      {/* Corner Resize Handles & Rotation Knob (Only active when NOT locked) */}
+                      {!isLocked && (
+                        <>
+                          <div 
+                            className="absolute -top-2 -left-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-blue-500 pointer-events-auto cursor-nwse-resize hover:scale-125 active:scale-110 transition-transform z-50" 
+                            onPointerDown={(e) => handleResizeDown(e, 'tl')} 
+                            title="Drag to minimize / maximize size" 
+                          />
+                          <div 
+                            className="absolute -top-2 -right-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-blue-500 pointer-events-auto cursor-nesw-resize hover:scale-125 active:scale-110 transition-transform z-50" 
+                            onPointerDown={(e) => handleResizeDown(e, 'tr')} 
+                            title="Drag to minimize / maximize size" 
+                          />
+                          <div 
+                            className="absolute -bottom-2 -left-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-blue-500 pointer-events-auto cursor-nesw-resize hover:scale-125 active:scale-110 transition-transform z-50" 
+                            onPointerDown={(e) => handleResizeDown(e, 'bl')} 
+                            title="Drag to minimize / maximize size" 
+                          />
+                          <div 
+                            className="absolute -bottom-2 -right-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-blue-500 pointer-events-auto cursor-nwse-resize hover:scale-125 active:scale-110 transition-transform z-50" 
+                            onPointerDown={(e) => handleResizeDown(e, 'br')} 
+                            title="Drag to minimize / maximize size" 
+                          />
+
+                          {/* Top Rotation Stalk & Knob */}
+                          <div className="absolute -top-9 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-auto z-50">
+                            <div 
+                              className="w-6 h-6 rounded-full bg-white text-black shadow-lg border border-black/20 flex items-center justify-center cursor-grab active:cursor-grabbing hover:scale-115 transition-transform"
+                              title="Drag to rotate (Hold Shift for 15° snap)"
+                              onPointerDown={handleRotateDown}
+                            >
+                              <RotateCw size={12} className="text-black/80" />
+                            </div>
+                            <div className="w-0.5 h-3 bg-blue-500" />
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1824,7 +1891,7 @@ export default function StudioPage() {
             
             {watermark && watermarkTarget === 'canvas' && (
               <div 
-                className={`absolute pointer-events-none z-20 transition-all ${
+                className={`absolute pointer-events-none z-20 w-fit inline-flex ${
                   watermarkPosition === 'bottom-right' ? 'bottom-6 right-6' :
                   watermarkPosition === 'bottom-left' ? 'bottom-6 left-6' :
                   watermarkPosition === 'bottom-center' ? 'bottom-6 left-1/2 -translate-x-1/2' :
@@ -1832,17 +1899,20 @@ export default function StudioPage() {
                 }`}
               >
                 <div 
-                  className="px-4 py-2 rounded-full text-xs font-medium tracking-wide flex items-center gap-1.5 transition-all shadow-md"
+                  className="px-4 py-2 rounded-full text-xs font-medium tracking-wide inline-flex items-center gap-1.5 whitespace-nowrap overflow-hidden leading-none select-none shrink-0"
                   style={{
                     background: `rgba(255, 255, 255, ${(watermarkOpacity / 100) * 0.25})`,
                     border: `1px solid rgba(255, 255, 255, ${watermarkOpacity / 100})`,
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
+                    backdropFilter: !isExporting ? 'blur(20px)' : 'none',
+                    WebkitBackdropFilter: !isExporting ? 'blur(20px)' : 'none',
                     color: '#ffffff',
+                    boxSizing: 'border-box',
                   }}
                 >
-                  {renderPlatformIcon(watermarkPlatform, 12)}
-                  <span>{watermarkPlatform === 'x' && !watermark.startsWith('@') ? `@${watermark}` : watermark}</span>
+                  <div className="shrink-0 flex items-center justify-center">
+                    {renderPlatformIcon(watermarkPlatform, 12)}
+                  </div>
+                  <span className="leading-none">{watermarkPlatform === 'x' && !watermark.startsWith('@') ? `@${watermark}` : watermark}</span>
                 </div>
               </div>
             )}
