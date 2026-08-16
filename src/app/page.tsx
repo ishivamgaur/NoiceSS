@@ -59,23 +59,23 @@ const ASPECT_CATEGORIES = [
 const FLAT_RATIOS = ASPECT_CATEGORIES.flatMap(c => c.ratios);
 
 const MACOS_BACKGROUNDS = [
-  { name: 'Big Sur Dark', url: '/wallpapers/macos-big-sur-apple-layers-fluidic-colorful-dark-wwdc-2020-6016x6016-1432.jpg' },
-  { name: 'Big Sur Light', url: '/wallpapers/macos-big-sur-apple-layers-fluidic-colorful-wwdc-stock-4096x2304-1455.jpg' },
-  { name: 'Monterey Dark', url: '/wallpapers/macos-monterey-stock-black-dark-mode-layers-5k-6016x6016-5889.jpg' },
-  { name: 'Monterey WWDC', url: '/wallpapers/macos-monterey-wwdc-21-stock-dark-mode-5k-6016x6016-5585.jpg' },
-  { name: 'Sequoia', url: '/wallpapers/macos-sequoia-forest-3840x2160-24082.jpg' },
-  { name: 'Tahoe Light', url: '/wallpapers/macos-tahoe-26-5120x2880-22675.jpg' },
-  { name: 'Tahoe Dark', url: '/wallpapers/macos-tahoe-26-5k-6016x6016-22672.jpg' },
-  { name: 'Abstract Waves', url: '/wallpapers/abstract-waves-3840x2160-26731.jpg' },
-  { name: 'Blue Abstract', url: '/wallpapers/blue-abstract-3840x2160-24798.png' },
-  { name: 'Iridescent', url: '/wallpapers/iridescent-spheres-3840x2160-26346.jpg' },
-  { name: 'Golden', url: '/wallpapers/macos-27-golden-4480x3088-26625.png' },
-  { name: 'Surface', url: '/wallpapers/microsoft-surface-3840x2160-26627.png' },
-  { name: 'MacBook Abstract', url: '/wallpapers/wp14041666-macbook-abstract-wallpapers.jpg' },
-  { name: 'Dark Green 8K', url: '/wallpapers/wp14135599-8k-mac-dark-green-wallpapers.jpg' },
-  { name: 'Emerald Dark', url: '/wallpapers/wp14135646-8k-mac-dark-green-wallpapers.jpg' },
+  { name: 'Big Sur Dark', url: '/wallpapers/macos-big-sur-apple-layers-fluidic-colorful-dark-wwdc-2020-6016x6016-1432.webp' },
+  { name: 'Big Sur Light', url: '/wallpapers/macos-big-sur-apple-layers-fluidic-colorful-wwdc-stock-4096x2304-1455.webp' },
+  { name: 'Monterey Dark', url: '/wallpapers/macos-monterey-stock-black-dark-mode-layers-5k-6016x6016-5889.webp' },
+  { name: 'Monterey WWDC', url: '/wallpapers/macos-monterey-wwdc-21-stock-dark-mode-5k-6016x6016-5585.webp' },
+  { name: 'Sequoia', url: '/wallpapers/macos-sequoia-forest-3840x2160-24082.webp' },
+  { name: 'Tahoe Light', url: '/wallpapers/macos-tahoe-26-5120x2880-22675.webp' },
+  { name: 'Tahoe Dark', url: '/wallpapers/macos-tahoe-26-5k-6016x6016-22672.webp' },
+  { name: 'Abstract Waves', url: '/wallpapers/abstract-waves-3840x2160-26731.webp' },
+  { name: 'Blue Abstract', url: '/wallpapers/blue-abstract-3840x2160-24798.webp' },
+  { name: 'Iridescent', url: '/wallpapers/iridescent-spheres-3840x2160-26346.webp' },
+  { name: 'Golden', url: '/wallpapers/macos-27-golden-4480x3088-26625.webp' },
+  { name: 'Surface', url: '/wallpapers/microsoft-surface-3840x2160-26627.webp' },
+  { name: 'MacBook Abstract', url: '/wallpapers/wp14041666-macbook-abstract-wallpapers.webp' },
+  { name: 'Dark Green 8K', url: '/wallpapers/wp14135599-8k-mac-dark-green-wallpapers.webp' },
+  { name: 'Emerald Dark', url: '/wallpapers/wp14135646-8k-mac-dark-green-wallpapers.webp' },
   { name: 'Dark macOS 4K', url: '/wallpapers/wp16202777-dark-4k-macos-wallpapers.webp' },
-  { name: 'Apple Retina', url: '/wallpapers/wp8994371-apple-4k-retina-wallpapers.jpg' }
+  { name: 'Apple Retina', url: '/wallpapers/wp8994371-apple-4k-retina-wallpapers.webp' }
 ];
 
 const GRADIENTS = [
@@ -200,7 +200,7 @@ const PRESETS = [
     desc: 'Dark 8K Green + Glass',
     icon: Moon,
     config: {
-      background: 'url("/wallpapers/wp14135599-8k-mac-dark-green-wallpapers.jpg")',
+      background: 'url("/wallpapers/wp14135599-8k-mac-dark-green-wallpapers.webp")',
       showMacOsBar: true,
       view: 'default',
       perspective: 'isometric-left',
@@ -220,7 +220,7 @@ const PRESETS = [
     desc: 'Iridescent Waves + Frost',
     icon: Droplet,
     config: {
-      background: 'url("/wallpapers/abstract-waves-3840x2160-26731.jpg")',
+      background: 'url("/wallpapers/abstract-waves-3840x2160-26731.webp")',
       showMacOsBar: true,
       view: 'default',
       perspective: 'front',
@@ -242,7 +242,7 @@ const PRESETS = [
     desc: 'Browser bar + Clean Flat',
     icon: Globe,
     config: {
-      background: 'url("/wallpapers/blue-abstract-3840x2160-24798.png")',
+      background: 'url("/wallpapers/blue-abstract-3840x2160-24798.webp")',
       showMacOsBar: true,
       view: 'browser',
       perspective: 'front',
@@ -304,7 +304,7 @@ const PRESETS = [
     desc: 'Warm glow + Deep shadow',
     icon: Sun,
     config: {
-      background: 'url("/wallpapers/macos-27-golden-4480x3088-26625.png")',
+      background: 'url("/wallpapers/macos-27-golden-4480x3088-26625.webp")',
       showMacOsBar: true,
       view: 'default',
       perspective: 'subtle',
@@ -464,7 +464,23 @@ export default function StudioPage() {
   const [imageBlur, setImageBlur] = useState(0);
   const [bgBlur, setBgBlur] = useState(0);
   
+  // Manual lighting & grading state
+  const [brightness, setBrightness] = useState(100);
+  const [contrast, setContrast] = useState(100);
+  const [saturation, setSaturation] = useState(100);
+  const [hueRotate, setHueRotate] = useState(0);
+  
   const [filter, setFilter] = useState('none');
+
+  const resetLighting = () => {
+    setBrightness(100);
+    setContrast(100);
+    setSaturation(100);
+    setHueRotate(0);
+    setFilter('none');
+  };
+
+  const isCustomLighting = brightness !== 100 || contrast !== 100 || saturation !== 100 || hueRotate !== 0 || filter !== 'none';
   const [view, setView] = useState('default');
   const [perspective, setPerspective] = useState('front');
   const [rotateX, setRotateX] = useState(0);
@@ -516,7 +532,7 @@ export default function StudioPage() {
   const [copied, setCopied] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   
-  const [background, setBackground] = useState('url("/wallpapers/abstract-waves-3840x2160-26731.jpg")');
+  const [background, setBackground] = useState('url("/wallpapers/abstract-waves-3840x2160-26731.webp")');
 
   // Generate real pixel noise texture
   const noiseTexture = React.useMemo(() => {
@@ -894,11 +910,28 @@ export default function StudioPage() {
 
   const getFilterStyle = () => {
     const selectedFilter = FILTERS.find(f => f.id === filter);
-    let baseFilter = selectedFilter ? selectedFilter.filterStyle : 'none';
-    if (imageBlur > 0) {
-      baseFilter = baseFilter === 'none' ? `blur(${imageBlur}px)` : `${baseFilter} blur(${imageBlur}px)`;
+    const parts: string[] = [];
+    
+    if (selectedFilter && selectedFilter.filterStyle !== 'none') {
+      parts.push(selectedFilter.filterStyle);
     }
-    return baseFilter;
+    if (brightness !== 100) {
+      parts.push(`brightness(${brightness}%)`);
+    }
+    if (contrast !== 100) {
+      parts.push(`contrast(${contrast}%)`);
+    }
+    if (saturation !== 100) {
+      parts.push(`saturate(${saturation}%)`);
+    }
+    if (hueRotate !== 0) {
+      parts.push(`hue-rotate(${hueRotate}deg)`);
+    }
+    if (imageBlur > 0) {
+      parts.push(`blur(${imageBlur}px)`);
+    }
+    
+    return parts.length > 0 ? parts.join(' ') : 'none';
   };
 
   const activeRatioData = aspectRatio === 'custom'
@@ -919,165 +952,203 @@ export default function StudioPage() {
   const bgImageUrl = bgUrlMatch ? bgUrlMatch[1] : null;
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-bg-dark text-text-main font-sans">
+    <div className="flex h-screen w-screen overflow-hidden bg-bg-dark text-text-main font-sans antialiased">
       
       {/* Left Sidebar */}
-      <aside className="w-[300px] min-w-[300px] flex flex-col bg-panel border-r border-border overflow-y-auto p-4 gap-5 z-20 shadow-lg">
-        {/* Navigation Tabs */}
-        <div className="grid grid-cols-3 bg-black/40 p-1 rounded-xl border border-white/5 relative">
-          <button 
-            className={`py-2 text-xs font-semibold rounded-lg transition-all text-center ${leftTab === 'layout' ? 'bg-blue-600/20 text-blue-400 shadow-sm border border-blue-500/30' : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'}`}
-            onClick={() => setLeftTab('layout')}
-          >
-            Layout
-          </button>
-          <button 
-            className={`py-2 text-xs font-semibold rounded-lg transition-all text-center ${leftTab === 'background' ? 'bg-blue-600/20 text-blue-400 shadow-sm border border-blue-500/30' : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'}`}
-            onClick={() => setLeftTab('background')}
-          >
-            Backdrop
-          </button>
-          <button 
-            className={`py-2 text-xs font-semibold rounded-lg transition-all text-center ${leftTab === 'effects' ? 'bg-blue-600/20 text-blue-400 shadow-sm border border-blue-500/30' : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'}`}
-            onClick={() => setLeftTab('effects')}
-          >
-            Effects
-          </button>
+      <aside className="w-[300px] min-w-[300px] flex flex-col bg-panel border-r border-white/5 z-20 select-none h-full">
+        {/* Top Tab Bar aligned with h-16 main header */}
+        <div className="h-16 border-b border-white/5 px-3.5 flex items-center shrink-0">
+          <div className="grid grid-cols-3 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04] w-full">
+            <button 
+              onClick={() => setLeftTab('layout')}
+              aria-label="Layout settings"
+              className={`py-1.5 text-xs font-medium rounded-md transition-all duration-150 active:scale-95 text-center ${
+                leftTab === 'layout' 
+                  ? 'bg-white text-black font-semibold shadow-sm' 
+                  : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
+              }`}
+            >
+              Layout
+            </button>
+            <button 
+              onClick={() => setLeftTab('background')}
+              aria-label="Backdrop settings"
+              className={`py-1.5 text-xs font-medium rounded-md transition-all duration-150 active:scale-95 text-center ${
+                leftTab === 'background' 
+                  ? 'bg-white text-black font-semibold shadow-sm' 
+                  : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
+              }`}
+            >
+              Backdrop
+            </button>
+            <button 
+              onClick={() => setLeftTab('effects')}
+              aria-label="Effects and filters"
+              className={`py-1.5 text-xs font-medium rounded-md transition-all duration-150 active:scale-95 text-center ${
+                leftTab === 'effects' 
+                  ? 'bg-white text-black font-semibold shadow-sm' 
+                  : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
+              }`}
+            >
+              Effects
+            </button>
+          </div>
         </div>
 
-        {/* Tab 1: Layout & Frame */}
-        {leftTab === 'layout' && (
-          <div className="animate-in fade-in slide-in-from-left-2 duration-200 flex flex-col gap-5">
-            <div>
-              <h3 className="text-xs uppercase tracking-wider text-text-muted mb-3 font-semibold flex items-center justify-between">
-                <span>Canvas Setup</span>
-                <span className="text-[10px] text-accent lowercase font-mono">{activeRatioData.name}</span>
-              </h3>
-              <div className="flex flex-col gap-4">
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-3 pb-8 flex flex-col gap-2.5">
+          {/* Tab 1: Layout & Frame */}
+          {leftTab === 'layout' && (
+          <div className="animate-in fade-in slide-in-from-left-1 duration-200 flex flex-col gap-4">
+            {/* Section 1: Canvas Dimensions */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between px-0.5">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Canvas Setup</span>
+                <span className="text-[10px] text-zinc-400 font-mono tabular-nums bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.04]">
+                  {activeRatioData.name}
+                </span>
+              </div>
+              
+              <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-3">
+                {/* Padding */}
                 <div>
                   <div className="flex items-center justify-between text-xs mb-2">
-                    <label className="text-text-main font-medium">Padding</label>
-                    <span className="text-text-muted font-mono">{padding}px</span>
+                    <label className="text-zinc-300 font-medium">Padding</label>
+                    <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{padding}px</span>
                   </div>
                   <Slider min={0} max={120} step={1} value={[padding]} onValueChange={(v) => setPadding(Array.isArray(v) ? v[0] : v as number)} />
                 </div>
                 
+                {/* Image Scale */}
                 <div>
                   <div className="flex items-center justify-between text-xs mb-2">
-                    <label className="text-text-main font-medium">Image Size</label>
-                    <span className="text-text-muted font-mono">{Math.round(scale)}%</span>
+                    <label className="text-zinc-300 font-medium">Image Scale</label>
+                    <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{Math.round(scale)}%</span>
                   </div>
                   <Slider min={20} max={300} step={1} value={[scale]} onValueChange={(v) => setScale(Array.isArray(v) ? v[0] : v as number)} />
                 </div>
 
+                {/* Rotation */}
                 <div>
                   <div className="flex items-center justify-between text-xs mb-2">
-                    <label className="text-text-main font-medium">Rotation</label>
+                    <label className="text-zinc-300 font-medium">Rotation</label>
                     <div className="flex items-center gap-1">
                       <input 
                         type="text" 
                         inputMode="numeric"
+                        aria-label="Rotation angle"
                         value={rotation} 
                         onChange={(e) => {
                           const val = parseFloat(e.target.value);
                           if (!isNaN(val)) setRotation(((Math.round(val) % 360) + 360) % 360);
                           else if (e.target.value === '') setRotation(0);
                         }}
-                        className="w-12 h-6 px-1 bg-black/40 border border-border rounded text-center text-xs font-mono text-text-muted focus:text-white focus:outline-none focus:border-accent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        className="w-11 h-5 px-1 bg-white/[0.02] border border-white/5 rounded-md text-center text-[11px] font-mono tabular-nums text-zinc-300 focus:text-white focus:outline-none focus:border-white/20 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
-                      <span className="text-xs text-text-muted">°</span>
+                      <span className="text-[11px] text-zinc-400 font-mono">°</span>
                     </div>
                   </div>
                   <Slider min={0} max={360} step={1} value={[rotation]} onValueChange={(v) => setRotation(Array.isArray(v) ? v[0] : v as number)} />
                 </div>
 
-                {/* Lock Canvas Position Toggle */}
+                {/* Lock Canvas Position */}
                 <button
                   onClick={() => setIsLocked(!isLocked)}
-                  className={`flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-medium transition-all border mt-1 ${
+                  aria-label={isLocked ? "Unlock position" : "Lock position"}
+                  className={`flex items-center justify-between w-full px-3 py-2 rounded-lg text-xs font-medium transition-all duration-150 active:scale-[0.98] border ${
                     isLocked
-                      ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 shadow-sm'
-                      : 'bg-black/20 border-white/5 text-zinc-400 hover:bg-white/[0.04] hover:text-white hover:border-white/10'
+                      ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                      : 'bg-white/[0.02] border-white/[0.04] text-zinc-400 hover:bg-white/[0.05] hover:text-zinc-200'
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    {isLocked ? <Lock size={13} className="text-amber-400" /> : <Unlock size={13} />}
-                    <span>Lock Position on Canvas</span>
+                    {isLocked ? <Lock size={12} className="text-amber-400" /> : <Unlock size={12} />}
+                    <span>Lock Position</span>
                   </div>
-                  <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${isLocked ? 'bg-amber-500/30 text-amber-300' : 'bg-white/5 text-zinc-400'}`}>
-                    {isLocked ? 'LOCKED' : 'UNLOCKED'}
+                  <span className={`text-[9px] font-mono font-bold tracking-wider px-1.5 py-0.5 rounded ${isLocked ? 'bg-amber-500/20 text-amber-300' : 'bg-white/5 text-zinc-500'}`}>
+                    {isLocked ? 'LOCKED' : 'FREE'}
                   </span>
                 </button>
               </div>
             </div>
 
-            <div className="border-t border-border pt-4">
-              <h3 className="text-xs uppercase tracking-wider text-text-muted mb-3 font-semibold">Frame & Window</h3>
-              <div className="flex flex-col gap-4 text-xs">
-                <label className="flex items-center gap-2.5 cursor-pointer">
-                  <Checkbox checked={showMacOsBar} onCheckedChange={(c) => setShowMacOsBar(c as boolean)} />
-                  <span className="text-text-main font-medium">macOS Titlebar</span>
-                </label>
+            {/* Section 2: Frame & Window */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between px-0.5">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Frame & Window</span>
+              </div>
+              
+              <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-3 text-xs">
+                {/* Toggles */}
+                <div className="flex items-center justify-between py-0.5">
+                  <label htmlFor="macos-bar-toggle" className="text-zinc-300 font-medium cursor-pointer">macOS Titlebar</label>
+                  <Checkbox id="macos-bar-toggle" checked={showMacOsBar} onCheckedChange={(c) => setShowMacOsBar(c as boolean)} />
+                </div>
                 
-                <label className="flex items-center gap-2.5 cursor-pointer">
-                  <Checkbox checked={glassBorder} onCheckedChange={(c) => setGlassBorder(c as boolean)} />
-                  <span className="text-text-main font-medium">Frosted Glass Border</span>
-                </label>
+                <div className="flex items-center justify-between py-0.5">
+                  <label htmlFor="glass-border-toggle" className="text-zinc-300 font-medium cursor-pointer">Frosted Glass Border</label>
+                  <Checkbox id="glass-border-toggle" checked={glassBorder} onCheckedChange={(c) => setGlassBorder(c as boolean)} />
+                </div>
                 
                 {glassBorder && (
-                  <div className="flex flex-col gap-3 bg-black/20 p-3 rounded-xl border border-white/5">
+                  <div className="flex flex-col gap-3 bg-white/[0.02] p-3 rounded-lg border border-white/[0.04] mt-1">
                     <div>
                       <div className="flex items-center justify-between text-xs mb-1.5">
-                        <label className="text-text-muted font-medium">Border Width</label>
-                        <span className="text-text-muted font-mono">{glassBorderWidth}px</span>
+                        <label className="text-zinc-400 font-medium">Border Width</label>
+                        <span className="text-zinc-400 font-mono tabular-nums text-[11px]">{glassBorderWidth}px</span>
                       </div>
                       <Slider min={2} max={32} step={1} value={[glassBorderWidth]} onValueChange={(v) => setGlassBorderWidth(Array.isArray(v) ? v[0] : v as number)} />
                     </div>
 
                     <div>
                       <div className="flex items-center justify-between text-xs mb-1.5">
-                        <label className="text-text-muted font-medium">Border Opacity</label>
-                        <span className="text-text-muted font-mono">{glassBorderOpacity}%</span>
+                        <label className="text-zinc-400 font-medium">Border Opacity</label>
+                        <span className="text-zinc-400 font-mono tabular-nums text-[11px]">{glassBorderOpacity}%</span>
                       </div>
                       <Slider min={5} max={100} step={1} value={[glassBorderOpacity]} onValueChange={(v) => setGlassBorderOpacity(Array.isArray(v) ? v[0] : v as number)} />
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <label className="text-text-muted font-medium">Border Tint</label>
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-full border border-white/20 shadow-inner" style={{ backgroundColor: glassBorderColor }} />
-                        <input type="color" value={glassBorderColor} onChange={(e) => setGlassBorderColor(e.target.value)} className="w-6 h-6 rounded cursor-pointer bg-transparent border-0 opacity-0 absolute" />
+                    <div className="flex items-center justify-between pt-1">
+                      <label className="text-zinc-400 font-medium">Border Tint</label>
+                      <div className="flex items-center gap-2 relative">
+                        <div className="w-5 h-5 rounded-full border border-white/10 shadow-inner" style={{ backgroundColor: glassBorderColor }} />
+                        <input type="color" aria-label="Glass border tint color" value={glassBorderColor} onChange={(e) => setGlassBorderColor(e.target.value)} className="w-5 h-5 rounded cursor-pointer bg-transparent border-0 opacity-0 absolute inset-0" />
                       </div>
                     </div>
                   </div>
                 )}
 
+                {/* Border Radius */}
                 <div>
                   <div className="flex items-center justify-between text-xs mb-2">
-                    <label className="text-text-main font-medium">Border Radius</label>
-                    <span className="text-text-muted font-mono">{radius}px</span>
+                    <label className="text-zinc-300 font-medium">Corner Radius</label>
+                    <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{radius}px</span>
                   </div>
                   <Slider min={0} max={40} step={1} value={[radius]} onValueChange={(v) => setRadius(Array.isArray(v) ? v[0] : v as number)} />
                 </div>
 
+                {/* Drop Shadow */}
                 <div>
                   <div className="flex items-center justify-between text-xs mb-2">
-                    <label className="text-text-main font-medium">Drop Shadow</label>
-                    <span className="text-text-muted font-mono">{shadow}px</span>
+                    <label className="text-zinc-300 font-medium">Drop Shadow</label>
+                    <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{shadow}px</span>
                   </div>
                   <Slider min={0} max={60} step={1} value={[shadow]} onValueChange={(v) => setShadow(Array.isArray(v) ? v[0] : v as number)} />
                 </div>
               </div>
             </div>
 
-            {/* Watermark & Social Badge Section */}
-            <div className="border-t border-border pt-4">
-              <h3 className="text-xs uppercase tracking-wider text-text-muted mb-3 font-semibold">Watermark & Badge</h3>
-              <div className="flex flex-col gap-3.5 text-xs">
+            {/* Section 3: Watermark & Badge */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between px-0.5">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Watermark & Badge</span>
+              </div>
+              
+              <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-3.5 text-xs">
                 {/* Platform selector */}
                 <div>
-                  <label className="text-xs text-text-muted font-medium mb-1.5 block">Platform Icon</label>
-                  <div className="grid grid-cols-6 gap-1 bg-black/30 p-1 rounded-lg border border-white/5">
+                  <label className="text-[11px] text-zinc-400 font-medium mb-1.5 block">Platform Icon</label>
+                  <div className="grid grid-cols-6 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04]">
                     {[
                       { id: 'x', label: '𝕏' },
                       { id: 'github', label: 'GH' },
@@ -1089,7 +1160,12 @@ export default function StudioPage() {
                       <button
                         key={p.id}
                         onClick={() => setWatermarkPlatform(p.id as any)}
-                        className={`py-1 text-[11px] font-medium rounded transition-colors flex items-center justify-center ${watermarkPlatform === p.id ? 'bg-blue-600 text-white font-semibold shadow-sm' : 'text-zinc-400 hover:text-white hover:bg-white/[0.06]'}`}
+                        aria-label={`Watermark platform ${p.id}`}
+                        className={`py-1 text-[11px] font-medium rounded-md transition-all duration-150 active:scale-95 flex items-center justify-center ${
+                          watermarkPlatform === p.id 
+                            ? 'bg-white text-black font-semibold shadow-sm' 
+                            : 'text-zinc-400 hover:text-white hover:bg-white/[0.05]'
+                        }`}
                         title={p.id.toUpperCase()}
                       >
                         {p.label}
@@ -1100,13 +1176,13 @@ export default function StudioPage() {
 
                 {/* Handle / Text Input */}
                 <div>
-                  <label className="text-xs text-text-muted font-medium mb-1.5 block">Username / Handle</label>
+                  <label className="text-[11px] text-zinc-400 font-medium mb-1.5 block">Handle / Text</label>
                   <Input 
                     type="text" 
-                    placeholder="e.g. ishivgaur or yourname" 
+                    placeholder="e.g. @yourname" 
                     value={watermark} 
                     onChange={(e) => setWatermark(e.target.value)}
-                    className="bg-black/30 text-xs border-border text-white"
+                    className="bg-white/[0.02] text-xs border-white/[0.05] text-white h-8 focus-visible:ring-1 focus-visible:ring-white/20"
                   />
                 </div>
 
@@ -1114,17 +1190,17 @@ export default function StudioPage() {
                   <>
                     {/* Placement Target */}
                     <div>
-                      <label className="text-xs text-text-muted font-medium mb-1.5 block">Overlay Placement</label>
-                      <div className="grid grid-cols-2 gap-1 bg-black/30 p-1 rounded-lg border border-white/5">
+                      <label className="text-[11px] text-zinc-400 font-medium mb-1.5 block">Overlay Placement</label>
+                      <div className="grid grid-cols-2 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04]">
                         <button
                           onClick={() => setWatermarkTarget('screenshot')}
-                          className={`py-1 text-[11px] font-medium rounded transition-colors ${watermarkTarget === 'screenshot' ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 shadow-sm font-semibold' : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'}`}
+                          className={`py-1 text-[11px] font-medium rounded-md transition-all duration-150 active:scale-95 ${watermarkTarget === 'screenshot' ? 'bg-white text-black font-semibold shadow-sm' : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'}`}
                         >
                           On Screenshot
                         </button>
                         <button
                           onClick={() => setWatermarkTarget('canvas')}
-                          className={`py-1 text-[11px] font-medium rounded transition-colors ${watermarkTarget === 'canvas' ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 shadow-sm font-semibold' : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'}`}
+                          className={`py-1 text-[11px] font-medium rounded-md transition-all duration-150 active:scale-95 ${watermarkTarget === 'canvas' ? 'bg-white text-black font-semibold shadow-sm' : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'}`}
                         >
                           On Canvas
                         </button>
@@ -1133,8 +1209,8 @@ export default function StudioPage() {
 
                     {/* Position Selector */}
                     <div>
-                      <label className="text-xs text-text-muted font-medium mb-1.5 block">Position</label>
-                      <div className="grid grid-cols-4 gap-1 bg-black/30 p-1 rounded-lg border border-white/5">
+                      <label className="text-[11px] text-zinc-400 font-medium mb-1.5 block">Position</label>
+                      <div className="grid grid-cols-4 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04]">
                         {[
                           { id: 'bottom-right', label: 'B-Right' },
                           { id: 'bottom-center', label: 'B-Center' },
@@ -1144,7 +1220,7 @@ export default function StudioPage() {
                           <button
                             key={pos.id}
                             onClick={() => setWatermarkPosition(pos.id as any)}
-                            className={`py-1 text-[10px] font-medium rounded transition-colors ${watermarkPosition === pos.id ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 shadow-sm font-semibold' : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'}`}
+                            className={`py-1 text-[10px] font-medium rounded-md transition-all duration-150 active:scale-95 ${watermarkPosition === pos.id ? 'bg-white text-black font-semibold shadow-sm' : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'}`}
                           >
                             {pos.label}
                           </button>
@@ -1155,8 +1231,8 @@ export default function StudioPage() {
                     {/* Opacity Slider */}
                     <div>
                       <div className="flex items-center justify-between text-xs mb-1.5">
-                        <label className="text-text-muted font-medium">Watermark Opacity</label>
-                        <span className="text-text-muted font-mono">{watermarkOpacity}%</span>
+                        <label className="text-zinc-300 font-medium">Badge Opacity</label>
+                        <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{watermarkOpacity}%</span>
                       </div>
                       <Slider min={10} max={100} step={1} value={[watermarkOpacity]} onValueChange={(v) => setWatermarkOpacity(Array.isArray(v) ? v[0] : v as number)} />
                     </div>
@@ -1165,113 +1241,156 @@ export default function StudioPage() {
               </div>
             </div>
           </div>
-        )}
-
-        {/* Tab 2: Backgrounds */}
+        )}        {/* Tab 2: Backgrounds */}
         {leftTab === 'background' && (
-          <div className="animate-in fade-in slide-in-from-left-2 duration-200 flex flex-col gap-5">
-            {/* Background Blur */}
-            <div>
-              <div className="flex items-center justify-between text-xs mb-2">
-                <label className="text-text-main font-semibold">Background Blur</label>
-                <span className="text-text-muted font-mono bg-white/10 px-1.5 py-0.5 rounded text-[11px] font-medium">{bgBlur}px</span>
+          <div className="animate-in fade-in slide-in-from-left-1 duration-200 flex flex-col gap-4">
+            {/* Section 1: Blur & Focus */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between px-0.5">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Background Blur</span>
+                <span className="text-zinc-400 font-mono tabular-nums text-[10px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.04]">{bgBlur}px</span>
               </div>
-              <Slider min={0} max={50} step={1} value={[bgBlur]} onValueChange={(v) => setBgBlur(Array.isArray(v) ? v[0] : v as number)} />
-              
-              <div className="grid grid-cols-4 gap-1 mt-2">
-                {[
-                  { val: 0, label: 'Off' },
-                  { val: 12, label: 'Soft' },
-                  { val: 24, label: 'Medium' },
-                  { val: 40, label: 'Frosted' }
-                ].map((p) => (
+
+              <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-3">
+                <Slider min={0} max={50} step={1} value={[bgBlur]} onValueChange={(v) => setBgBlur(Array.isArray(v) ? v[0] : v as number)} />
+                
+                <div className="grid grid-cols-4 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04]">
+                  {[
+                    { val: 0, label: 'Off' },
+                    { val: 12, label: 'Soft' },
+                    { val: 24, label: 'Medium' },
+                    { val: 40, label: 'Frosted' }
+                  ].map((p) => (
+                    <button
+                      key={p.val}
+                      onClick={() => setBgBlur(p.val)}
+                      className={`py-1 text-[10px] font-mono tabular-nums rounded-md transition-all duration-150 active:scale-95 ${bgBlur === p.val ? 'bg-white text-black font-semibold shadow-sm' : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'}`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+
+                {image && (
                   <button
-                    key={p.val}
-                    onClick={() => setBgBlur(p.val)}
-                    className={`py-1 text-[10px] font-mono rounded transition-colors ${bgBlur === p.val ? 'bg-blue-600 text-white font-semibold shadow-sm' : 'bg-black/30 text-zinc-400 hover:text-white hover:bg-white/[0.06]'}`}
+                    onClick={() => {
+                      setBackground(`url("${image}")`);
+                      if (bgBlur === 0) setBgBlur(25);
+                    }}
+                    className="w-full py-2 px-3 rounded-lg border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.07] text-white text-xs font-medium flex items-center justify-center gap-2 transition-all duration-150 active:scale-[0.98]"
                   >
-                    {p.label}
+                    <Sparkles size={13} className="text-zinc-300" />
+                    <span>Use Screenshot as Backdrop</span>
                   </button>
-                ))}
-              </div>
-
-              {image && (
-                <button
-                  onClick={() => {
-                    setBackground(`url("${image}")`);
-                    if (bgBlur === 0) setBgBlur(25);
-                  }}
-                  className="mt-2 w-full py-1.5 px-2.5 rounded-lg border border-blue-500/30 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 hover:text-blue-300 text-[11px] font-medium flex items-center justify-center gap-1.5 transition-colors"
-                >
-                  <Sparkles size={12} />
-                  <span>Use Screenshot as Blurred Backdrop</span>
-                </button>
-              )}
-            </div>
-
-            <div className="border-t border-border pt-4">
-              <h3 className="text-xs uppercase tracking-wider text-text-muted mb-2.5 font-semibold">Wallpapers</h3>
-              <div className="grid grid-cols-4 gap-2 max-h-56 overflow-y-auto pr-1">
-                {MACOS_BACKGROUNDS.map((bg, idx) => {
-                  const bgUrl = `url("${bg.url}")`;
-                  return (
-                    <div 
-                      key={idx} 
-                      title={bg.name}
-                      className={`aspect-square rounded-lg cursor-pointer border-2 hover:scale-105 transition-all shadow-sm ${background === bgUrl ? 'border-blue-500 ring-2 ring-blue-500/30' : 'border-transparent hover:border-white/20'}`}
-                      style={{ background: bgUrl, backgroundSize: 'cover', backgroundPosition: 'center' }}
-                      onClick={() => setBackground(bgUrl)}
-                    />
-                  );
-                })}
+                )}
               </div>
             </div>
 
-            <div className="border-t border-border pt-4">
-              <h3 className="text-xs uppercase tracking-wider text-text-muted mb-2.5 font-semibold">Gradients</h3>
-              <div className="grid grid-cols-4 gap-2">
-                {GRADIENTS.map((bg, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`aspect-square rounded-lg cursor-pointer border-2 hover:scale-105 transition-all shadow-sm ${background === bg ? 'border-blue-500 ring-2 ring-blue-500/30' : 'border-transparent hover:border-white/20'}`}
-                    style={{ background: bg }}
-                    onClick={() => setBackground(bg)}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="border-t border-border pt-4">
-              <h3 className="text-xs uppercase tracking-wider text-text-muted mb-2.5 font-semibold">Solid Colors</h3>
-              <div className="grid grid-cols-5 gap-2">
-                {SOLID_COLORS.map((col, idx) => (
-                  <div 
-                    key={idx}
-                    title={col.name}
-                    className={`aspect-square rounded-lg cursor-pointer border-2 hover:scale-105 transition-all flex items-center justify-center ${background === col.value ? 'border-blue-500 ring-2 ring-blue-500/30' : 'border-border hover:border-white/20'}`}
-                    style={{ background: col.value === 'transparent' ? 'repeating-conic-gradient(#333 0% 25%, #222 0% 50%) 50% / 10px 10px' : col.value }}
-                    onClick={() => setBackground(col.value)}
-                  />
-                ))}
+            {/* Section 2: Curated Wallpapers */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between px-0.5">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Studio Wallpapers</span>
+                <span className="text-[10px] text-zinc-500 font-mono">{MACOS_BACKGROUNDS.length} Presets</span>
               </div>
               
-              <div className="grid grid-cols-2 gap-2 mt-2.5">
-                <label className="py-2 px-3 rounded-lg border border-border hover:border-blue-500/50 flex items-center justify-center gap-2 cursor-pointer bg-white/[0.03] hover:bg-white/[0.08] transition-colors text-xs font-medium text-zinc-300 hover:text-white relative overflow-hidden">
-                  <Pipette size={13} />
-                  <span>Custom Color</span>
-                  <input type="color" className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" onChange={(e) => setBackground(e.target.value)} />
-                </label>
-                <label className="py-2 px-3 rounded-lg border border-border hover:border-blue-500/50 flex items-center justify-center gap-2 cursor-pointer bg-white/[0.03] hover:bg-white/[0.08] transition-colors text-xs font-medium text-zinc-300 hover:text-white">
-                  <Upload size={13} />
-                  <span>Upload Image</span>
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      const reader = new FileReader();
-                      reader.onload = (ev) => { if (ev.target?.result) setBackground(`url("${ev.target.result}")`); };
-                      reader.readAsDataURL(e.target.files[0]);
-                    }
-                  }} />
-                </label>
+              <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04]">
+                <div className="grid grid-cols-4 gap-2 max-h-52 overflow-y-auto pr-0.5">
+                  {MACOS_BACKGROUNDS.map((bg, idx) => {
+                    const bgUrl = `url("${bg.url}")`;
+                    const isSelected = background === bgUrl;
+                    return (
+                      <button 
+                        key={idx} 
+                        title={bg.name}
+                        aria-label={`Select wallpaper ${bg.name}`}
+                        className={`aspect-square rounded-lg transition-all duration-150 active:scale-95 border relative overflow-hidden ${
+                          isSelected 
+                            ? 'border-white ring-2 ring-white/20 shadow-md' 
+                            : 'border-white/[0.06] hover:border-white/30 hover:scale-105'
+                        }`}
+                        style={{ background: bgUrl, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                        onClick={() => setBackground(bgUrl)}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: Gradients */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between px-0.5">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Studio Gradients</span>
+                <span className="text-[10px] text-zinc-500 font-mono">{GRADIENTS.length} Themes</span>
+              </div>
+              
+              <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04]">
+                <div className="grid grid-cols-4 gap-2">
+                  {GRADIENTS.map((bg, idx) => {
+                    const isSelected = background === bg;
+                    return (
+                      <button 
+                        key={idx} 
+                        aria-label={`Select gradient ${idx + 1}`}
+                        className={`aspect-square rounded-lg transition-all duration-150 active:scale-95 border ${
+                          isSelected 
+                            ? 'border-white ring-2 ring-white/20 shadow-md' 
+                            : 'border-white/[0.06] hover:border-white/30 hover:scale-105'
+                        }`}
+                        style={{ background: bg }}
+                        onClick={() => setBackground(bg)}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Section 4: Solid & Custom Colors */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between px-0.5">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Solid Colors</span>
+              </div>
+              
+              <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-2.5">
+                <div className="grid grid-cols-5 gap-2">
+                  {SOLID_COLORS.map((col, idx) => {
+                    const isSelected = background === col.value;
+                    return (
+                      <button 
+                        key={idx} 
+                        title={col.name}
+                        aria-label={`Select solid color ${col.name}`}
+                        className={`aspect-square rounded-lg transition-all duration-150 active:scale-95 border ${
+                          isSelected 
+                            ? 'border-white ring-2 ring-white/20 shadow-md' 
+                            : 'border-white/[0.06] hover:border-white/30 hover:scale-105'
+                        }`}
+                        style={{ background: col.value === 'transparent' ? 'repeating-conic-gradient(#333 0% 25%, #222 0% 50%) 50% / 8px 8px' : col.value }}
+                        onClick={() => setBackground(col.value)}
+                      />
+                    );
+                  })}
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2 mt-1">
+                  <label className="py-2 px-3 rounded-lg border border-white/[0.06] hover:border-white/20 flex items-center justify-center gap-2 cursor-pointer bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-150 active:scale-[0.98] text-xs font-medium text-zinc-300 hover:text-white relative overflow-hidden">
+                    <Pipette size={13} />
+                    <span>Custom Color</span>
+                    <input type="color" aria-label="Pick custom background color" className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" onChange={(e) => setBackground(e.target.value)} />
+                  </label>
+                  <label className="py-2 px-3 rounded-lg border border-white/[0.06] hover:border-white/20 flex items-center justify-center gap-2 cursor-pointer bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-150 active:scale-[0.98] text-xs font-medium text-zinc-300 hover:text-white">
+                    <Upload size={13} />
+                    <span>Upload Image</span>
+                    <input type="file" aria-label="Upload custom background image" accept="image/*" className="hidden" onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => { if (ev.target?.result) setBackground(`url("${ev.target.result}")`); };
+                        reader.readAsDataURL(e.target.files[0]);
+                      }
+                    }} />
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -1279,34 +1398,42 @@ export default function StudioPage() {
 
         {/* Tab 3: Effects */}
         {leftTab === 'effects' && (
-          <div className="animate-in fade-in slide-in-from-left-2 duration-200 flex flex-col gap-5">
-            <div>
-              <h3 className="text-xs uppercase tracking-wider text-text-muted mb-3 font-semibold">Texture & Noise</h3>
-              <div className="flex flex-col gap-4">
+          <div className="animate-in fade-in slide-in-from-left-1 duration-200 flex flex-col gap-4">
+            {/* Section 1: Texture & Noise */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between px-0.5">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Texture & Noise</span>
+              </div>
+              
+              <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-3">
                 <div>
                   <div className="flex items-center justify-between text-xs mb-2">
-                    <label className="text-text-main font-medium">Digital Pixel Noise</label>
-                    <span className="text-text-muted font-mono">{noiseIntensity}%</span>
+                    <label className="text-zinc-300 font-medium">Digital Pixel Noise</label>
+                    <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{noiseIntensity}%</span>
                   </div>
                   <Slider min={0} max={100} step={1} value={[noiseIntensity]} onValueChange={(v) => setNoiseIntensity(Array.isArray(v) ? v[0] : v as number)} />
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between text-xs mb-2">
-                    <label className="text-text-main font-medium">Film Grain</label>
-                    <span className="text-text-muted font-mono">{grainIntensity}%</span>
+                    <label className="text-zinc-300 font-medium">Film Grain</label>
+                    <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{grainIntensity}%</span>
                   </div>
                   <Slider min={0} max={100} step={1} value={[grainIntensity]} onValueChange={(v) => setGrainIntensity(Array.isArray(v) ? v[0] : v as number)} />
                 </div>
 
                 <div>
-                  <label className="text-xs text-text-muted block mb-2 font-medium">Noise Target</label>
-                  <div className="grid grid-cols-3 gap-1 bg-black/40 p-1 rounded-lg border border-white/5">
+                  <label className="text-[11px] text-zinc-400 block mb-2 font-medium">Noise Application Layer</label>
+                  <div className="grid grid-cols-3 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04]">
                     {['canvas', 'image', 'both'].map((t) => (
                       <button
                         key={t}
                         onClick={() => setNoiseTarget(t)}
-                        className={`py-1 text-[11px] font-medium capitalize rounded transition-colors ${noiseTarget === t ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 shadow-sm font-semibold' : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'}`}
+                        className={`py-1 text-[11px] font-medium capitalize rounded-md transition-all duration-150 active:scale-95 ${
+                          noiseTarget === t 
+                            ? 'bg-white text-black font-semibold shadow-sm' 
+                            : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
+                        }`}
                       >
                         {t}
                       </button>
@@ -1316,50 +1443,69 @@ export default function StudioPage() {
               </div>
             </div>
 
-            <div className="border-t border-border pt-4">
-              <h3 className="text-xs uppercase tracking-wider text-text-muted mb-3 font-semibold">Focus & Blur</h3>
-              <div className="flex flex-col gap-4">
+            {/* Section 2: Focus & Blur */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between px-0.5">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Focus & Blur</span>
+              </div>
+              
+              <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-3">
                 <div>
                   <div className="flex items-center justify-between text-xs mb-2">
-                    <label className="text-text-main font-medium">Backdrop Blur</label>
-                    <span className="text-text-muted font-mono">{bgBlur}px</span>
+                    <label className="text-zinc-300 font-medium">Backdrop Blur</label>
+                    <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{bgBlur}px</span>
                   </div>
                   <Slider min={0} max={50} step={1} value={[bgBlur]} onValueChange={(v) => setBgBlur(Array.isArray(v) ? v[0] : v as number)} />
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between text-xs mb-2">
-                    <label className="text-text-main font-medium">Image Blur</label>
-                    <span className="text-text-muted font-mono">{imageBlur}px</span>
+                    <label className="text-zinc-300 font-medium">Image Focus Blur</label>
+                    <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{imageBlur}px</span>
                   </div>
                   <Slider min={0} max={20} step={1} value={[imageBlur]} onValueChange={(v) => setImageBlur(Array.isArray(v) ? v[0] : v as number)} />
                 </div>
               </div>
             </div>
 
-            <div className="border-t border-border pt-4">
-              <h3 className="text-xs uppercase tracking-wider text-text-muted mb-3 font-semibold">Preset Filters</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {FILTERS.map((f) => (
-                  <button
-                    key={f.id}
-                    onClick={() => setFilter(f.id)}
-                    className={`flex flex-col text-left p-2.5 rounded-lg border transition-all ${filter === f.id ? 'bg-blue-600/15 border-blue-500 text-white shadow-sm' : 'bg-black/20 border-border text-zinc-400 hover:bg-white/[0.04] hover:border-white/20 hover:text-white'}`}
-                  >
-                    <span className="text-xs font-semibold text-white">{f.name}</span>
-                    <span className="text-[10px] opacity-70 mt-0.5">{f.desc}</span>
-                  </button>
-                ))}
+            {/* Section 3: Color Filters */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between px-0.5">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Color Presets</span>
+                <span className="text-[10px] text-zinc-500 font-mono">{FILTERS.length} Filters</span>
+              </div>
+              
+              <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04]">
+                <div className="grid grid-cols-2 gap-2">
+                  {FILTERS.map((f) => {
+                    const isSelected = filter === f.id;
+                    return (
+                      <button
+                        key={f.id}
+                        onClick={() => setFilter(f.id)}
+                        className={`flex flex-col text-left p-2.5 rounded-lg border transition-all duration-150 active:scale-[0.98] ${
+                          isSelected 
+                            ? 'bg-white/10 border-white/20 text-white shadow-sm ring-1 ring-white/10' 
+                            : 'bg-white/[0.02] border-white/[0.04] text-zinc-400 hover:bg-white/[0.05] hover:border-white/10 hover:text-zinc-200'
+                        }`}
+                      >
+                        <span className={`text-xs font-semibold ${isSelected ? 'text-white' : 'text-zinc-300'}`}>{f.name}</span>
+                        <span className="text-[10px] text-zinc-500 mt-0.5 line-clamp-1">{f.desc}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
         )}
+        </div>
       </aside>
 
       {/* Main Studio Workspace */}
       <main className="flex-grow flex flex-col bg-bg-dark h-full relative overflow-hidden">
         {/* Top Control Bar */}
-        <header className="h-16 border-b border-border bg-panel flex items-center justify-between px-6 z-30 shrink-0">
+        <header className="h-16 border-b border-white/5 bg-panel flex items-center justify-between px-6 z-30 shrink-0">
           <div className="flex items-center">
             <span className="font-bold text-sm tracking-[0.22em] text-white uppercase select-none">
               NOICESS
@@ -1370,9 +1516,9 @@ export default function StudioPage() {
           <div className="relative">
             <button
               onClick={() => setShowRatioMenu(!showRatioMenu)}
-              className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-border bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20 text-xs font-medium transition-all shadow-inner text-zinc-200 hover:text-white"
+              className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/5 text-xs font-medium transition shadow-inner text-zinc-200 hover:text-white"
             >
-              <div className="w-4 h-4 flex items-center justify-center text-blue-400 shrink-0">
+              <div className="w-4 h-4 flex items-center justify-center text-white shrink-0">
                 {renderAspectBox(aspectStyle)}
               </div>
               <span className="font-semibold text-white">{activeRatioData.name}</span>
@@ -1380,10 +1526,10 @@ export default function StudioPage() {
             </button>
 
             {showRatioMenu && (
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-80 min-w-[310px] bg-[#1C1C1E] border border-white/15 rounded-2xl p-3 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150 max-h-[480px] overflow-y-auto">
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-80 min-w-[310px] bg-[#1C1C1E] border border-white/5 rounded-xl p-3 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150 max-h-[480px] overflow-y-auto">
                 
                 {/* Top Section: Manual Ratio Input (e.g. 16 : 9, 21 : 9, 4 : 3) */}
-                <div className="p-2.5 bg-black/40 rounded-xl border border-white/10 mb-3 flex items-center justify-between gap-2">
+                <div className="p-2.5 bg-white/[0.02] rounded-lg border border-white/10 mb-3 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5 flex-1">
                     <span className="text-[11px] font-medium text-zinc-400 mr-1">Ratio:</span>
                     <input
@@ -1395,7 +1541,7 @@ export default function StudioPage() {
                         setCustomRatioW(val);
                         setAspectRatio('custom');
                       }}
-                      className="w-12 h-7 px-1 bg-black/60 border border-white/15 rounded-lg text-center text-xs font-mono text-white focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className="w-12 h-7 px-1 bg-black/60 border border-white/5 rounded-md text-center text-xs font-mono tabular-nums text-white focus:outline-none focus:border-white/10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       placeholder="16"
                     />
                     <span className="text-zinc-500 text-xs font-bold">:</span>
@@ -1408,7 +1554,7 @@ export default function StudioPage() {
                         setCustomRatioH(val);
                         setAspectRatio('custom');
                       }}
-                      className="w-12 h-7 px-1 bg-black/60 border border-white/15 rounded-lg text-center text-xs font-mono text-white focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className="w-12 h-7 px-1 bg-black/60 border border-white/5 rounded-md text-center text-xs font-mono tabular-nums text-white focus:outline-none focus:border-white/10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       placeholder="9"
                     />
                   </div>
@@ -1418,7 +1564,7 @@ export default function StudioPage() {
                       setAspectRatio('custom');
                       setShowRatioMenu(false);
                     }}
-                    className="px-3 h-7 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-sm transition-colors shrink-0"
+                    className="px-3 h-7 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-sm transition-colors shrink-0"
                   >
                     Apply
                   </button>
@@ -1438,14 +1584,14 @@ export default function StudioPage() {
                             <button
                               key={r.id}
                               onClick={() => { setAspectRatio(r.id); setShowRatioMenu(false); }}
-                              className={`flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left text-xs transition-all border ${
+                              className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-xs transition border ${
                                 isSelected 
-                                  ? 'bg-blue-600/20 border-blue-500 text-white font-semibold shadow-sm' 
-                                  : 'bg-black/20 border-white/5 text-zinc-400 hover:bg-white/[0.06] hover:text-white hover:border-white/10'
+                                  ? 'bg-white/10 border-white/10 text-white font-semibold shadow-sm' 
+                                  : 'bg-white/[0.02] border-white/[0.02] text-zinc-400 hover:bg-white/[0.06] hover:text-white hover:border-white/10'
                               }`}
                             >
                               {/* Visual Ratio Box */}
-                              <div className={`w-5 h-5 flex items-center justify-center shrink-0 ${isSelected ? 'text-blue-400' : 'text-zinc-400'}`}>
+                              <div className={`w-5 h-5 flex items-center justify-center shrink-0 ${isSelected ? 'text-white' : 'text-zinc-400'}`}>
                                 {renderAspectBox(r.aspect)}
                               </div>
                               <div className="flex flex-col min-w-0">
@@ -1469,7 +1615,7 @@ export default function StudioPage() {
             <button
               onClick={handleCopyClipboard}
               disabled={!image || isExporting}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium border border-border bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20 text-zinc-200 hover:text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-95"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/5 text-zinc-200 hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.96]"
               title="Copy screenshot to clipboard"
             >
               {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
@@ -1478,7 +1624,7 @@ export default function StudioPage() {
 
             {/* Clear Button */}
             <button 
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium border border-border text-zinc-400 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-95" 
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium border border-white/5 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30 transition disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.96]" 
               onClick={() => { setImage(null); setImageSelected(false); setRotation(0); setPos({ x: 0, y: 0 }); }} 
               disabled={!image}
             >
@@ -1488,7 +1634,7 @@ export default function StudioPage() {
 
             {/* High-End Export Modal Trigger Button */}
             <button 
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40 transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95" 
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold bg-white hover:bg-zinc-200 text-black shadow-lg shadow-white/10 hover:shadow-white/20 transition duration-150 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.96]" 
               onClick={() => setShowExportModal(true)} 
               disabled={!image}
             >
@@ -1548,26 +1694,40 @@ export default function StudioPage() {
               {bgBlur > 0 && (
                 bgImageUrl ? (
                   <div className="absolute inset-0 w-full h-full pointer-events-none flex items-center justify-center overflow-hidden">
-                    <img 
-                      src={bgImageUrl} 
-                      alt="" 
-                      draggable={false}
-                      className="w-full h-full object-cover pointer-events-none"
+                    <div 
+                      className="absolute w-full h-full"
                       style={{
-                        filter: `blur(${bgBlur}px)`,
-                        transform: 'scale(1.25)',
-                        transformOrigin: 'center center',
+                        top: `-${bgBlur}px`,
+                        left: `-${bgBlur}px`,
+                        right: `-${bgBlur}px`,
+                        bottom: `-${bgBlur}px`,
+                        width: `calc(100% + ${bgBlur * 2}px)`,
+                        height: `calc(100% + ${bgBlur * 2}px)`,
                       }}
-                    />
+                    >
+                      <img 
+                        src={bgImageUrl} 
+                        alt="" 
+                        draggable={false}
+                        className="w-full h-full object-cover pointer-events-none"
+                        style={{
+                          filter: `blur(${bgBlur}px)`,
+                        }}
+                      />
+                    </div>
                   </div>
                 ) : (
                   <div 
-                    className="absolute inset-0 w-full h-full pointer-events-none"
+                    className="absolute pointer-events-none"
                     style={{
+                      top: `-${bgBlur}px`,
+                      left: `-${bgBlur}px`,
+                      right: `-${bgBlur}px`,
+                      bottom: `-${bgBlur}px`,
+                      width: `calc(100% + ${bgBlur * 2}px)`,
+                      height: `calc(100% + ${bgBlur * 2}px)`,
                       background: background,
                       filter: `blur(${bgBlur}px)`,
-                      transform: 'scale(1.25)',
-                      transformOrigin: 'center center',
                     }}
                   />
                 )
@@ -1599,7 +1759,7 @@ export default function StudioPage() {
               {/* Image Frame inside content container */}
               <div 
                 ref={imageFrameRef}
-                className={`relative group z-10 pointer-events-auto ${isRotating || isDragging || isResizing ? 'transition-none' : 'transition-all duration-200 ease-out'} flex flex-col justify-center items-center ${!image ? 'w-full h-full' : ''} ${isDragging ? 'cursor-grabbing' : (image ? (isLocked ? 'cursor-default' : 'cursor-move') : 'cursor-default')}`}
+                className={`relative group z-10 pointer-events-auto ${isRotating || isDragging || isResizing ? 'transition-none' : 'transition duration-200 ease-out'} flex flex-col justify-center items-center ${!image ? 'w-full h-full' : ''} ${isDragging ? 'cursor-grabbing' : (image ? (isLocked ? 'cursor-default' : 'cursor-move') : 'cursor-default')}`}
                 style={{
                   transform: `translate(${pos.x}px, ${pos.y}px) ${activePerspectiveTransform} ${rotation !== 0 ? `rotate(${rotation}deg)` : ''} scale(${scale / 100})`,
                   transformStyle: 'preserve-3d',
@@ -1609,7 +1769,7 @@ export default function StudioPage() {
                 {!isExporting && image && (imageSelected || isRotating) && (
                   <div 
                     data-no-export="true"
-                    className="no-export absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-[#1C1C1E] border border-white/15 rounded-lg px-2 py-1 shadow-2xl z-[70] pointer-events-auto animate-in fade-in slide-in-from-bottom-2 duration-200"
+                    className="no-export absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-[#1C1C1E] border border-white/5 rounded-md px-2 py-1 shadow-2xl z-[70] pointer-events-auto animate-in fade-in slide-in-from-bottom-2 duration-200"
                     style={{ bottom: 'calc(100% + 44px)' }}
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -1626,7 +1786,7 @@ export default function StudioPage() {
                           type="text"
                           inputMode="numeric"
                           autoFocus
-                          className="w-12 h-6 px-1 bg-black/70 text-white border border-blue-500 rounded text-center text-xs font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="w-12 h-6 px-1 bg-black/70 text-white border border-white/10 rounded text-center text-xs font-mono tabular-nums focus:outline-none focus:ring-1 focus:ring-white/10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           value={rotationInput}
                           onChange={(e) => {
                             const v = e.target.value;
@@ -1654,11 +1814,11 @@ export default function StudioPage() {
                             setIsEditingRotation(false);
                           }}
                         />
-                        <span className="text-[11px] font-mono text-white/50 ml-0.5">°</span>
+                        <span className="text-[11px] font-mono tabular-nums text-white/50 ml-0.5">°</span>
                       </div>
                     ) : (
                       <button 
-                        className="text-[11px] font-mono font-medium text-white/80 px-1.5 py-0.5 rounded bg-white/5 cursor-text hover:text-white hover:bg-white/10 hover:border-white/20 border border-transparent transition-all"
+                        className="text-[11px] font-mono tabular-nums font-medium text-white/80 px-1.5 py-0.5 rounded bg-white/5 cursor-text hover:text-white hover:bg-white/10 hover:border-white/5 border border-transparent transition"
                         title="Click to manually enter degree"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -1678,7 +1838,7 @@ export default function StudioPage() {
                       <Minimize2 size={14} />
                     </button>
                     <button
-                      className="text-[11px] font-mono font-medium text-white/70 px-1.5 py-0.5 rounded bg-white/5 hover:text-white hover:bg-white/10 transition-colors"
+                      className="text-[11px] font-mono tabular-nums font-medium text-white/70 px-1.5 py-0.5 rounded bg-white/5 hover:text-white hover:bg-white/10 transition-colors"
                       title="Click to reset size (100%)"
                       onClick={() => setScale(100)}
                     >
@@ -1776,7 +1936,7 @@ export default function StudioPage() {
                     
                     {image ? (
                       <div className="relative">
-                        <img src={image} alt="Uploaded screenshot" draggable={false} className="max-w-full max-h-full object-contain block transition-all relative z-10" style={{
+                        <img src={image} alt="Uploaded screenshot" draggable={false} className="max-w-full max-h-full object-contain block transition relative z-10" style={{
                           borderRadius: showMacOsBar 
                             ? `0 0 ${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px ${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px` 
                             : `${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px`,
@@ -1796,7 +1956,7 @@ export default function StudioPage() {
                             <div 
                               className="px-3.5 py-1.5 rounded-full text-[11px] font-medium tracking-wide inline-flex items-center gap-1.5 whitespace-nowrap overflow-hidden leading-none select-none shrink-0"
                               style={{
-                                background: `rgba(255, 255, 255, ${(watermarkOpacity / 100) * 0.25})`,
+                                background: isExporting ? `rgba(255, 255, 255, ${(watermarkOpacity / 100) * 0.6})` : `rgba(255, 255, 255, ${(watermarkOpacity / 100) * 0.25})`,
                                 border: `1px solid rgba(255, 255, 255, ${watermarkOpacity / 100})`,
                                 backdropFilter: !isExporting ? 'blur(20px)' : 'none',
                                 WebkitBackdropFilter: !isExporting ? 'blur(20px)' : 'none',
@@ -1813,9 +1973,9 @@ export default function StudioPage() {
                         )}
                       </div>
                     ) : (
-                      <label className={`flex-grow flex flex-col items-center justify-center gap-4 text-white drop-shadow-md w-full h-full cursor-pointer transition-all relative z-10 rounded-2xl ${background === 'transparent' ? 'border-2 border-dashed border-white/20 bg-black/20 backdrop-blur-md hover:bg-white/10 hover:border-accent/50' : 'hover:bg-white/5'}`}>
-                        <Upload size={48} className="opacity-70 text-accent" />
-                        <h2 className="text-xl font-semibold">Drop an image here</h2>
+                      <label className={`flex-grow flex flex-col items-center justify-center gap-4 text-white drop-shadow-md w-full h-full cursor-pointer transition relative z-10 rounded-xl ${background === 'transparent' ? 'border-2 border-dashed border-white/5 bg-black/20 backdrop-blur-md hover:bg-white/10 hover:border-white/5' : 'hover:bg-white/5'}`}>
+                        <Upload size={48} className="opacity-70 text-zinc-400" />
+                        <h2 className="text-xl font-semibold text-balance">Drop an image here</h2>
                         <p className="opacity-80 text-sm">Or paste from clipboard (Ctrl+V)</p>
                         <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                       </label>
@@ -1830,13 +1990,13 @@ export default function StudioPage() {
                     >
                       {/* Outline box */}
                       <div 
-                        className={`absolute inset-0 border-2 pointer-events-none shadow-sm transition-colors ${isLocked ? 'border-amber-500/70 border-dashed' : 'border-blue-500/90'}`} 
+                        className={`absolute inset-0 border-2 pointer-events-none shadow-sm transition-colors ${isLocked ? 'border-amber-500/70 border-dashed' : 'border-white/10/90'}`} 
                         style={{ borderRadius: `${radius}px` }} 
                       />
 
                       {/* Locked Badge Pill */}
                       {isLocked && (
-                        <div className="absolute top-2 right-2 bg-black/80 border border-amber-500/50 text-amber-300 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg z-50 pointer-events-none">
+                        <div className="absolute top-2 right-2 bg-black/80 border border-amber-500/50 text-amber-300 text-[10px] font-mono tabular-nums font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg z-50 pointer-events-none">
                           <Lock size={10} className="text-amber-400" />
                           <span>LOCKED</span>
                         </div>
@@ -1846,22 +2006,22 @@ export default function StudioPage() {
                       {!isLocked && (
                         <>
                           <div 
-                            className="absolute -top-2 -left-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-blue-500 pointer-events-auto cursor-nwse-resize hover:scale-125 active:scale-110 transition-transform z-50" 
+                            className="absolute -top-2 -left-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-white/10 pointer-events-auto cursor-nwse-resize hover:scale-125 active:scale-110 transition-transform z-50" 
                             onPointerDown={(e) => handleResizeDown(e, 'tl')} 
                             title="Drag to minimize / maximize size" 
                           />
                           <div 
-                            className="absolute -top-2 -right-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-blue-500 pointer-events-auto cursor-nesw-resize hover:scale-125 active:scale-110 transition-transform z-50" 
+                            className="absolute -top-2 -right-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-white/10 pointer-events-auto cursor-nesw-resize hover:scale-125 active:scale-110 transition-transform z-50" 
                             onPointerDown={(e) => handleResizeDown(e, 'tr')} 
                             title="Drag to minimize / maximize size" 
                           />
                           <div 
-                            className="absolute -bottom-2 -left-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-blue-500 pointer-events-auto cursor-nesw-resize hover:scale-125 active:scale-110 transition-transform z-50" 
+                            className="absolute -bottom-2 -left-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-white/10 pointer-events-auto cursor-nesw-resize hover:scale-125 active:scale-110 transition-transform z-50" 
                             onPointerDown={(e) => handleResizeDown(e, 'bl')} 
                             title="Drag to minimize / maximize size" 
                           />
                           <div 
-                            className="absolute -bottom-2 -right-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-blue-500 pointer-events-auto cursor-nwse-resize hover:scale-125 active:scale-110 transition-transform z-50" 
+                            className="absolute -bottom-2 -right-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-white/10 pointer-events-auto cursor-nwse-resize hover:scale-125 active:scale-110 transition-transform z-50" 
                             onPointerDown={(e) => handleResizeDown(e, 'br')} 
                             title="Drag to minimize / maximize size" 
                           />
@@ -1869,13 +2029,19 @@ export default function StudioPage() {
                           {/* Top Rotation Stalk & Knob */}
                           <div className="absolute -top-9 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-auto z-50">
                             <div 
+                              role="slider"
+                              aria-label="Rotate Image drag handle"
+                              aria-valuemin={0}
+                              aria-valuemax={360}
+                              aria-valuenow={rotation}
+                              tabIndex={0}
                               className="w-6 h-6 rounded-full bg-white text-black shadow-lg border border-black/20 flex items-center justify-center cursor-grab active:cursor-grabbing hover:scale-115 transition-transform"
                               title="Drag to rotate (Hold Shift for 15° snap)"
                               onPointerDown={handleRotateDown}
                             >
-                              <RotateCw size={12} className="text-black/80" />
+                              <RotateCw size={12} className="text-black/80" aria-hidden="true" />
                             </div>
-                            <div className="w-0.5 h-3 bg-blue-500" />
+                            <div className="w-0.5 h-3 bg-white/50" />
                           </div>
                         </>
                       )}
@@ -1886,8 +2052,8 @@ export default function StudioPage() {
             </div>
 
             {/* Snap guides */}
-            {!isExporting && isDragging && pos.x === 0 && <div data-no-export="true" className="no-export absolute top-0 bottom-0 left-1/2 w-px bg-blue-500/70 z-50 pointer-events-none drop-shadow-md" />}
-            {!isExporting && isDragging && pos.y === 0 && <div data-no-export="true" className="no-export absolute left-0 right-0 top-1/2 h-px bg-blue-500/70 z-50 pointer-events-none drop-shadow-md" />}
+            {!isExporting && isDragging && pos.x === 0 && <div data-no-export="true" className="no-export absolute top-0 bottom-0 left-1/2 w-px bg-white/40 z-50 pointer-events-none drop-shadow-md" />}
+            {!isExporting && isDragging && pos.y === 0 && <div data-no-export="true" className="no-export absolute left-0 right-0 top-1/2 h-px bg-white/40 z-50 pointer-events-none drop-shadow-md" />}
             
             {watermark && watermarkTarget === 'canvas' && (
               <div 
@@ -1901,7 +2067,7 @@ export default function StudioPage() {
                 <div 
                   className="px-4 py-2 rounded-full text-xs font-medium tracking-wide inline-flex items-center gap-1.5 whitespace-nowrap overflow-hidden leading-none select-none shrink-0"
                   style={{
-                    background: `rgba(255, 255, 255, ${(watermarkOpacity / 100) * 0.25})`,
+                    background: isExporting ? `rgba(255, 255, 255, ${(watermarkOpacity / 100) * 0.6})` : `rgba(255, 255, 255, ${(watermarkOpacity / 100) * 0.25})`,
                     border: `1px solid rgba(255, 255, 255, ${watermarkOpacity / 100})`,
                     backdropFilter: !isExporting ? 'blur(20px)' : 'none',
                     WebkitBackdropFilter: !isExporting ? 'blur(20px)' : 'none',
@@ -1922,25 +2088,25 @@ export default function StudioPage() {
         {/* Floating Viewport Zoom HUD Controls (Bottom Center) */}
         <div 
           data-no-export="true"
-          className="no-export absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-[#1C1C1E]/90 border border-white/15 backdrop-blur-md rounded-xl px-2 py-1 shadow-2xl z-40"
+          className="no-export absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-[#1C1C1E]/90 border border-white/5 backdrop-blur-md rounded-lg px-2 py-1 shadow-2xl z-40"
         >
           <button
             onClick={() => zoomCanvasAtCenter(0.85)}
-            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/10 text-zinc-300 hover:text-white transition-colors"
+            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white/10 text-zinc-300 hover:text-white transition-colors"
             title="Zoom Out (Scroll Down)"
           >
             <ZoomOut size={14} />
           </button>
           <button
             onClick={resetViewport}
-            className="px-2 py-1 text-[11px] font-mono font-medium text-zinc-300 hover:text-white hover:bg-white/10 rounded-md transition-colors"
+            className="px-2 py-1 text-[11px] font-mono tabular-nums font-medium text-zinc-300 hover:text-white hover:bg-white/10 rounded-md transition-colors"
             title="Reset Zoom to 100%"
           >
             {Math.round(viewportZoom * 100)}%
           </button>
           <button
             onClick={() => zoomCanvasAtCenter(1.15)}
-            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/10 text-zinc-300 hover:text-white transition-colors"
+            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white/10 text-zinc-300 hover:text-white transition-colors"
             title="Zoom In (Scroll Up)"
           >
             <ZoomIn size={14} />
@@ -1948,7 +2114,7 @@ export default function StudioPage() {
           <div className="w-px h-4 bg-white/15 mx-1" />
           <button
             onClick={resetViewport}
-            className="px-2 py-1 text-[11px] font-medium text-blue-400 hover:text-blue-300 hover:bg-blue-600/10 rounded-md transition-colors"
+            className="px-2 py-1 text-[11px] font-medium text-white hover:text-zinc-200 hover:bg-white/5 rounded-md transition-colors"
             title="Reset View"
           >
             Reset
@@ -1958,411 +2124,438 @@ export default function StudioPage() {
     </main>
 
       {/* Right Sidebar - 3D Camera, Studio Presets & Collapsible Studio Controls */}
-      <aside className="w-[320px] min-w-[320px] bg-panel border-l border-border flex flex-col p-4 gap-4 overflow-y-auto z-20 shadow-lg select-none">
-        
-        {/* Accordion 1: 3D Angles & XYZ Orbit */}
-        <div className="flex flex-col gap-3">
-          <button 
-            onClick={() => toggleSection('perspectives')}
-            className="flex items-center justify-between w-full py-1 text-xs uppercase tracking-wider font-semibold text-text-main hover:text-white transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <Box size={14} className="text-blue-400" />
-              <span>3D Camera & XYZ Angles</span>
-            </div>
-            <div className="flex items-center gap-2">
+      <aside className="w-[300px] min-w-[300px] bg-panel border-l border-white/5 flex flex-col z-20 shadow-lg select-none h-full">
+        {/* Top Header Bar aligned with h-16 main header */}
+        <div className="h-16 border-b border-white/5 px-3.5 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2">
+            <Box size={14} className="text-zinc-300" />
+            <span className="text-xs font-semibold text-zinc-200 tracking-tight">Camera & Angles</span>
+          </div>
+          <span className="text-[10px] text-zinc-500 font-mono">3D Studio</span>
+        </div>
+
+        {/* Scrollable Content Container with clean symmetrical padding */}
+        <div className="flex-1 overflow-y-auto p-3 pb-8 flex flex-col gap-3.5">
+          {/* Section 1: 3D Camera & XYZ Orbit */}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between px-0.5">
+              <button
+                onClick={() => toggleSection('perspectives')}
+                className="flex items-center gap-1.5 text-[11px] font-semibold text-zinc-400 hover:text-white uppercase tracking-wider transition-colors group"
+              >
+                <ChevronDown size={13} className={`text-zinc-500 group-hover:text-zinc-300 transition-transform duration-300 ease-out ${expandedSections.perspectives ? 'rotate-0' : '-rotate-90'}`} />
+                <span>3D Orbit & Tilt</span>
+              </button>
               {(rotateX !== 0 || rotateY !== 0 || rotateZ !== 0) && (
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-blue-600/20 text-blue-400 border border-blue-500/30">
-                  Custom
-                </span>
+                <button 
+                  onClick={reset3D}
+                  aria-label="Reset 3D rotation to flat"
+                  className="text-[10px] text-zinc-400 hover:text-white font-mono flex items-center gap-1 bg-white/[0.04] hover:bg-white/[0.08] px-1.5 py-0.5 rounded-md border border-white/[0.04] transition-colors"
+                >
+                  <RefreshCw size={10} />
+                  <span>Reset</span>
+                </button>
               )}
-              <ChevronDown size={14} className={`text-text-muted transition-transform duration-200 ${expandedSections.perspectives ? 'rotate-180' : ''}`} />
             </div>
-          </button>
 
-          {expandedSections.perspectives && (
-            <div className="flex flex-col gap-3.5 pt-1 animate-in fade-in slide-in-from-top-1 duration-150">
-              {/* Perspective Quick Preset Chips */}
-              <div className="grid grid-cols-4 gap-1.5">
-                {PERSPECTIVES.map((p) => {
-                  const isActive = perspective === p.id && rotateX === p.rx && rotateY === p.ry && rotateZ === p.rz;
-                  return (
-                    <button
-                      key={p.id}
-                      onClick={() => applyPerspectivePreset(p)}
-                      className={`py-1.5 px-1 rounded-lg text-center border transition-all text-[11px] font-medium flex flex-col items-center gap-1 ${
-                        isActive 
-                          ? 'bg-blue-600/20 border-blue-500 text-blue-400 shadow-sm' 
-                          : 'bg-black/30 border-white/5 hover:border-white/20 text-zinc-400 hover:text-white'
-                      }`}
-                      title={p.desc}
-                    >
-                      <p.icon size={13} className={isActive ? 'text-blue-400' : 'text-zinc-400'} />
-                      <span className="truncate w-full text-[10px]">{p.name}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* XYZ Controls Box */}
-              <div className="flex flex-col gap-3 bg-black/25 p-3 rounded-xl border border-white/5">
-                {/* Rotate X (Tilt / Pitch) */}
-                <div>
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <label className="text-text-muted font-medium flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-red-400/80" />
-                      <span>X-Axis (Pitch / Tilt)</span>
-                    </label>
-                    <div className="flex items-center gap-1">
-                      <input 
-                        type="text"
-                        inputMode="numeric"
-                        value={rotateX}
-                        onChange={(e) => {
-                          const val = parseFloat(e.target.value);
-                          if (!isNaN(val)) setRotateX(Math.max(-60, Math.min(60, Math.round(val))));
-                          else if (e.target.value === '' || e.target.value === '-') setRotateX(0);
-                        }}
-                        className="w-10 h-5 px-1 bg-black/50 border border-white/10 rounded text-center text-[11px] font-mono text-zinc-300 focus:text-white focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      />
-                      <span className="text-[10px] text-text-muted">°</span>
-                    </div>
-                  </div>
-                  <Slider 
-                    min={-60} 
-                    max={60} 
-                    step={1} 
-                    value={[rotateX]} 
-                    onValueChange={(v) => {
-                      setRotateX(Array.isArray(v) ? v[0] : v as number);
-                      setPerspective('custom');
-                    }} 
-                  />
-                </div>
-
-                {/* Rotate Y (Pan / Yaw) */}
-                <div>
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <label className="text-text-muted font-medium flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-green-400/80" />
-                      <span>Y-Axis (Yaw / Angle)</span>
-                    </label>
-                    <div className="flex items-center gap-1">
-                      <input 
-                        type="text"
-                        inputMode="numeric"
-                        value={rotateY}
-                        onChange={(e) => {
-                          const val = parseFloat(e.target.value);
-                          if (!isNaN(val)) setRotateY(Math.max(-60, Math.min(60, Math.round(val))));
-                          else if (e.target.value === '' || e.target.value === '-') setRotateY(0);
-                        }}
-                        className="w-10 h-5 px-1 bg-black/50 border border-white/10 rounded text-center text-[11px] font-mono text-zinc-300 focus:text-white focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      />
-                      <span className="text-[10px] text-text-muted">°</span>
-                    </div>
-                  </div>
-                  <Slider 
-                    min={-60} 
-                    max={60} 
-                    step={1} 
-                    value={[rotateY]} 
-                    onValueChange={(v) => {
-                      setRotateY(Array.isArray(v) ? v[0] : v as number);
-                      setPerspective('custom');
-                    }} 
-                  />
-                </div>
-
-                {/* Rotate Z (Roll) */}
-                <div>
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <label className="text-text-muted font-medium flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-blue-400/80" />
-                      <span>Z-Axis (Roll / Skew)</span>
-                    </label>
-                    <div className="flex items-center gap-1">
-                      <input 
-                        type="text"
-                        inputMode="numeric"
-                        value={rotateZ}
-                        onChange={(e) => {
-                          const val = parseFloat(e.target.value);
-                          if (!isNaN(val)) setRotateZ(Math.max(-45, Math.min(45, Math.round(val))));
-                          else if (e.target.value === '' || e.target.value === '-') setRotateZ(0);
-                        }}
-                        className="w-10 h-5 px-1 bg-black/50 border border-white/10 rounded text-center text-[11px] font-mono text-zinc-300 focus:text-white focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      />
-                      <span className="text-[10px] text-text-muted">°</span>
-                    </div>
-                  </div>
-                  <Slider 
-                    min={-45} 
-                    max={45} 
-                    step={1} 
-                    value={[rotateZ]} 
-                    onValueChange={(v) => {
-                      setRotateZ(Array.isArray(v) ? v[0] : v as number);
-                      setPerspective('custom');
-                    }} 
-                  />
-                </div>
-
-                {/* Perspective Depth */}
-                <div>
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <label className="text-text-muted font-medium">Camera Depth</label>
-                    <span className="text-text-muted font-mono text-[11px]">{perspectiveDepth}px</span>
-                  </div>
-                  <Slider 
-                    min={500} 
-                    max={2500} 
-                    step={50} 
-                    value={[perspectiveDepth]} 
-                    onValueChange={(v) => {
-                      setPerspectiveDepth(Array.isArray(v) ? v[0] : v as number);
-                      setPerspective('custom');
-                    }} 
-                  />
-                </div>
-
-                {/* Reset 3D Button */}
-                {(rotateX !== 0 || rotateY !== 0 || rotateZ !== 0) && (
-                  <button
-                    onClick={reset3D}
-                    className="w-full py-1 px-2 text-[11px] font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 flex items-center justify-center gap-1.5 transition-colors mt-0.5"
-                  >
-                    <RefreshCw size={12} />
-                    <span>Reset 3D to Flat (0, 0, 0)</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Accordion 2: Studio Themes */}
-        <div className="border-t border-border pt-4 flex flex-col gap-3">
-          <button 
-            onClick={() => toggleSection('themes')}
-            className="flex items-center justify-between w-full py-1 text-xs uppercase tracking-wider font-semibold text-text-main hover:text-white transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <Sparkles size={14} className="text-blue-400" />
-              <span>Studio Themes</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-zinc-400 font-mono">{PRESETS.length} Themes</span>
-              <ChevronDown size={14} className={`text-text-muted transition-transform duration-200 ${expandedSections.themes ? 'rotate-180' : ''}`} />
-            </div>
-          </button>
-
-          {expandedSections.themes && (
-            <div className="flex flex-col gap-2.5 pt-1 animate-in fade-in slide-in-from-top-1 duration-150">
-              {PRESETS.map((preset) => (
-                <button
-                  key={preset.id}
-                  onClick={() => {
-                    setBackground(preset.config.background);
-                    setShowMacOsBar(preset.config.showMacOsBar);
-                    setView(preset.config.view);
-                    const foundP = PERSPECTIVES.find(p => p.id === preset.config.perspective);
-                    if (foundP) applyPerspectivePreset(foundP);
-                    else {
-                      setPerspective(preset.config.perspective);
-                      setRotateX(0); setRotateY(0); setRotateZ(0); setPerspectiveDepth(1200);
-                    }
-                    setGlassBorder(preset.config.glassBorder);
-                    if (preset.config.glassBorderWidth) setGlassBorderWidth(preset.config.glassBorderWidth);
-                    if (preset.config.glassBorderOpacity) setGlassBorderOpacity(preset.config.glassBorderOpacity);
-                    setPadding(preset.config.padding);
-                    setRadius(preset.config.radius);
-                    setShadow(preset.config.shadow);
-                    if (preset.config.bgBlur !== undefined) setBgBlur(preset.config.bgBlur);
-                    setFilter(preset.config.filter);
-                    setNoiseIntensity(preset.config.noiseIntensity);
-                    setGrainIntensity(preset.config.grainIntensity);
-                  }}
-                  className="flex flex-col rounded-xl border border-white/5 bg-black/30 hover:bg-white/[0.04] hover:border-white/20 text-left transition-all overflow-hidden group shadow-sm"
-                >
-                  {/* Full-width High-Fidelity Preview Box */}
-                  <div 
-                    className="w-full h-24 flex items-center justify-center relative overflow-hidden p-3"
-                    style={{
-                      background: preset.config.background.startsWith('url(') ? preset.config.background : preset.config.background,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                    }}
-                  >
-                    {/* Simulated scaled mockup */}
-                    {image ? (
-                      <div 
-                        className="w-3/4 h-full flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
-                        style={{
-                          transform: preset.config.perspective === 'isometric-left' ? 'perspective(200px) rotateX(15deg) rotateY(-20deg)' : 'none'
-                        }}
-                      >
-                        <img 
-                          src={image} 
-                          alt={preset.name} 
-                          className="max-w-full max-h-full object-contain rounded shadow-lg border border-white/10" 
+            <div className={`grid transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${expandedSections.perspectives ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}`}>
+              <div className="overflow-hidden">
+                <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-3">
+                  {/* Rotate X */}
+                  <div>
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <label className="text-zinc-300 font-medium flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                        <span>Pitch (X-Axis)</span>
+                      </label>
+                      <div className="flex items-center gap-1">
+                        <input 
+                          type="text"
+                          inputMode="numeric"
+                          aria-label="Pitch angle"
+                          value={rotateX}
+                          onChange={(e) => {
+                            const val = parseFloat(e.target.value);
+                            if (!isNaN(val)) setRotateX(Math.max(-60, Math.min(60, Math.round(val))));
+                            else if (e.target.value === '' || e.target.value === '-') setRotateX(0);
+                          }}
+                          className="w-10 h-5 px-1 bg-white/[0.02] border border-white/5 rounded-md text-center text-[11px] font-mono tabular-nums text-zinc-300 focus:text-white focus:outline-none focus:border-white/20 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
+                        <span className="text-[11px] text-zinc-400 font-mono">°</span>
                       </div>
-                    ) : (
-                      <div className="flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-full border border-white/10 backdrop-blur-md">
-                        <preset.icon size={13} className="text-white" />
-                        <span className="text-xs font-semibold text-white">{preset.name}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between p-2.5 bg-[#141416]/90 border-t border-white/5">
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-xs font-semibold text-white group-hover:text-blue-400 transition-colors">
-                        {preset.name}
-                      </span>
-                      <span className="text-[10px] text-text-muted opacity-80 truncate">{preset.desc}</span>
                     </div>
-                    <span className="text-[10px] font-medium text-blue-400 bg-blue-600/10 px-2 py-0.5 rounded border border-blue-500/20 group-hover:bg-blue-600/20 transition-colors shrink-0">
-                      Apply
-                    </span>
+                    <Slider 
+                      min={-60} 
+                      max={60} 
+                      step={1} 
+                      value={[rotateX]} 
+                      onValueChange={(v) => {
+                        setRotateX(Array.isArray(v) ? v[0] : v as number);
+                        setPerspective('custom');
+                      }} 
+                    />
                   </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* Accordion 3: Window Templates */}
-        <div className="border-t border-border pt-4 flex flex-col gap-3">
-          <button 
-            onClick={() => toggleSection('templates')}
-            className="flex items-center justify-between w-full py-1 text-xs uppercase tracking-wider font-semibold text-text-main hover:text-white transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <LayoutTemplate size={14} className="text-blue-400" />
-              <span>Window Templates</span>
-            </div>
-            <ChevronDown size={14} className={`text-text-muted transition-transform duration-200 ${expandedSections.templates ? 'rotate-180' : ''}`} />
-          </button>
+                  {/* Rotate Y */}
+                  <div>
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <label className="text-zinc-300 font-medium flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                        <span>Yaw (Y-Axis)</span>
+                      </label>
+                      <div className="flex items-center gap-1">
+                        <input 
+                          type="text"
+                          inputMode="numeric"
+                          aria-label="Yaw angle"
+                          value={rotateY}
+                          onChange={(e) => {
+                            const val = parseFloat(e.target.value);
+                            if (!isNaN(val)) setRotateY(Math.max(-60, Math.min(60, Math.round(val))));
+                            else if (e.target.value === '' || e.target.value === '-') setRotateY(0);
+                          }}
+                          className="w-10 h-5 px-1 bg-white/[0.02] border border-white/5 rounded-md text-center text-[11px] font-mono tabular-nums text-zinc-300 focus:text-white focus:outline-none focus:border-white/20 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                        <span className="text-[11px] text-zinc-400 font-mono">°</span>
+                      </div>
+                    </div>
+                    <Slider 
+                      min={-60} 
+                      max={60} 
+                      step={1} 
+                      value={[rotateY]} 
+                      onValueChange={(v) => {
+                        setRotateY(Array.isArray(v) ? v[0] : v as number);
+                        setPerspective('custom');
+                      }} 
+                    />
+                  </div>
 
-          {expandedSections.templates && (
-            <div className="flex flex-col gap-2 pt-1 animate-in fade-in slide-in-from-top-1 duration-150">
-              <button 
-                onClick={() => { setView('default'); setShowMacOsBar(true); setGlassBorder(false); }}
-                className={`flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all ${view === 'default' && showMacOsBar && !glassBorder ? 'bg-blue-600/15 border-blue-500 text-white' : 'bg-black/30 border-white/5 hover:border-white/20 text-zinc-300'}`}
+                  {/* Rotate Z */}
+                  <div>
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <label className="text-zinc-300 font-medium flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                        <span>Roll (Z-Axis)</span>
+                      </label>
+                      <div className="flex items-center gap-1">
+                        <input 
+                          type="text"
+                          inputMode="numeric"
+                          aria-label="Roll angle"
+                          value={rotateZ}
+                          onChange={(e) => {
+                            const val = parseFloat(e.target.value);
+                            if (!isNaN(val)) setRotateZ(Math.max(-45, Math.min(45, Math.round(val))));
+                            else if (e.target.value === '' || e.target.value === '-') setRotateZ(0);
+                          }}
+                          className="w-10 h-5 px-1 bg-white/[0.02] border border-white/5 rounded-md text-center text-[11px] font-mono tabular-nums text-zinc-300 focus:text-white focus:outline-none focus:border-white/20 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                        <span className="text-[11px] text-zinc-400 font-mono">°</span>
+                      </div>
+                    </div>
+                    <Slider 
+                      min={-45} 
+                      max={45} 
+                      step={1} 
+                      value={[rotateZ]} 
+                      onValueChange={(v) => {
+                        setRotateZ(Array.isArray(v) ? v[0] : v as number);
+                        setPerspective('custom');
+                      }} 
+                    />
+                  </div>
+
+                  {/* Camera Depth */}
+                  <div>
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <label className="text-zinc-300 font-medium">Camera Depth</label>
+                      <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{perspectiveDepth}px</span>
+                    </div>
+                    <Slider 
+                      min={500} 
+                      max={2500} 
+                      step={50} 
+                      value={[perspectiveDepth]} 
+                      onValueChange={(v) => {
+                        setPerspectiveDepth(Array.isArray(v) ? v[0] : v as number);
+                        setPerspective('custom');
+                      }} 
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2: Perspective Presets */}
+          <div className="flex flex-col gap-1.5">
+            <button
+              onClick={() => toggleSection('themes')}
+              className="flex items-center justify-between px-0.5 text-[11px] font-semibold text-zinc-400 hover:text-white uppercase tracking-wider transition-colors group"
+            >
+              <div className="flex items-center gap-1.5">
+                <ChevronDown size={13} className={`text-zinc-500 group-hover:text-zinc-300 transition-transform duration-300 ease-out ${expandedSections.themes ? 'rotate-0' : '-rotate-90'}`} />
+                <span>Angles & Perspective</span>
+              </div>
+              <span className="text-[10px] text-zinc-500 font-mono">{PERSPECTIVES.length} Angles</span>
+            </button>
+
+            <div className={`grid transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${expandedSections.themes ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}`}>
+              <div className="overflow-hidden">
+                <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-2.5">
+                  {PERSPECTIVES.map((p) => {
+                    const isActive = perspective === p.id && rotateX === p.rx && rotateY === p.ry && rotateZ === p.rz;
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => applyPerspectivePreset(p)}
+                        className={`flex flex-col rounded-lg border transition-all duration-150 active:scale-[0.98] overflow-hidden group shadow-sm ${
+                          isActive 
+                            ? 'bg-white/10 border-white/20 ring-1 ring-white/10 shadow-md' 
+                            : 'bg-white/[0.02] border-white/[0.04] hover:border-white/20 hover:bg-white/[0.05]'
+                        }`}
+                        title={p.desc}
+                        aria-label={p.name}
+                      >
+                        {/* Clean Minimal Preview Box - Full Width */}
+                        <div className="w-full h-24 flex items-center justify-center p-3 relative overflow-hidden bg-black/30">
+                          {image ? (
+                            <div 
+                              className="w-full h-full flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
+                              style={{ transform: p.previewTransform || p.transform }}
+                            >
+                              <img 
+                                src={image} 
+                                alt={p.name} 
+                                className="max-w-full max-h-full object-contain rounded shadow-lg border border-white/10" 
+                              />
+                            </div>
+                          ) : (
+                            <div className={`flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 ${isActive ? 'text-white' : 'text-zinc-500'}`}>
+                              <p.icon size={16} aria-hidden="true" />
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Window Templates */}
+          <div className="flex flex-col gap-1.5">
+            <button
+              onClick={() => toggleSection('templates')}
+              className="flex items-center justify-between px-0.5 text-[11px] font-semibold text-zinc-400 hover:text-white uppercase tracking-wider transition-colors group"
+            >
+              <div className="flex items-center gap-1.5">
+                <ChevronDown size={13} className={`text-zinc-500 group-hover:text-zinc-300 transition-transform duration-300 ease-out ${expandedSections.templates ? 'rotate-0' : '-rotate-90'}`} />
+                <span>Window Chrome</span>
+              </div>
+              <span className="text-[10px] text-zinc-500 font-mono">4 Themes</span>
+            </button>
+
+            <div className={`grid transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${expandedSections.templates ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}`}>
+              <div className="overflow-hidden">
+                <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-2">
+                  <button 
+                    onClick={() => { setView('default'); setShowMacOsBar(true); setGlassBorder(false); }}
+                    className={`flex items-center gap-2.5 p-2 rounded-lg border text-left transition-all duration-150 active:scale-[0.98] ${
+                      view === 'default' && showMacOsBar && !glassBorder 
+                        ? 'bg-white/10 border-white/20 text-white shadow-sm ring-1 ring-white/10' 
+                        : 'bg-white/[0.02] border-white/[0.04] hover:bg-white/[0.05] hover:border-white/10 text-zinc-400 hover:text-zinc-200'
+                    }`}
+                  >
+                    <div className="w-7 h-7 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center shrink-0">
+                      <Laptop size={14} className="text-white" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-semibold text-white">Default macOS</span>
+                      <span className="text-[10px] text-zinc-500">Standard window bar</span>
+                    </div>
+                  </button>
+
+                  <button 
+                    onClick={() => { setView('browser'); setShowMacOsBar(true); setGlassBorder(false); }}
+                    className={`flex items-center gap-2.5 p-2 rounded-lg border text-left transition-all duration-150 active:scale-[0.98] ${
+                      view === 'browser' 
+                        ? 'bg-white/10 border-white/20 text-white shadow-sm ring-1 ring-white/10' 
+                        : 'bg-white/[0.02] border-white/[0.04] hover:bg-white/[0.05] hover:border-white/10 text-zinc-400 hover:text-zinc-200'
+                    }`}
+                  >
+                    <div className="w-7 h-7 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center shrink-0">
+                      <Globe size={14} className="text-zinc-300" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-semibold text-white">Web Browser</span>
+                      <span className="text-[10px] text-zinc-500">Safari URL address bar</span>
+                    </div>
+                  </button>
+
+                  <button 
+                    onClick={() => { setView('minimal'); setShowMacOsBar(false); setGlassBorder(false); }}
+                    className={`flex items-center gap-2.5 p-2 rounded-lg border text-left transition-all duration-150 active:scale-[0.98] ${
+                      view === 'minimal' && !showMacOsBar && !glassBorder 
+                      ? 'bg-white/10 border-white/20 text-white shadow-sm ring-1 ring-white/10' 
+                      : 'bg-white/[0.02] border-white/[0.04] hover:bg-white/[0.05] hover:border-white/10 text-zinc-400 hover:text-zinc-200'
+                    }`}
+                  >
+                    <div className="w-7 h-7 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center shrink-0">
+                      <Square size={14} className="text-zinc-300" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-semibold text-white">Minimal Frameless</span>
+                      <span className="text-[10px] text-zinc-500">Zero chrome focus</span>
+                    </div>
+                  </button>
+
+                  <button 
+                    onClick={() => { 
+                      setView('default'); 
+                      setShowMacOsBar(true); 
+                      setGlassBorder(true); 
+                      setGlassBorderWidth(10); 
+                      setGlassBorderOpacity(40); 
+                      setPerspective('isometric-left');
+                      setRotateX(15);
+                      setRotateY(-20);
+                      setRotateZ(2);
+                      setPerspectiveDepth(1200);
+                    }}
+                    className={`flex items-center gap-2.5 p-2 rounded-lg border text-left transition-all duration-150 active:scale-[0.98] ${
+                      glassBorder 
+                        ? 'bg-white/10 border-white/20 text-white shadow-sm ring-1 ring-white/10' 
+                        : 'bg-white/[0.02] border-white/[0.04] hover:bg-white/[0.05] hover:border-white/10 text-zinc-400 hover:text-zinc-200'
+                    }`}
+                  >
+                    <div className="w-7 h-7 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center shrink-0">
+                      <Sparkles size={14} className="text-amber-300" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-semibold text-white">3D Frosted Glass</span>
+                      <span className="text-[10px] text-zinc-500">Glass border + 3D angle</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 4: Studio Lighting & Manual Sliders */}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between px-0.5">
+              <button
+                onClick={() => toggleSection('filters')}
+                className="flex items-center gap-1.5 text-[11px] font-semibold text-zinc-400 hover:text-white uppercase tracking-wider transition-colors group"
               >
-                <div className="w-9 h-9 rounded-lg bg-black/50 border border-white/10 flex items-center justify-center shrink-0">
-                  <Laptop size={16} className="text-blue-400" />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-xs font-semibold text-white">Default macOS Studio</span>
-                  <span className="text-[10px] text-text-muted">Window dots + clean frame</span>
-                </div>
+                <ChevronDown size={13} className={`text-zinc-500 group-hover:text-zinc-300 transition-transform duration-300 ease-out ${expandedSections.filters ? 'rotate-0' : '-rotate-90'}`} />
+                <span>Studio Lighting</span>
               </button>
-
-              <button 
-                onClick={() => { setView('browser'); setShowMacOsBar(true); setGlassBorder(false); }}
-                className={`flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all ${view === 'browser' ? 'bg-blue-600/15 border-blue-500 text-white' : 'bg-black/30 border-white/5 hover:border-white/20 text-zinc-300'}`}
-              >
-                <div className="w-9 h-9 rounded-lg bg-black/50 border border-white/10 flex items-center justify-center shrink-0">
-                  <Globe size={16} className="text-green-400" />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-xs font-semibold text-white">Web Browser</span>
-                  <span className="text-[10px] text-text-muted">Safari bar with address URL</span>
-                </div>
-              </button>
-
-              <button 
-                onClick={() => { setView('minimal'); setShowMacOsBar(false); setGlassBorder(false); }}
-                className={`flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all ${view === 'minimal' && !showMacOsBar && !glassBorder ? 'bg-blue-600/15 border-blue-500 text-white' : 'bg-black/30 border-white/5 hover:border-white/20 text-zinc-300'}`}
-              >
-                <div className="w-9 h-9 rounded-lg bg-black/50 border border-white/10 flex items-center justify-center shrink-0">
-                  <Square size={16} className="text-purple-400" />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-xs font-semibold text-white">Minimalist</span>
-                  <span className="text-[10px] text-text-muted">Zero chrome, frameless focus</span>
-                </div>
-              </button>
-
-              <button 
-                onClick={() => { 
-                  setView('default'); 
-                  setShowMacOsBar(true); 
-                  setGlassBorder(true); 
-                  setGlassBorderWidth(10); 
-                  setGlassBorderOpacity(40); 
-                  setPerspective('isometric-left');
-                  setRotateX(15);
-                  setRotateY(-20);
-                  setRotateZ(2);
-                  setPerspectiveDepth(1200);
-                }}
-                className={`flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all ${glassBorder ? 'bg-blue-600/15 border-blue-500 text-white' : 'bg-black/30 border-white/5 hover:border-white/20 text-zinc-300'}`}
-              >
-                <div className="w-9 h-9 rounded-lg bg-black/50 border border-white/10 flex items-center justify-center shrink-0">
-                  <Sparkles size={16} className="text-amber-400" />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-xs font-semibold text-white">3D Frosted Glass</span>
-                  <span className="text-[10px] text-text-muted">Glass border + 3D isometric tilt</span>
-                </div>
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Accordion 4: Color Grading & Filters */}
-        <div className="border-t border-border pt-4 flex flex-col gap-3">
-          <button 
-            onClick={() => toggleSection('filters')}
-            className="flex items-center justify-between w-full py-1 text-xs uppercase tracking-wider font-semibold text-text-main hover:text-white transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <Filter size={14} className="text-blue-400" />
-              <span>Color Profiles</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-zinc-400 font-mono">{FILTERS.length} Profiles</span>
-              <ChevronDown size={14} className={`text-text-muted transition-transform duration-200 ${expandedSections.filters ? 'rotate-180' : ''}`} />
-            </div>
-          </button>
-
-          {expandedSections.filters && (
-            <div className="grid grid-cols-2 gap-2 pt-1 animate-in fade-in slide-in-from-top-1 duration-150">
-              {FILTERS.map((f) => (
-                <button
-                  key={f.id}
-                  onClick={() => setFilter(f.id)}
-                  className={`flex flex-col p-2 rounded-xl border text-left transition-all group ${filter === f.id ? 'bg-blue-600/15 border-blue-500 ring-1 ring-blue-500/30 text-white shadow-md' : 'bg-black/30 border-white/5 hover:border-white/20 text-zinc-400 hover:text-zinc-200'}`}
+              {isCustomLighting && (
+                <button 
+                  onClick={resetLighting}
+                  aria-label="Reset lighting adjustments to default"
+                  className="text-[10px] text-zinc-400 hover:text-white font-mono flex items-center gap-1 bg-white/[0.04] hover:bg-white/[0.08] px-1.5 py-0.5 rounded-md border border-white/[0.04] transition-colors"
                 >
-                  {/* Miniature Filter Preview Box */}
-                  <div className="w-full h-14 rounded-lg bg-[#141416] border border-white/5 flex items-center justify-center overflow-hidden mb-1.5 relative p-1 shadow-inner">
-                    {image ? (
-                      <img 
-                        src={image} 
-                        alt={f.name} 
-                        className="max-w-full max-h-full object-contain rounded"
-                        style={{ filter: f.filterStyle }}
-                      />
-                    ) : (
-                      <div 
-                        className="w-10 h-7 rounded bg-gradient-to-r from-blue-400 to-indigo-600"
-                        style={{ filter: f.filterStyle }}
-                      />
-                    )}
+                  <RefreshCw size={10} />
+                  <span>Reset</span>
+                </button>
+              )}
+            </div>
+
+            <div className={`grid transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${expandedSections.filters ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}`}>
+              <div className="overflow-hidden">
+                <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-3.5">
+                  {/* Manual Adjustments Sliders */}
+                  <div className="flex flex-col gap-3">
+                    {/* Brightness */}
+                    <div>
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <label className="text-zinc-300 font-medium">Brightness</label>
+                        <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{brightness}%</span>
+                      </div>
+                      <Slider min={50} max={150} step={1} value={[brightness]} onValueChange={(v) => setBrightness(Array.isArray(v) ? v[0] : v as number)} />
+                    </div>
+
+                    {/* Contrast */}
+                    <div>
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <label className="text-zinc-300 font-medium">Contrast</label>
+                        <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{contrast}%</span>
+                      </div>
+                      <Slider min={50} max={150} step={1} value={[contrast]} onValueChange={(v) => setContrast(Array.isArray(v) ? v[0] : v as number)} />
+                    </div>
+
+                    {/* Saturation */}
+                    <div>
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <label className="text-zinc-300 font-medium">Saturation</label>
+                        <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{saturation}%</span>
+                      </div>
+                      <Slider min={0} max={200} step={1} value={[saturation]} onValueChange={(v) => setSaturation(Array.isArray(v) ? v[0] : v as number)} />
+                    </div>
+
+                    {/* Hue Shift / Tone */}
+                    <div>
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <label className="text-zinc-300 font-medium">Color Tone (Hue)</label>
+                        <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{hueRotate}°</span>
+                      </div>
+                      <Slider min={0} max={360} step={1} value={[hueRotate]} onValueChange={(v) => setHueRotate(Array.isArray(v) ? v[0] : v as number)} />
+                    </div>
                   </div>
 
-                  <span className="text-[11px] font-semibold text-white truncate">{f.name}</span>
-                  <span className="text-[9px] text-text-muted opacity-70 truncate">{f.desc}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+                  {/* Presets Sub-heading & Grid */}
+                  <div className="flex flex-col gap-2 pt-2 border-t border-white/[0.04]">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Preset Filters</span>
+                      <span className="text-[10px] text-zinc-500 font-mono">{FILTERS.length} Profiles</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {FILTERS.map((f) => {
+                        const isSelected = filter === f.id;
+                        return (
+                          <button
+                            key={f.id}
+                            onClick={() => setFilter(f.id)}
+                            className={`flex flex-col p-2 rounded-lg border text-left transition-all duration-150 active:scale-[0.98] ${
+                              isSelected 
+                                ? 'bg-white/10 border-white/20 ring-1 ring-white/10 text-white shadow-md' 
+                                : 'bg-white/[0.02] border-white/[0.04] hover:border-white/10 text-zinc-400 hover:text-zinc-200'
+                            }`}
+                          >
+                            {/* Miniature Preview Box */}
+                            <div className="w-full h-12 rounded-md bg-black/30 border border-white/5 flex items-center justify-center overflow-hidden mb-1 relative p-1">
+                              {image ? (
+                                <img 
+                                  src={image} 
+                                  alt={f.name} 
+                                  className="max-w-full max-h-full object-contain rounded"
+                                  style={{ filter: f.filterStyle }}
+                                />
+                              ) : (
+                                <div 
+                                  className="w-8 h-5 rounded bg-gradient-to-r from-zinc-500 to-zinc-700"
+                                  style={{ filter: f.filterStyle }}
+                                />
+                              )}
+                            </div>
 
+                            <span className={`text-[11px] font-semibold truncate ${isSelected ? 'text-white' : 'text-zinc-300'}`}>{f.name}</span>
+                            <span className="text-[9px] text-zinc-500 truncate">{f.desc}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </aside>
 
       {/* Export Quality & Format Panel (Modal) */}
@@ -2372,32 +2565,33 @@ export default function StudioPage() {
           onClick={() => setShowExportModal(false)}
         >
           <div 
-            className="bg-[#18181B] border border-white/15 rounded-2xl w-full max-w-md p-6 shadow-2xl flex flex-col gap-5 animate-in zoom-in-95 duration-200"
+            className="bg-[#18181B] border border-white/5 rounded-xl w-full max-w-md p-6 shadow-2xl flex flex-col gap-5 animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400">
+                <div className="w-8 h-8 rounded-md bg-white/10 border border-white/10/40 flex items-center justify-center text-white">
                   <Download size={16} />
                 </div>
                 <div>
-                  <h2 className="text-sm font-bold text-white">Export Studio Image</h2>
+                  <h2 className="text-sm font-bold text-white text-balance">Export Studio Image</h2>
                   <p className="text-[11px] text-text-muted">Choose your resolution and format</p>
                 </div>
               </div>
               <button 
                 onClick={() => setShowExportModal(false)}
-                className="w-7 h-7 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+                className="w-7 h-7 rounded-md bg-white/[0.05] hover:bg-white/[0.1] flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+                aria-label="Close Export Modal"
               >
-                <X size={15} />
+                <X size={15} aria-hidden="true" />
               </button>
             </div>
 
             {/* Resolution / Quality Selection */}
             <div>
               <label className="text-xs font-semibold text-white/90 uppercase tracking-wider block mb-2.5 flex items-center gap-1.5">
-                <Gauge size={13} className="text-blue-400" /> Select Quality & Resolution
+                <Gauge size={13} className="text-white" /> Select Quality & Resolution
               </label>
               <div className="grid grid-cols-2 gap-2.5">
                 {[
@@ -2409,13 +2603,13 @@ export default function StudioPage() {
                   <button
                     key={res.val}
                     onClick={() => setExportScale(res.val)}
-                    className={`flex flex-col p-3 rounded-xl border text-left transition-all relative ${exportScale === res.val ? 'bg-blue-600/15 border-blue-500 ring-1 ring-blue-500/30 text-white shadow-md' : 'bg-black/30 border-white/10 text-zinc-400 hover:bg-white/[0.04] hover:border-white/20 hover:text-white'}`}
+                    className={`flex flex-col p-3 rounded-lg border text-left transition relative ${exportScale === res.val ? 'bg-white/10 border-white/10 ring-1 ring-white/5 text-white shadow-md' : 'bg-white/[0.02] border-white/10 text-zinc-400 hover:bg-white/[0.04] hover:border-white/5 hover:text-white'}`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs font-bold text-white">{res.label}</span>
-                      <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full ${exportScale === res.val ? 'bg-blue-600 text-white font-semibold' : 'bg-white/10 text-zinc-400'}`}>{res.badge}</span>
+                      <span className={`text-[9px] font-mono tabular-nums px-1.5 py-0.5 rounded-full ${exportScale === res.val ? 'bg-white text-black font-semibold' : 'bg-white/10 text-zinc-400'}`}>{res.badge}</span>
                     </div>
-                    <span className="text-[10px] opacity-75 font-mono">{res.desc}</span>
+                    <span className="text-[10px] opacity-75 font-mono tabular-nums">{res.desc}</span>
                   </button>
                 ))}
               </div>
@@ -2424,7 +2618,7 @@ export default function StudioPage() {
             {/* Format Selection */}
             <div>
               <label className="text-xs font-semibold text-white/90 uppercase tracking-wider block mb-2.5 flex items-center gap-1.5">
-                <ImageIcon size={13} className="text-blue-400" /> File Format
+                <ImageIcon size={13} className="text-white" /> File Format
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {[
@@ -2435,7 +2629,7 @@ export default function StudioPage() {
                   <button
                     key={fmt.id}
                     onClick={() => setExportFormat(fmt.id as any)}
-                    className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all ${exportFormat === fmt.id ? 'bg-blue-600/15 border-blue-500 ring-1 ring-blue-500/30 text-white shadow-md' : 'bg-black/30 border-white/10 text-zinc-400 hover:bg-white/[0.04] hover:border-white/20 hover:text-white'}`}
+                    className={`flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all duration-300 ease-out active:scale-[0.98] ${exportFormat === fmt.id ? 'bg-white/10 border-white/10 ring-1 ring-white/5 text-white shadow-md' : 'bg-white/[0.02] border-white/10 text-zinc-400 hover:bg-white/[0.04] hover:border-white/5 hover:text-white'}`}
                   >
                     <span className="text-xs font-bold text-white">{fmt.name}</span>
                     <span className="text-[9px] opacity-70 mt-0.5">{fmt.desc}</span>
@@ -2445,9 +2639,9 @@ export default function StudioPage() {
             </div>
 
             {/* Random Filename Preview */}
-            <div className="bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 flex items-center justify-between text-xs">
+            <div className="bg-white/[0.02] border border-white/10 rounded-lg px-3.5 py-2.5 flex items-center justify-between text-xs">
               <span className="text-text-muted font-medium">Output Filename:</span>
-              <span className="font-mono text-white/90 font-medium bg-white/5 px-2 py-0.5 rounded border border-white/5">
+              <span className="font-mono tabular-nums text-white/90 font-medium bg-white/5 px-2 py-0.5 rounded border border-white/5">
                 noicess-XXXXXX.{exportFormat === 'jpeg' ? 'jpg' : exportFormat}
               </span>
             </div>
@@ -2457,7 +2651,7 @@ export default function StudioPage() {
               <button
                 onClick={handleCopyClipboard}
                 disabled={!image || isExporting}
-                className="flex-1 py-2.5 rounded-xl border border-white/10 bg-white/[0.05] hover:bg-white/[0.1] text-xs font-semibold flex items-center justify-center gap-2 text-zinc-200 hover:text-white transition-colors disabled:opacity-40"
+                className="flex-1 py-2.5 rounded-lg border border-white/10 bg-white/[0.05] hover:bg-white/[0.1] text-xs font-semibold flex items-center justify-center gap-2 text-zinc-200 hover:text-white transition-colors disabled:opacity-40"
               >
                 {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
                 <span>{copied ? 'Copied Image!' : 'Copy to Clipboard'}</span>
@@ -2469,7 +2663,7 @@ export default function StudioPage() {
                   setShowExportModal(false);
                 }}
                 disabled={!image || isExporting}
-                className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-semibold flex items-center justify-center gap-2 text-white shadow-lg shadow-blue-600/30 hover:shadow-blue-500/45 transition-all active:scale-95 disabled:opacity-40"
+                className="flex-1 py-2.5 rounded-lg bg-white hover:bg-zinc-200 text-black text-xs font-semibold flex items-center justify-center gap-2 shadow-lg shadow-white/10 hover:shadow-white/20 transition active:scale-[0.96] disabled:opacity-40"
               >
                 {isExporting ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
                 <span>{isExporting ? 'Generating...' : `Download ${exportScale}x`}</span>
