@@ -152,27 +152,56 @@ body {
   }
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 2px;
-  height: 2px;
+/* Prevent layout shift when scrollbars appear or disappear */
+.overflow-y-auto,
+.overflow-y-scroll {
+  scrollbar-gutter: stable;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* Custom Scrollbar - ultra sleek, no stepper arrows, zero track */
+::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
 }
 
-::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 2px;
+::-webkit-scrollbar-button,
+*::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
-*:hover::-webkit-scrollbar-thumb {
-  background: var(--border);
+::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-corner {
+  display: none !important;
+  background: transparent !important;
 }
 
-*:hover::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
+::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track,
+::-webkit-scrollbar-track-piece,
+*::-webkit-scrollbar-track-piece {
+  background: transparent !important;
+  border: none !important;
+}
+
+::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  border: none !important;
+  transition: background 0.15s ease;
+}
+
+::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+
+::-webkit-scrollbar-thumb:active,
+*::-webkit-scrollbar-thumb:active {
+  background: rgba(255, 255, 255, 0.25) !important;
 }
 
 /* Remove spin buttons from number inputs across the entire application */
@@ -184,4 +213,25 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
+}
+
+/* Global Interactive Element Cursors */
+button,
+[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="checkbox"],
+input[type="radio"],
+input[type="color"],
+select,
+label[for] {
+  cursor: pointer;
+}
+
+button:disabled,
+[role="button"]:disabled,
+input:disabled,
+select:disabled {
+  cursor: not-allowed !important;
 }

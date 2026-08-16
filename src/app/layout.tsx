@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NoiceSS — Pro Screenshot & Mockup Studio",
+  title: "NoiceSS - Pro Screenshot & Mockup Studio",
   description: "Create stunning screenshot mockups with 3D perspectives, macOS frames, radiant backdrops, and multi-resolution exports.",
   icons: {
     icon: "/favicon.svg",
