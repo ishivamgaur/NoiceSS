@@ -4037,45 +4037,113 @@ export default function StudioPage() {
                           aspectRatio: aspectStyle === 'auto' ? '4/3' : aspectStyle,
                         }}
                       >
-                        {/* Background Layer with Blur */}
-                        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                        {image ? (
                           <div 
-                            className="absolute inset-0 w-full h-full"
-                            style={{
-                              backgroundImage: `url('/wallpapers/wp14135599-8k-mac-dark-green-wallpapers.webp')`,
-                              backgroundSize: 'cover',
-                              backgroundPosition: 'center',
-                              filter: 'blur(10px)',
-                              transform: 'scale(1.15)'
+                            className="w-full h-full flex items-center justify-center overflow-hidden shadow-sm relative"
+                            style={{ 
+                              padding: `${(padding / parseFloat(getCanvasDimensions().width as string)) * 100}%`,
                             }}
-                          />
-                        </div>
-                        
-                        {/* 3D Transformed Mock Card */}
-                        <div 
-                          className="flex items-center justify-center transition-transform duration-300 w-full h-full z-10"
-                          style={{ 
-                            transform: p.previewTransform || p.transform,
-                            transformStyle: 'preserve-3d',
-                          }}
-                        >
-                            <div 
-                              className="relative flex flex-col w-[75%] aspect-video rounded-sm overflow-hidden shadow-2xl border border-white/20 bg-black/50"
-                            >
-                              <img 
-                                src="/wallpapers/wp14135599-8k-mac-dark-green-wallpapers.webp" 
-                                alt="Mock Preview" 
-                                className="w-full h-full object-cover block"
+                          >
+                            {/* Background Layer with Blur */}
+                            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                              <div 
+                                className="absolute inset-0 w-full h-full"
+                                style={{
+                                  ...(background.startsWith('url(') 
+                                    ? { backgroundImage: background, backgroundSize: 'cover', backgroundPosition: 'center' }
+                                    : { background: background }),
+                                  filter: bgBlur > 0 ? `blur(${bgBlur / 4}px)` : 'none',
+                                  transform: bgBlur > 0 ? `scale(${1 + (bgBlur / 100)})` : 'none',
+                                }}
                               />
                             </div>
-                        </div>
-
-                        {/* Overlay Icon */}
-                        <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-                          <div className={`flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-md border border-white/20 shadow-lg ${isActive ? 'text-white' : 'text-zinc-300 group-hover:text-white transition-colors'}`}>
-                            <p.icon size={16} aria-hidden="true" />
+                            
+                            <div 
+                              className="flex items-center justify-center transition-transform duration-300 w-full h-full z-10"
+                              style={{ 
+                                transform: p.previewTransform || p.transform,
+                                transformStyle: 'preserve-3d',
+                              }}
+                            >
+                                {/* Miniaturized Screenshot Card */}
+                                <div 
+                                  className="relative flex flex-col"
+                                  style={{
+                                    maxWidth: 'none',
+                                    maxHeight: 'none',
+                                    width: `${scale}%`,
+                                    height: aspectStyle === 'auto' ? 'auto' : `${scale}%`,
+                                    borderRadius: `${radius / 4}px`,
+                                    boxShadow: 'none',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    backdropFilter: 'none',
+                                    WebkitBackdropFilter: 'none',
+                                    padding: '0',
+                                    filter: imageBlur > 0 ? `blur(${imageBlur / 4}px)` : 'none',
+                                    isolation: 'isolate'
+                                  }}
+                                >
+                                  <div className={`relative flex flex-col overflow-hidden w-full h-full`} style={{ borderRadius: `${radius / 4}px` }}>
+                                    {showMacOsBar && (
+                                      <div className={`shrink-0 bg-[#1C1C1E] flex items-center px-1.5 py-0.5 gap-0.5 ${view === 'browser' ? 'border-b border-white/10' : ''}`}>
+                                        <div className="w-[3px] h-[3px] rounded-full bg-[#ff5f56]" />
+                                        <div className="w-[3px] h-[3px] rounded-full bg-[#ffbd2e]" />
+                                        <div className="w-[3px] h-[3px] rounded-full bg-[#27c93f]" />
+                                      </div>
+                                    )}
+                                    <img 
+                                      src={image} 
+                                      alt={p.name} 
+                                      className="w-full h-full object-contain block"
+                                    />
+                                  </div>
+                                </div>
+                            </div>
                           </div>
-                        </div>
+                        ) : (
+                          <>
+                            {/* Background Layer with Blur (Actual Selected Background) */}
+                            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                              <div 
+                                className="absolute inset-0 w-full h-full"
+                                style={{
+                                  ...(background.startsWith('url(') 
+                                    ? { backgroundImage: background, backgroundSize: 'cover', backgroundPosition: 'center' }
+                                    : { background: background }),
+                                  filter: bgBlur > 0 ? `blur(${bgBlur / 4}px)` : 'none',
+                                  transform: bgBlur > 0 ? `scale(${1 + (bgBlur / 100)})` : 'none',
+                                }}
+                              />
+                            </div>
+                            
+                            {/* 3D Transformed Mock Card */}
+                            <div 
+                              className="flex items-center justify-center transition-transform duration-300 w-full h-full z-10"
+                              style={{ 
+                                transform: p.previewTransform || p.transform,
+                                transformStyle: 'preserve-3d',
+                              }}
+                            >
+                                <div 
+                                  className="relative flex flex-col w-[75%] aspect-video rounded-sm overflow-hidden shadow-2xl border border-white/20 bg-black/50"
+                                >
+                                  <img 
+                                    src="/wallpapers/wp14135599-8k-mac-dark-green-wallpapers.webp" 
+                                    alt="Mock Preview" 
+                                    className="w-full h-full object-cover block"
+                                  />
+                                </div>
+                            </div>
+
+                            {/* Overlay Icon */}
+                            <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                              <div className={`flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-md border border-white/20 shadow-lg ${isActive ? 'text-white' : 'text-zinc-300 group-hover:text-white transition-colors'}`}>
+                                <p.icon size={16} aria-hidden="true" />
+                              </div>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </button>
                   );
