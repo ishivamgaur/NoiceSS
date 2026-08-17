@@ -3807,7 +3807,7 @@ export default function StudioPage() {
             target="_blank" 
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/10 text-xs font-medium transition text-zinc-200 hover:text-white active:scale-[0.96]"
-            title="Star NoiceSS on GitHub"
+            title="Star NOICESS on GitHub"
           >
             <Star size={13} className={starCount !== null ? "fill-yellow-500 text-yellow-500" : ""} />
             <span>Star</span>
