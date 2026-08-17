@@ -25,3 +25,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - **Minimalism**: Keep the UI clean, distraction-free, and uncluttered. If a tool isn't frequently used, hide it behind an "Advanced" accordion or popover.
 - **Micro-interactions**: Interactive elements (buttons, inputs) must have `hover:`, `active:scale-95`, and `transition-colors duration-200` states to feel premium and tactile.
 - **Dark Mode Standard**: NoiceSS is a dark-mode-first application. Text should be `text-zinc-300`, headers `text-white`, and muted text `text-zinc-500`. Avoid pure black backgrounds; use deep grays like `#0f0f11` or `#18181b`.
+
+## 4. User Preferences & Strict Directives
+- **Username**: The user's username is `ishivgaur` (not `ishivamgaur`). Keep this in mind if generating mock data.
+- **Active States**: Avoid colored border accents unless explicitly requested. Use `border-white ring-1 ring-white/30 shadow-md` (or similar white/translucent combos) for strong active/selected states.
+- **Preview Parity**: Sidebar previews and thumbnails MUST visually mirror the main canvas exactly (applying scaled-down dimensions, blur, padding, etc.) without arbitrary backgrounds or borders. Do not add box-shadows or padding to previews that don't exist on the main canvas.
+- **Clean Interactions**: Avoid arbitrary hover zooms (`hover:scale-105`) on UI preview elements unless necessary. Keep UI interactions flat and minimal.
+- **Floating Controls & Z-Index**:
+  - `Header` is `z-[200]`.
+  - `Floating HUDs/Editors` are `z-[150]`.
+  - Always remember to use `e.stopPropagation()` on `onClick` AND `onPointerDown` for interactive canvas elements (like watermarks) so they don't accidentally trigger canvas deselection.

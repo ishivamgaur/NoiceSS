@@ -9,7 +9,7 @@ import {
   Loader2, Aperture, SlidersHorizontal, Droplets, Droplet, Tv, Radio, Film, 
   Focus, Pipette, Paintbrush, Flame, Zap, SunMedium, Type, Scan, Scaling, 
   AppWindow, Gauge, EyeOff, SlidersVertical, X, Lock, Unlock, Bookmark, Save, Plus, Star, Camera, Undo2, Redo2,
-  ArrowUp, ArrowDown, ArrowLeft, ArrowRight
+  ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Menu
 } from 'lucide-react';
 import { toPng, toJpeg, toBlob } from 'html-to-image';
 import { Slider } from "@/components/ui/slider";
@@ -551,6 +551,7 @@ export default function StudioPage() {
 
   // Canvas Viewport Zoom & Pan (Figma-style smooth workspace navigation)
   const [viewportZoom, setViewportZoom] = useState(1);
+  const [baseZoom, setBaseZoom] = useState(1);
   const [viewportPan, setViewportPan] = useState({ x: 0, y: 0 });
   const [isPanningWorkspace, setIsPanningWorkspace] = useState(false);
   const [isSpacePressed, setIsSpacePressed] = useState(false);
@@ -603,6 +604,10 @@ export default function StudioPage() {
   };
 
   const isCustomLighting = brightness !== 100 || contrast !== 100 || saturation !== 100 || hueRotate !== 0 || filter !== 'none';
+
+  // Mobile layout state
+  const [showLeftSidebar, setShowLeftSidebar] = useState(false);
+  const [showRightSidebar, setShowRightSidebar] = useState(false);
   const [view, setView] = useState('default');
   const [perspective, setPerspective] = useState('front');
   const [rotateX, setRotateX] = useState(0);
@@ -1333,10 +1338,114 @@ export default function StudioPage() {
     }
   };
 
-  const resetViewport = () => {
-    setViewportZoom(1);
-    setViewportPan({ x: 0, y: 0 });
+  const handleSheetDrag = (e: React.PointerEvent<HTMLDivElement>, closeSetter: (v: boolean) => void) => {
+    const el = e.currentTarget.parentElement?.parentElement;
+    if (!el) return;
+    const startY = e.clientY;
+    let currentY = 0;
+    
+    const handleMove = (eMove: PointerEvent) => {
+      currentY = Math.max(0, eMove.clientY - startY);
+      el.style.transform = `translateY(${currentY}px)`;
+      el.style.transition = 'none';
+    };
+    
+    const handleUp = () => {
+      window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerup', handleUp);
+      el.style.transition = 'transform 0.2s ease-out';
+      if (currentY > 60) {
+         closeSetter(false);
+         setTimeout(() => { el.style.transform = ''; }, 300); // Reset after unmount
+      } else {
+         el.style.transform = '';
+      }
+    };
+    
+    window.addEventListener('pointermove', handleMove);
+    window.addEventListener('pointerup', handleUp);
   };
+
+  const getInitialZoom = () => {
+    if (typeof window !== 'undefined') {
+      const workspace = workspaceRef.current;
+      
+      if (workspace) {
+        const workspaceW = workspace.clientWidth;
+        const workspaceH = workspace.clientHeight;
+        
+        // Use getCanvasDimensions() directly to avoid waiting for DOM updates
+        const dims = getCanvasDimensions();
+        const canvasW = parseFloat(dims.width as string);
+        const canvasH = parseFloat(dims.height as string);
+        
+        if (canvasW > 0 && canvasH > 0) {
+          // Responsive padding: 48px on mobile, 80px on desktop
+          const paddingX = window.innerWidth < 768 ? 48 : 80;
+          const paddingY = window.innerWidth < 768 ? 48 : 80;
+          const scaleW = (workspaceW - paddingX) / canvasW;
+          const scaleH = (workspaceH - paddingY) / canvasH;
+          
+          return Math.max(0.1, Math.min(scaleW, scaleH, 1)); // Cap at 1.0x so it doesn't blow up on desktop
+        }
+      }
+      
+      // Fallback
+      if (window.innerWidth < 768) {
+        return Math.max(0.2, (window.innerWidth - 32) / 850);
+      }
+    }
+    return 1;
+  };
+
+  const resetViewport = () => {
+    const zoom = getInitialZoom();
+    setBaseZoom(zoom);
+    setViewportZoom(zoom);
+    
+    // Auto-center translation for transformOrigin: 0 0
+    if (workspaceRef.current) {
+      const w = workspaceRef.current.clientWidth;
+      const h = workspaceRef.current.clientHeight;
+      setViewportPan({
+        x: (w - w * zoom) / 2,
+        y: (h - h * zoom) / 2
+      });
+    } else {
+      setViewportPan({ x: 0, y: 0 });
+    }
+  };
+
+  useEffect(() => {
+    resetViewport();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-fit whenever aspect ratio or padding changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const t = setTimeout(() => {
+        resetViewport();
+      }, 50);
+      return () => clearTimeout(t);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aspectRatio, customRatioW, customRatioH, padding, image]);
+
+  // Auto-fit when workspace container resizes
+  useEffect(() => {
+    const workspace = workspaceRef.current;
+    if (!workspace) return;
+    
+    const observer = new ResizeObserver(() => {
+      // Debounce slightly to prevent jerky zooming
+      resetViewport();
+    });
+    
+    observer.observe(workspace);
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const viewportZoomTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const viewportZoomIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -1778,22 +1887,38 @@ export default function StudioPage() {
     
     return {
       width: `${finalW}px`,
-      height: `${finalH}px`,
-      percentW: (finalW / canvasW) * 100,
-      percentH: (finalH / canvasH) * 100,
-      paddingPercent: (padding / canvasW) * 100
+      height: `${finalH}px`
     };
   };
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-bg-dark text-text-main font-sans antialiased">
+    <div className="flex flex-col md:flex-row h-[100dvh] w-[100dvw] overflow-hidden bg-bg-dark text-text-main font-sans antialiased">
       
+      {/* Mobile Header (Only visible on mobile) */}
+      <header className="md:hidden h-14 border-b border-white/5 bg-panel flex items-center justify-between px-4 shrink-0 z-40">
+        <button onClick={() => setShowLeftSidebar(true)} className="text-zinc-400 hover:text-white p-2 -ml-2"><Menu size={20}/></button>
+        <span className="font-bold text-sm tracking-[0.2em] text-white uppercase select-none drop-shadow-sm">NOICESS</span>
+        <button onClick={() => setShowRightSidebar(true)} className="text-zinc-400 hover:text-white p-2 -mr-2"><SlidersHorizontal size={20}/></button>
+      </header>
+
+      {/* Mobile Overlay for Left Sidebar */}
+      {showLeftSidebar && (
+        <div className="md:hidden fixed inset-0 bg-black/60 z-[290] backdrop-blur-sm" onClick={() => setShowLeftSidebar(false)} />
+      )}
+
       {/* Left Sidebar */}
-      <aside className="w-[300px] min-w-[300px] flex flex-col bg-panel border-r border-white/5 z-20 select-none h-full overflow-hidden">
+      <aside className={`fixed md:relative flex z-[300] md:z-20 inset-y-0 left-0 w-[85vw] max-w-[300px] md:min-w-[300px] md:w-[300px] flex-col bg-panel border-r border-white/5 select-none h-full overflow-hidden transition-transform duration-300 ${showLeftSidebar ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        
         {/* Top Header Bar aligned with h-16 main header */}
-        <div className="h-16 border-b border-white/5 px-6 flex items-center shrink-0">
+        <div className="hidden md:flex h-16 border-b border-white/5 px-6 items-center shrink-0">
           <span className="font-bold text-base tracking-[0.2em] text-white uppercase select-none drop-shadow-sm">
             NOICESS
           </span>
+        </div>
+        
+        {/* Mobile Sidebar Close Header */}
+        <div className="md:hidden h-14 border-b border-white/5 px-4 flex items-center justify-between shrink-0">
+          <span className="font-bold text-sm text-zinc-400 uppercase">Configuration</span>
+          <button onClick={() => setShowLeftSidebar(false)} className="text-zinc-400 hover:text-white p-1"><X size={18}/></button>
         </div>
 
         {/* Sticky Tabs Header */}
@@ -1846,7 +1971,7 @@ export default function StudioPage() {
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto [scrollbar-gutter:stable] p-3 pb-8 flex flex-col">
+        <div className="flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable] p-3 pb-8 flex flex-col">
 
           {/* Tab 1: Layout & Frame */}
           {leftTab === 'layout' && (
@@ -2608,29 +2733,29 @@ export default function StudioPage() {
 
       {/* Main Studio Workspace */}
       <main className="flex-grow flex flex-col bg-bg-dark h-full relative overflow-hidden">
-        <header className="h-16 border-b border-white/5 bg-panel flex items-center justify-between px-6 z-[200] shrink-0">
+        <header className="h-16 border-b border-white/5 bg-panel flex items-center justify-between px-3 md:px-6 z-[200] shrink-0 overflow-x-auto md:overflow-visible no-scrollbar gap-1">
           {/* Left Actions: Undo / Redo */}
-          <div className="flex-1 flex items-center gap-1.5">
+          <div className="flex-1 flex items-center gap-1.5 md:gap-2">
             <button 
               onClick={handleUndo}
               disabled={historyIndex <= 0}
-              className="flex items-center justify-center w-[34px] h-[34px] rounded-lg border border-transparent hover:bg-white/[0.04] hover:border-white/5 text-zinc-400 hover:text-white transition-all active:scale-[0.96] disabled:opacity-30 disabled:hover:bg-transparent disabled:active:scale-100 disabled:cursor-not-allowed" 
+              className="flex items-center justify-center w-[32px] h-[32px] md:w-[34px] md:h-[34px] rounded-lg border border-transparent hover:bg-white/[0.04] hover:border-white/5 text-zinc-400 hover:text-white transition-all active:scale-[0.96] disabled:opacity-30 disabled:hover:bg-transparent disabled:active:scale-100 disabled:cursor-not-allowed" 
               title="Undo" aria-label="Undo"
             >
-              <Undo2 size={15} />
+              <Undo2 className="w-[14px] h-[14px] md:w-[15px] md:h-[15px]" />
             </button>
             <button 
               onClick={handleRedo}
               disabled={historyIndex >= history.length - 1}
-              className="flex items-center justify-center w-[34px] h-[34px] rounded-lg border border-transparent hover:bg-white/[0.04] hover:border-white/5 text-zinc-400 hover:text-white transition-all active:scale-[0.96] disabled:opacity-30 disabled:hover:bg-transparent disabled:active:scale-100 disabled:cursor-not-allowed" 
+              className="flex items-center justify-center w-[32px] h-[32px] md:w-[34px] md:h-[34px] rounded-lg border border-transparent hover:bg-white/[0.04] hover:border-white/5 text-zinc-400 hover:text-white transition-all active:scale-[0.96] disabled:opacity-30 disabled:hover:bg-transparent disabled:active:scale-100 disabled:cursor-not-allowed" 
               title="Redo" aria-label="Redo"
             >
-              <Redo2 size={15} />
+              <Redo2 className="w-[14px] h-[14px] md:w-[15px] md:h-[15px]" />
             </button>
           </div>
 
           {/* Center Hub: Aspect Ratio + Presets */}
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-1.5 md:gap-2">
             {/* Aspect Ratio Selector */}
             <div className="relative">
               <button
@@ -2638,28 +2763,36 @@ export default function StudioPage() {
                   setShowRatioMenu(!showRatioMenu);
                   setShowPresetsMenu(false);
                 }}
-                className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/5 text-xs font-medium transition shadow-inner text-zinc-200 hover:text-white active:scale-[0.96]"
+                className="flex items-center gap-1.5 md:gap-2.5 px-2.5 md:px-3.5 py-2 rounded-lg border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/5 text-[11px] sm:text-xs font-medium transition shadow-inner text-zinc-200 hover:text-white active:scale-[0.96]"
               >
-                <div className="w-4 h-4 flex items-center justify-center text-white shrink-0">
+                <div className="w-3.5 h-3.5 md:w-4 md:h-4 flex items-center justify-center text-white shrink-0">
                   {renderAspectBox(aspectStyle)}
                 </div>
-                <span className="font-semibold text-white">{activeRatioData.name}</span>
-                <ChevronDown size={14} className={`text-zinc-400 transition-transform duration-200 ${showRatioMenu ? 'rotate-180 text-white' : ''}`} />
+                <span className="font-semibold text-white hidden sm:inline">{activeRatioData.name}</span>
+                <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${showRatioMenu ? 'rotate-180 text-white' : ''}`} />
               </button>
 
               {showRatioMenu && (
                 <>
                   {/* Backdrop to close popover on outside click */}
                   <div 
-                    className="fixed inset-0 z-40" 
+                    className="fixed inset-0 z-[290] md:z-40 md:bg-transparent bg-black/60 backdrop-blur-sm md:backdrop-blur-none" 
                     onClick={() => setShowRatioMenu(false)} 
                   />
 
-                  <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[360px] max-w-[94vw] bg-[#141417] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
-                    <div className="max-h-[480px] overflow-y-auto [scrollbar-gutter:stable] p-3 pb-4 flex flex-col gap-3.5">
+                  <div className="fixed md:absolute bottom-0 md:bottom-auto md:top-full left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:mt-2 md:w-[360px] md:max-w-[94vw] w-full bg-[#141417] border-t md:border border-white/10 rounded-t-2xl md:rounded-xl overflow-hidden shadow-2xl z-[300] md:z-50 animate-in slide-in-from-bottom-2 md:slide-in-from-top-2 fade-in duration-150">
+                    <div className="max-h-[85vh] md:max-h-[480px] overflow-y-auto [scrollbar-gutter:stable] p-4 md:p-3 pb-6 flex flex-col gap-4 md:gap-3.5">
                       
+                      {/* Mobile Sheet Handle */}
+                      <div 
+                        className="w-full h-8 -mt-2 -mb-2 flex items-center justify-center cursor-grab active:cursor-grabbing md:hidden shrink-0 touch-none"
+                        onPointerDown={(e) => handleSheetDrag(e, setShowRatioMenu)}
+                      >
+                        <div className="w-12 h-1.5 bg-white/10 rounded-full" />
+                      </div>
+
                       {/* Top Section: Custom Ratio */}
-                      <div className="flex flex-col gap-1.5">
+                      <div className="flex flex-col gap-1.5 shrink-0">
                         <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider px-0.5">
                           Custom Ratio
                         </span>
@@ -2777,32 +2910,40 @@ export default function StudioPage() {
                   setShowPresetsMenu(!showPresetsMenu);
                   setShowRatioMenu(false);
                 }}
-                className="flex items-center gap-2 px-3.5 py-2 rounded-lg border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/5 text-xs font-medium transition shadow-inner text-zinc-200 hover:text-white active:scale-[0.96]"
+                className="flex items-center gap-1.5 md:gap-2.5 px-2.5 md:px-3.5 py-2 rounded-lg border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/5 text-[11px] sm:text-xs font-medium transition shadow-inner text-zinc-200 hover:text-white active:scale-[0.96]"
                 title="Custom Presets & Studio Styles"
               >
-                <Bookmark size={13} className="text-zinc-300" />
-                <span className="font-semibold text-white">Presets</span>
+                <Bookmark className="w-3.5 h-3.5 md:w-[13px] md:h-[13px] text-zinc-300" />
+                <span className="font-semibold text-white hidden sm:inline">Presets</span>
                 {customPresets.length > 0 && (
-                  <span className="w-4 h-4 rounded-full bg-white/10 text-[10px] font-mono flex items-center justify-center text-zinc-300">
+                  <span className="w-3.5 h-3.5 md:w-4 md:h-4 rounded-full bg-white/10 text-[9px] md:text-[10px] font-mono flex items-center justify-center text-zinc-300">
                     {customPresets.length}
                   </span>
                 )}
-                <ChevronDown size={14} className={`text-zinc-400 transition-transform duration-200 ${showPresetsMenu ? 'rotate-180 text-white' : ''}`} />
+                <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${showPresetsMenu ? 'rotate-180 text-white' : ''}`} />
               </button>
 
               {showPresetsMenu && (
                 <>
                   {/* Backdrop to close popover on outside click */}
                   <div 
-                    className="fixed inset-0 z-40" 
+                    className="fixed inset-0 z-[290] md:z-40 md:bg-transparent bg-black/60 backdrop-blur-sm md:backdrop-blur-none" 
                     onClick={() => setShowPresetsMenu(false)} 
                   />
 
-                  <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[340px] max-w-[94vw] bg-[#141417] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
-                    <div className="max-h-[460px] overflow-y-auto [scrollbar-gutter:stable] p-3 pb-3.5 flex flex-col gap-3.5">
+                  <div className="fixed md:absolute bottom-0 md:bottom-auto md:top-full left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:mt-2 md:w-[340px] md:max-w-[94vw] w-full bg-[#141417] border-t md:border border-white/10 rounded-t-2xl md:rounded-xl overflow-hidden shadow-2xl z-[300] md:z-50 animate-in slide-in-from-bottom-2 md:slide-in-from-top-2 fade-in duration-150">
+                    <div className="max-h-[85vh] md:max-h-[460px] overflow-y-auto [scrollbar-gutter:stable] p-4 md:p-3 pb-6 flex flex-col gap-4 md:gap-3.5">
                       
+                      {/* Mobile Sheet Handle */}
+                      <div 
+                        className="w-full h-8 -mt-2 -mb-2 flex items-center justify-center cursor-grab active:cursor-grabbing md:hidden shrink-0 touch-none"
+                        onPointerDown={(e) => handleSheetDrag(e, setShowPresetsMenu)}
+                      >
+                        <div className="w-12 h-1.5 bg-white/10 rounded-full" />
+                      </div>
+
                       {/* Section 1: Save Current Preset */}
-                      <div className="flex flex-col gap-1.5">
+                      <div className="flex flex-col gap-1.5 shrink-0">
                         <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider px-0.5">
                           Save Current Style
                         </span>
@@ -2932,37 +3073,39 @@ export default function StudioPage() {
           </div>
 
           {/* Header Action Controls */}
-          <div className="flex-1 flex items-center justify-end gap-3">
+          <div className="flex-1 flex items-center justify-end gap-1.5 md:gap-2">
 
             {/* Copy to Clipboard */}
             <button
               onClick={handleCopyClipboard}
               disabled={!image || isExporting}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/5 text-zinc-200 hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.96]"
+              className="flex items-center gap-0 sm:gap-1.5 md:gap-1.5 px-2.5 sm:px-3 md:px-3.5 py-2 rounded-lg text-xs font-medium border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/5 text-zinc-200 hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.96]"
               title="Copy screenshot to clipboard"
             >
-              {copied ? <Check size={14} className="text-white" /> : <Copy size={14} />}
-              <span>{copied ? 'Copied!' : 'Copy'}</span>
+              {copied ? <Check className="w-[14px] h-[14px] sm:w-[13px] sm:h-[13px] md:w-3.5 md:h-3.5 text-white" /> : <Copy className="w-[14px] h-[14px] sm:w-[13px] sm:h-[13px] md:w-3.5 md:h-3.5" />}
+              <span className="hidden sm:inline">{copied ? 'Copied!' : 'Copy'}</span>
             </button>
 
             {/* Clear Button */}
             <button 
-              className="group flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium border border-white/5 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-zinc-400 disabled:hover:border-white/5 disabled:cursor-not-allowed active:scale-[0.96]" 
+              className="group flex items-center gap-0 sm:gap-1.5 md:gap-1.5 px-2.5 sm:px-3 md:px-3.5 py-2 rounded-lg text-xs font-medium border border-white/5 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-zinc-400 disabled:hover:border-white/5 disabled:cursor-not-allowed active:scale-[0.96]" 
               onClick={() => { setImage(null); setImageSelected(false); setRotation(0); setPos({ x: 0, y: 0 }); setWatermark(''); }} 
               disabled={!image}
+              title="Clear Image"
             >
-              <Trash2 size={13} className={`transition-colors ${image ? 'text-red-500/80 group-hover:text-red-500' : ''}`} />
-              <span>Clear</span>
+              <Trash2 className={`w-[14px] h-[14px] sm:w-[13px] sm:h-[13px] md:w-[13px] md:h-[13px] transition-colors ${image ? 'text-red-500/80 group-hover:text-red-500' : ''}`} />
+              <span className="hidden sm:inline">Clear</span>
             </button>
 
             {/* High-End Export Modal Trigger Button */}
             <button 
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold bg-white hover:bg-zinc-200 text-black shadow-lg shadow-white/10 hover:shadow-white/20 transition duration-150 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.96]" 
+              className="flex items-center gap-0 sm:gap-1.5 md:gap-2 px-2.5 sm:px-3 md:px-4 py-2 rounded-lg text-xs font-semibold bg-white hover:bg-zinc-200 text-black shadow-lg shadow-white/10 hover:shadow-white/20 transition duration-150 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.96]" 
               onClick={() => setShowExportModal(true)} 
               disabled={!image}
+              title="Export Settings"
             >
-              <Download size={14} />
-              <span>Export</span>
+              <Download className="w-[14px] h-[14px] sm:w-[13px] sm:h-[13px] md:w-3.5 md:h-3.5" />
+              <span className="hidden sm:inline">Export</span>
             </button>
           </div>
         </header>
@@ -3333,15 +3476,15 @@ export default function StudioPage() {
         {!isExporting && image && (imageSelected || isRotating) && (
           <div 
             data-no-export="true"
-            className="no-export absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-[#1C1C1E]/95 backdrop-blur-md border border-white/10 rounded-xl px-2.5 py-1.5 shadow-2xl z-[150] pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-200"
+            className="no-export absolute top-6 md:top-8 left-1/2 -translate-x-1/2 flex items-center gap-1 sm:gap-1.5 bg-[#1C1C1E]/95 backdrop-blur-md border border-white/10 rounded-xl px-2 sm:px-2.5 py-1.5 shadow-2xl z-[150] pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-200"
             onPointerDown={(e) => e.stopPropagation()}
           >
             <button
-              className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors"
+              className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors"
               title="Rotate 90°"
               onClick={() => setRotation((r) => (r + 90) % 360)}
             >
-              <RotateCw size={15} />
+              <RotateCw className="w-4 h-4 sm:w-[15px] sm:h-[15px]" />
             </button>
             {isEditingRotation ? (
               <div className="flex items-center mx-1">
@@ -3349,7 +3492,7 @@ export default function StudioPage() {
                   type="text"
                   inputMode="numeric"
                   autoFocus
-                  className="w-12 h-7 px-1 bg-black/70 text-white border border-white/10 rounded-md text-center text-xs font-mono tabular-nums focus:outline-none focus:ring-1 focus:ring-white/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-10 sm:w-12 h-6 sm:h-7 px-1 bg-black/70 text-white border border-white/10 rounded-md text-center text-[10px] sm:text-xs font-mono tabular-nums focus:outline-none focus:ring-1 focus:ring-white/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   value={rotationInput}
                   onChange={(e) => {
                     const v = e.target.value;
@@ -3377,11 +3520,11 @@ export default function StudioPage() {
                     setIsEditingRotation(false);
                   }}
                 />
-                <span className="text-[11px] font-mono tabular-nums text-white/50 ml-1">°</span>
+                <span className="text-[10px] sm:text-[11px] font-mono tabular-nums text-white/50 ml-1">°</span>
               </div>
             ) : (
               <button 
-                className="text-xs font-mono tabular-nums font-semibold text-white/90 mx-1 px-2 py-1 rounded-md bg-white/5 cursor-text hover:text-white hover:bg-white/10 hover:border-white/10 border border-transparent transition"
+                className="text-[10px] sm:text-xs font-mono tabular-nums font-semibold text-white/90 mx-1 px-1.5 sm:px-2 py-1 rounded-md bg-white/5 cursor-text hover:text-white hover:bg-white/10 hover:border-white/10 border border-transparent transition"
                 title="Click to manually enter degree"
                 onClick={() => {
                   setRotationInput(String(rotation));
@@ -3393,35 +3536,35 @@ export default function StudioPage() {
             )}
             <div className="w-px h-5 bg-white/10 mx-1" />
             <button
-              className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
+              className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
               title="Minimize / Scale Down (-1%)"
               onPointerDown={(e) => startScale(e, -1)}
               onPointerUp={stopScale}
               onPointerLeave={stopScale}
               onPointerCancel={stopScale}
             >
-              <Minimize2 size={15} />
+              <Minimize2 className="w-4 h-4 sm:w-[15px] sm:h-[15px]" />
             </button>
             <button
-              className="text-xs font-mono tabular-nums font-semibold text-white/90 px-2 py-1 mx-0.5 rounded-md bg-white/5 hover:text-white hover:bg-white/10 transition-colors"
+              className="text-[10px] sm:text-xs font-mono tabular-nums font-semibold text-white/90 px-1.5 sm:px-2 py-1 mx-0.5 rounded-md bg-white/5 hover:text-white hover:bg-white/10 transition-colors"
               title="Click to reset size (100%)"
               onClick={() => setScale(100)}
             >
               {Math.round(scale)}%
             </button>
             <button
-              className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
+              className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
               title="Maximize / Scale Up (+1%)"
               onPointerDown={(e) => startScale(e, 1)}
               onPointerUp={stopScale}
               onPointerLeave={stopScale}
               onPointerCancel={stopScale}
             >
-              <Maximize2 size={15} />
+              <Maximize2 className="w-4 h-4 sm:w-[15px] sm:h-[15px]" />
             </button>
             <div className="w-px h-5 bg-white/10 mx-1" />
             <button
-              className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${
+              className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg transition-colors ${
                 isLocked 
                   ? 'bg-white/20 text-white' 
                   : 'hover:bg-white/10 text-white/80 hover:text-white'
@@ -3429,15 +3572,15 @@ export default function StudioPage() {
               title={isLocked ? "Unlock Position (Currently Locked)" : "Lock Position on Canvas"}
               onClick={() => setIsLocked(!isLocked)}
             >
-              {isLocked ? <Lock size={15} className="text-white" /> : <Unlock size={15} />}
+              {isLocked ? <Lock className="w-4 h-4 sm:w-[15px] sm:h-[15px] text-white" /> : <Unlock className="w-4 h-4 sm:w-[15px] sm:h-[15px]" />}
             </button>
             <div className="w-px h-5 bg-white/10 mx-1" />
             <button
-              className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-red-500/20 text-zinc-400 hover:text-red-400 transition-colors"
+              className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg hover:bg-red-500/20 text-zinc-400 hover:text-red-400 transition-colors"
               title="Remove image"
               onClick={() => { setImage(null); setImageSelected(false); setRotation(0); setPos({ x: 0, y: 0 }); }}
             >
-              <Trash2 size={15} />
+              <Trash2 className="w-4 h-4 sm:w-[15px] sm:h-[15px]" />
             </button>
           </div>
         )}
@@ -3446,86 +3589,86 @@ export default function StudioPage() {
         {!isExporting && watermark && watermarkSelected && (
           <div 
             data-no-export="true"
-            className="no-export absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-[#1C1C1E]/95 backdrop-blur-md border border-white/10 rounded-xl px-2.5 py-1.5 shadow-2xl z-[150] pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-200"
+            className="no-export absolute top-6 md:top-8 left-1/2 -translate-x-1/2 flex items-center gap-1 sm:gap-1.5 bg-[#1C1C1E]/95 backdrop-blur-md border border-white/10 rounded-xl px-2 sm:px-2.5 py-1.5 shadow-2xl z-[150] pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-200"
             onPointerDown={(e) => e.stopPropagation()}
           >
             <button
-              className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
+              className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
               title="Scale Down (-5%)"
               onPointerDown={(e) => startWatermarkScale(e, -5)}
               onPointerUp={stopWatermarkScale}
               onPointerLeave={stopWatermarkScale}
               onPointerCancel={stopWatermarkScale}
             >
-              <Minimize2 size={15} />
+              <Minimize2 className="w-4 h-4 sm:w-[15px] sm:h-[15px]" />
             </button>
             <button
-              className="text-xs font-mono tabular-nums font-semibold text-white/90 px-2 py-1 mx-0.5 rounded-md bg-white/5 hover:text-white hover:bg-white/10 transition-colors"
+              className="text-[10px] sm:text-xs font-mono tabular-nums font-semibold text-white/90 px-1.5 sm:px-2 py-1 mx-0.5 rounded-md bg-white/5 hover:text-white hover:bg-white/10 transition-colors"
               title="Click to reset size (100%)"
               onClick={() => setWatermarkScale(100)}
             >
               {Math.round(watermarkScale)}%
             </button>
             <button
-              className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
+              className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
               title="Scale Up (+5%)"
               onPointerDown={(e) => startWatermarkScale(e, 5)}
               onPointerUp={stopWatermarkScale}
               onPointerLeave={stopWatermarkScale}
               onPointerCancel={stopWatermarkScale}
             >
-              <Maximize2 size={15} />
+              <Maximize2 className="w-4 h-4 sm:w-[15px] sm:h-[15px]" />
             </button>
             <div className="w-px h-5 bg-white/10 mx-1" />
             <div className="flex gap-0.5">
               <button 
-                className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors" 
+                className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors" 
                 onPointerDown={(e) => startWatermarkNudge(e, 0, -1)}
                 onPointerUp={stopWatermarkNudge}
                 onPointerLeave={stopWatermarkNudge}
                 onPointerCancel={stopWatermarkNudge}
                 title="Nudge Up (1px)"
               >
-                <ArrowUp size={14} />
+                <ArrowUp className="w-3.5 h-3.5 sm:w-[14px] sm:h-[14px]" />
               </button>
               <button 
-                className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors" 
+                className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors" 
                 onPointerDown={(e) => startWatermarkNudge(e, 0, 1)}
                 onPointerUp={stopWatermarkNudge}
                 onPointerLeave={stopWatermarkNudge}
                 onPointerCancel={stopWatermarkNudge}
                 title="Nudge Down (1px)"
               >
-                <ArrowDown size={14} />
+                <ArrowDown className="w-3.5 h-3.5 sm:w-[14px] sm:h-[14px]" />
               </button>
               <button 
-                className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors" 
+                className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors" 
                 onPointerDown={(e) => startWatermarkNudge(e, -1, 0)}
                 onPointerUp={stopWatermarkNudge}
                 onPointerLeave={stopWatermarkNudge}
                 onPointerCancel={stopWatermarkNudge}
                 title="Nudge Left (1px)"
               >
-                <ArrowLeft size={14} />
+                <ArrowLeft className="w-3.5 h-3.5 sm:w-[14px] sm:h-[14px]" />
               </button>
               <button 
-                className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors" 
+                className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors" 
                 onPointerDown={(e) => startWatermarkNudge(e, 1, 0)}
                 onPointerUp={stopWatermarkNudge}
                 onPointerLeave={stopWatermarkNudge}
                 onPointerCancel={stopWatermarkNudge}
                 title="Nudge Right (1px)"
               >
-                <ArrowRight size={14} />
+                <ArrowRight className="w-3.5 h-3.5 sm:w-[14px] sm:h-[14px]" />
               </button>
             </div>
             <div className="w-px h-5 bg-white/10 mx-1" />
             <button
-              className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-red-500/20 text-zinc-400 hover:text-red-400 transition-colors"
+              className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg hover:bg-red-500/20 text-zinc-400 hover:text-red-400 transition-colors"
               title="Remove watermark"
               onClick={() => { setWatermark(''); setWatermarkSelected(false); setWatermarkOffsetX(0); setWatermarkOffsetY(0); }}
             >
-              <Trash2 size={15} />
+              <Trash2 className="w-4 h-4 sm:w-[15px] sm:h-[15px]" />
             </button>
           </div>
         )}
@@ -3551,7 +3694,7 @@ export default function StudioPage() {
             className="px-2 py-1 text-[11px] font-mono tabular-nums font-medium text-zinc-300 hover:text-white hover:bg-white/10 rounded-md transition-colors"
             title="Reset Zoom to 100%"
           >
-            {Math.round(viewportZoom * 100)}%
+            {Math.round((viewportZoom / baseZoom) * 100)}%
           </button>
           <button
             onPointerDown={(e) => startViewportZoom(e, 0.01)}
@@ -3575,10 +3718,16 @@ export default function StudioPage() {
       </div>
     </main>
 
+      {/* Mobile Overlay for Right Sidebar */}
+      {showRightSidebar && (
+        <div className="md:hidden fixed inset-0 bg-black/60 z-[290] backdrop-blur-sm" onClick={() => setShowRightSidebar(false)} />
+      )}
+
       {/* Right Sidebar - 3D Camera, Studio Presets & Collapsible Studio Controls */}
-      <aside className="w-[300px] min-w-[300px] bg-panel border-l border-white/5 flex flex-col z-20 shadow-lg select-none h-full overflow-hidden">
+      <aside className={`fixed md:relative flex z-[300] md:z-20 inset-y-0 right-0 w-[85vw] max-w-[300px] md:min-w-[300px] md:w-[300px] bg-panel border-l border-white/5 flex-col shadow-lg select-none h-full overflow-hidden transition-transform duration-300 ${showRightSidebar ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}`}>
+        
         {/* Top Header Bar aligned with h-16 main header */}
-        <div className="h-16 border-b border-white/5 px-6 flex items-center justify-end shrink-0 gap-3">
+        <div className="hidden md:flex h-16 border-b border-white/5 px-6 items-center justify-end shrink-0 gap-3">
           {/* GitHub Star Button (Minimal) */}
           <a 
             href="https://github.com/ishivamgaur/noiceSS" 
@@ -3607,6 +3756,12 @@ export default function StudioPage() {
             <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
           </a>
         </div>
+        
+        {/* Mobile Sidebar Close Header */}
+        <div className="md:hidden h-14 border-b border-white/5 px-4 flex items-center justify-between shrink-0">
+          <span className="font-bold text-sm text-zinc-400 uppercase">Studio</span>
+          <button onClick={() => setShowRightSidebar(false)} className="text-zinc-400 hover:text-white p-1"><X size={18}/></button>
+        </div>
 
         {/* Sticky Camera Header */}
         <div className="px-3 py-3 border-b border-white/5 shrink-0">
@@ -3617,7 +3772,7 @@ export default function StudioPage() {
         </div>
 
         {/* Scrollable Content Container with clean symmetrical padding */}
-        <div className="flex-1 overflow-y-auto [scrollbar-gutter:stable] p-3 pb-8 flex flex-col gap-3">
+        <div className="flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable] p-3 pb-8 flex flex-col gap-3">
           {/* Section 1: 3D Camera & XYZ Orbit */}
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between w-full h-[26px] min-h-[26px] px-0.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider leading-none">
@@ -3802,82 +3957,50 @@ export default function StudioPage() {
                       title={p.desc}
                       aria-label={p.name}
                     >
-                      {/* Clean Minimal Preview Box - Dynamic Aspect Ratio */}
+                      {/* Clean Minimal Preview Box - Fixed 4:3 Aspect Ratio for Consistency */}
                       <div 
                         className="w-full flex items-center justify-center relative overflow-hidden bg-black/30"
-                        style={{
-                          aspectRatio: aspectStyle === 'auto' ? (imageDimensions ? `${imageDimensions.width}/${imageDimensions.height}` : '16/9') : aspectStyle,
-                        }}
+                        style={{ aspectRatio: '4/3' }}
                       >
-                        {image ? (
+                        {/* Background Layer with Blur */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
                           <div 
-                            className="w-full h-full flex items-center justify-center overflow-hidden shadow-sm relative"
-                            style={{ 
-                              padding: `${(padding / parseFloat(getCanvasDimensions().width as string)) * 100}%`,
+                            className="absolute inset-0 w-full h-full"
+                            style={{
+                              backgroundImage: `url('/wallpapers/wp14135599-8k-mac-dark-green-wallpapers.webp')`,
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center',
+                              filter: 'blur(10px)',
+                              transform: 'scale(1.15)'
                             }}
-                          >
-                            {/* Background Layer with Blur */}
-                            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-                              <div 
-                                className="absolute inset-0 w-full h-full"
-                                style={{
-                                  ...(background.startsWith('url(') 
-                                    ? { backgroundImage: background, backgroundSize: 'cover', backgroundPosition: 'center' }
-                                    : { background: background }),
-                                  filter: bgBlur > 0 ? `blur(${bgBlur / 4}px)` : 'none',
-                                  transform: bgBlur > 0 ? `scale(${1 + (bgBlur / 100)})` : 'none',
-                                }}
+                          />
+                        </div>
+                        
+                        {/* 3D Transformed Mock Card */}
+                        <div 
+                          className="flex items-center justify-center transition-transform duration-300 w-full h-full z-10"
+                          style={{ 
+                            transform: p.previewTransform || p.transform,
+                            transformStyle: 'preserve-3d',
+                          }}
+                        >
+                            <div 
+                              className="relative flex flex-col w-[75%] aspect-video rounded-sm overflow-hidden shadow-2xl border border-white/20 bg-black/50"
+                            >
+                              <img 
+                                src="/wallpapers/wp14135599-8k-mac-dark-green-wallpapers.webp" 
+                                alt="Mock Preview" 
+                                className="w-full h-full object-cover block"
                               />
                             </div>
-                            
-                            <div 
-                              className="flex items-center justify-center transition-transform duration-300 w-full h-full z-10"
-                              style={{ 
-                                transform: p.previewTransform || p.transform,
-                                transformStyle: 'preserve-3d',
-                              }}
-                            >
-                                {/* Miniaturized Screenshot Card */}
-                                <div 
-                                  className="relative flex flex-col"
-                                  style={{
-                                    maxWidth: 'none',
-                                    maxHeight: 'none',
-                                    width: `${scale}%`,
-                                    height: aspectStyle === 'auto' ? 'auto' : `${scale}%`,
-                                    borderRadius: `${radius / 4}px`,
-                                    boxShadow: 'none',
-                                    border: 'none',
-                                    background: 'transparent',
-                                    backdropFilter: 'none',
-                                    WebkitBackdropFilter: 'none',
-                                    padding: '0',
-                                    filter: imageBlur > 0 ? `blur(${imageBlur / 4}px)` : 'none',
-                                    isolation: 'isolate'
-                                  }}
-                                >
-                                  <div className={`relative flex flex-col overflow-hidden w-full h-full`} style={{ borderRadius: `${radius / 4}px` }}>
-                                    {showMacOsBar && (
-                                      <div className={`shrink-0 bg-[#1C1C1E] flex items-center px-1.5 py-0.5 gap-0.5 ${view === 'browser' ? 'border-b border-white/10' : ''}`}>
-                                        <div className="w-[3px] h-[3px] rounded-full bg-[#ff5f56]" />
-                                        <div className="w-[3px] h-[3px] rounded-full bg-[#ffbd2e]" />
-                                        <div className="w-[3px] h-[3px] rounded-full bg-[#27c93f]" />
-                                      </div>
-                                    )}
-                                    <img 
-                                      src={image} 
-                                      alt={p.name} 
-                                      className="w-full h-full object-contain block"
-                                    />
-                                  </div>
-                                </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className={`flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 ${isActive ? 'text-white' : 'text-zinc-500'}`}>
+                        </div>
+
+                        {/* Overlay Icon */}
+                        <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                          <div className={`flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-md border border-white/20 shadow-lg ${isActive ? 'text-white' : 'text-zinc-300 group-hover:text-white transition-colors'}`}>
                             <p.icon size={16} aria-hidden="true" />
                           </div>
-                        )}
+                        </div>
                       </div>
                     </button>
                   );
@@ -4101,11 +4224,11 @@ export default function StudioPage() {
       {/* Export Quality & Format Panel (Modal) */}
       {showExportModal && (
         <div 
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-150"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[300] flex items-center justify-center p-4 animate-in fade-in duration-150"
           onClick={() => setShowExportModal(false)}
         >
           <div 
-            className="bg-[#141417] border border-white/10 rounded-2xl w-full max-w-[380px] p-4.5 shadow-2xl flex flex-col gap-3.5 animate-in zoom-in-95 duration-150"
+            className="bg-[#141417] border border-white/10 rounded-2xl w-full max-w-[380px] p-4 md:p-4.5 shadow-2xl flex flex-col gap-3.5 animate-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}

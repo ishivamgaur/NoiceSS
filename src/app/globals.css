@@ -20,6 +20,11 @@
 body {
   background-color: var(--color-bg-dark);
   color: var(--color-text-main);
+  overscroll-behavior: none;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
 }
 
 @theme inline {
@@ -234,4 +239,13 @@ button:disabled,
 input:disabled,
 select:disabled {
   cursor: not-allowed !important;
+}
+
+/* Hide scrollbar for elements with no-scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
