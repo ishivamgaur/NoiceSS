@@ -590,6 +590,7 @@ export default function StudioPage() {
   const [contrast, setContrast] = useState(100);
   const [saturation, setSaturation] = useState(100);
   const [hueRotate, setHueRotate] = useState(0);
+  const [lightingTarget, setLightingTarget] = useState('image');
   
   const [filter, setFilter] = useState('none');
 
@@ -1653,7 +1654,7 @@ export default function StudioPage() {
     e.stopPropagation();
   };
 
-  const getFilterStyle = () => {
+  const getLightingFilterStyle = () => {
     const selectedFilter = FILTERS.find(f => f.id === filter);
     const parts: string[] = [];
     
@@ -1671,9 +1672,6 @@ export default function StudioPage() {
     }
     if (hueRotate !== 0) {
       parts.push(`hue-rotate(${hueRotate}deg)`);
-    }
-    if (imageBlur > 0) {
-      parts.push(`blur(${imageBlur}px)`);
     }
     
     return parts.length > 0 ? parts.join(' ') : 'none';
@@ -3018,7 +3016,7 @@ export default function StudioPage() {
                     ? { backgroundImage: background, backgroundSize: 'cover', backgroundPosition: 'center' }
                     : { background: background }
                   ),
-                  filter: bgBlur > 0 ? `blur(${bgBlur}px)` : 'none',
+                  filter: `${lightingTarget === 'canvas' || lightingTarget === 'both' ? getLightingFilterStyle() : ''} ${bgBlur > 0 ? `blur(${bgBlur}px)` : ''}`.trim() || 'none',
                   transform: bgBlur > 0 ? `scale(${1 + (bgBlur / 100)})` : 'none',
                 }}
               />
@@ -3139,7 +3137,7 @@ export default function StudioPage() {
                           borderRadius: showMacOsBar 
                             ? `0 0 ${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px ${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px` 
                             : `${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px`,
-                          filter: getFilterStyle(),
+                          filter: `${lightingTarget === 'image' || lightingTarget === 'both' ? getLightingFilterStyle() : ''} ${imageBlur > 0 ? `blur(${imageBlur}px)` : ''}`.trim() || 'none',
                         }} />
                         
                         {/* Watermark Overlay on Screenshot */}
@@ -3798,7 +3796,7 @@ export default function StudioPage() {
                       onClick={() => applyPerspectivePreset(p)}
                       className={`flex flex-col rounded-lg border transition-all duration-150 active:scale-[0.98] overflow-hidden group shadow-sm ${
                         isActive 
-                          ? 'bg-white/10 border-white/20 ring-1 ring-white/10 shadow-md' 
+                          ? 'bg-white/15 border-white ring-1 ring-white/30 shadow-md' 
                           : 'bg-white/[0.02] border-white/[0.04] hover:border-white/20 hover:bg-white/[0.05]'
                       }`}
                       title={p.desc}
@@ -4011,6 +4009,39 @@ export default function StudioPage() {
 
             {expandedSections.filters && (
               <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-3.5 animate-in fade-in slide-in-from-top-1 duration-150">
+                {/* Application Layer Target */}
+                <div>
+                  <label className="text-[11px] text-zinc-400 block mb-2 font-medium">Lighting Target</label>
+                  <div className="relative grid grid-cols-3 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04] isolate">
+                    {(() => {
+                      const targets = ['canvas', 'image', 'both'];
+                      const idx = targets.indexOf(lightingTarget);
+                      return (
+                        <div 
+                          className="absolute top-1 bottom-1 w-[calc((100%-16px)/3)] bg-white/10 border border-white/20 rounded-md shadow-sm ring-1 ring-white/10 transition-transform duration-250 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none -z-10"
+                          style={{
+                            transform: `translateX(calc(${idx * 100}% + ${idx * 4}px))`,
+                            left: '4px'
+                          }}
+                        />
+                      );
+                    })()}
+                    {['canvas', 'image', 'both'].map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setLightingTarget(t)}
+                        className={`py-1 text-[11px] font-medium capitalize rounded-md transition-colors duration-200 active:scale-95 text-center cursor-pointer ${
+                          lightingTarget === t 
+                            ? 'text-white font-semibold' 
+                            : 'text-zinc-400 hover:text-zinc-200'
+                        }`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Manual Adjustments Sliders */}
                 <div className="flex flex-col gap-3">
                   {/* Brightness */}
