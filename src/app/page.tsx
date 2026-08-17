@@ -3957,10 +3957,12 @@ export default function StudioPage() {
                       title={p.desc}
                       aria-label={p.name}
                     >
-                      {/* Clean Minimal Preview Box - Fixed 4:3 Aspect Ratio for Consistency */}
+                      {/* Clean Minimal Preview Box - Dynamic Aspect Ratio */}
                       <div 
                         className="w-full flex items-center justify-center relative overflow-hidden bg-black/30"
-                        style={{ aspectRatio: '4/3' }}
+                        style={{
+                          aspectRatio: aspectStyle === 'auto' ? '4/3' : aspectStyle,
+                        }}
                       >
                         {/* Background Layer with Blur */}
                         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
