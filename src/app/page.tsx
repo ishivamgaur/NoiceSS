@@ -8,7 +8,8 @@ import {
   Wand2, Box, Orbit, Compass, Eye, RefreshCw, Sun, Moon, Laptop, Globe, CheckCircle2,
   Loader2, Aperture, SlidersHorizontal, Droplets, Droplet, Tv, Radio, Film, 
   Focus, Pipette, Paintbrush, Flame, Zap, SunMedium, Type, Scan, Scaling, 
-  AppWindow, Gauge, EyeOff, SlidersVertical, X, Lock, Unlock, Bookmark, Save, Plus, Star, Camera, Undo2, Redo2
+  AppWindow, Gauge, EyeOff, SlidersVertical, X, Lock, Unlock, Bookmark, Save, Plus, Star, Camera, Undo2, Redo2,
+  ArrowUp, ArrowDown, ArrowLeft, ArrowRight
 } from 'lucide-react';
 import { toPng, toJpeg, toBlob } from 'html-to-image';
 import { Slider } from "@/components/ui/slider";
@@ -617,9 +618,10 @@ export default function StudioPage() {
   const [watermarkGlass, setWatermarkGlass] = useState<'frosted' | 'dark' | 'clear'>('frosted');
   const [watermarkBorderWidth, setWatermarkBorderWidth] = useState<number>(1);
   const [watermarkBorderOpacity, setWatermarkBorderOpacity] = useState<number>(25);
-  const [watermarkOffsetX, setWatermarkOffsetX] = useState<number>(16);
-  const [watermarkOffsetY, setWatermarkOffsetY] = useState<number>(16);
+  const [watermarkOffsetX, setWatermarkOffsetX] = useState<number>(0);
+  const [watermarkOffsetY, setWatermarkOffsetY] = useState<number>(0);
   const [watermarkScale, setWatermarkScale] = useState<number>(100);
+  const [watermarkSelected, setWatermarkSelected] = useState(false);
 
   // --- History (Undo / Redo) ---
   const [history, setHistory] = useState<any[]>([]);
@@ -1126,15 +1128,16 @@ export default function StudioPage() {
   }, []);
   const [showExportModal, setShowExportModal] = useState(false);
 
-  // Generate real pixel noise texture
-  const noiseTexture = React.useMemo(() => {
-    if (typeof document === 'undefined') return '';
+  const [noiseTexture, setNoiseTexture] = useState<string>('');
+  
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
     const size = 150;
     const c = document.createElement('canvas');
     c.width = size;
     c.height = size;
     const ctx = c.getContext('2d');
-    if (!ctx) return '';
+    if (!ctx) return;
     const imageData = ctx.createImageData(size, size);
     for (let i = 0; i < imageData.data.length; i += 4) {
       const r = Math.random();
@@ -1145,7 +1148,7 @@ export default function StudioPage() {
       imageData.data[i + 3] = 255;
     }
     ctx.putImageData(imageData, 0, 0);
-    return c.toDataURL('image/png');
+    setNoiseTexture(c.toDataURL('image/png'));
   }, []);
   
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -1170,6 +1173,50 @@ export default function StudioPage() {
     }
     if (scaleTimeoutRef.current) clearTimeout(scaleTimeoutRef.current);
     if (scaleIntervalRef.current) clearInterval(scaleIntervalRef.current);
+  };
+
+  const watermarkScaleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const watermarkScaleIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const startWatermarkScale = (e: React.PointerEvent<HTMLButtonElement>, delta: number) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    setWatermarkScale((s) => Math.min(Math.max(s + delta, 25), 300));
+    watermarkScaleTimeoutRef.current = setTimeout(() => {
+      watermarkScaleIntervalRef.current = setInterval(() => {
+        setWatermarkScale((s) => Math.min(Math.max(s + delta, 25), 300));
+      }, 30);
+    }, 300);
+  };
+
+  const stopWatermarkScale = (e?: React.PointerEvent<HTMLButtonElement>) => {
+    if (e && e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+    if (watermarkScaleTimeoutRef.current) clearTimeout(watermarkScaleTimeoutRef.current);
+    if (watermarkScaleIntervalRef.current) clearInterval(watermarkScaleIntervalRef.current);
+  };
+
+  const watermarkNudgeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const watermarkNudgeIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const startWatermarkNudge = (e: React.PointerEvent<HTMLButtonElement>, dx: number, dy: number) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    if (dx !== 0) setWatermarkOffsetX((prev) => prev + dx);
+    if (dy !== 0) setWatermarkOffsetY((prev) => prev + dy);
+    watermarkNudgeTimeoutRef.current = setTimeout(() => {
+      watermarkNudgeIntervalRef.current = setInterval(() => {
+        if (dx !== 0) setWatermarkOffsetX((prev) => prev + dx);
+        if (dy !== 0) setWatermarkOffsetY((prev) => prev + dy);
+      }, 30);
+    }, 300);
+  };
+
+  const stopWatermarkNudge = (e?: React.PointerEvent<HTMLButtonElement>) => {
+    if (e && e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+    if (watermarkNudgeTimeoutRef.current) clearTimeout(watermarkNudgeTimeoutRef.current);
+    if (watermarkNudgeIntervalRef.current) clearInterval(watermarkNudgeIntervalRef.current);
   };
 
   // Spacebar key listener for canvas panning
@@ -1406,6 +1453,9 @@ export default function StudioPage() {
     img.onload = () => {
       setImageDimensions({ w: img.width, h: img.height });
       setImage(url);
+      setScale(100);
+      setPos({ x: 0, y: 0 });
+      setAspectRatio('auto');
     };
     img.src = url;
   };
@@ -1542,11 +1592,14 @@ export default function StudioPage() {
     rotateRef.current = { startAngle, startRotation: rotation, centerX, centerY };
     setIsRotating(true);
     setImageSelected(true);
+    setWatermarkSelected(false);
   };
 
   const handlePointerDown = (e: React.PointerEvent) => {
     if (isLocked) return;
     setIsDragging(true);
+    setImageSelected(true);
+    setWatermarkSelected(false);
     setDragStart({ 
       x: e.clientX - pos.x, 
       y: e.clientY - pos.y 
@@ -1564,6 +1617,40 @@ export default function StudioPage() {
   const handlePointerUp = (e: React.PointerEvent) => {
     setIsDragging(false);
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+  };
+
+  const [isDraggingWatermark, setIsDraggingWatermark] = useState(false);
+  const [watermarkDragStart, setWatermarkDragStart] = useState({ x: 0, y: 0 });
+
+  const handleWatermarkPointerDown = (e: React.PointerEvent) => {
+    setIsDraggingWatermark(true);
+    setWatermarkSelected(true);
+    setImageSelected(false);
+    setWatermarkDragStart({ 
+      x: e.clientX - watermarkOffsetX, 
+      y: e.clientY - watermarkOffsetY 
+    });
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    e.stopPropagation();
+  };
+  const handleWatermarkPointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingWatermark) return;
+    setWatermarkOffsetX(e.clientX - watermarkDragStart.x);
+    setWatermarkOffsetY(e.clientY - watermarkDragStart.y);
+    e.stopPropagation();
+  };
+  const handleWatermarkPointerUp = (e: React.PointerEvent) => {
+    setIsDraggingWatermark(false);
+    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    e.stopPropagation();
+  };
+  const handleWatermarkWheel = (e: React.WheelEvent) => {
+    if (e.deltaY < 0) {
+      setWatermarkScale((prev) => Math.min(300, prev + 5));
+    } else {
+      setWatermarkScale((prev) => Math.max(25, prev - 5));
+    }
+    e.stopPropagation();
   };
 
   const getFilterStyle = () => {
@@ -1614,39 +1701,89 @@ export default function StudioPage() {
 
   const getCanvasDimensions = () => {
     const defaultSize = 800;
-    const minInnerSize = image ? 64 : 200; 
-    const requiredMinSide = padding * 2 + minInnerSize;
-
-    if (aspectStyle === 'auto') {
-      return image ? { width: `${defaultSize}px`, maxHeight: `${defaultSize}px` } : { width: `${defaultSize}px`, height: '600px' };
-    }
-
-    const [wStr, hStr] = aspectStyle.split('/');
-    const ratioW = Number(wStr);
-    const ratioH = Number(hStr);
-    const ratio = ratioW / ratioH;
 
     let finalW, finalH;
 
-    if (ratio >= 1) {
-      finalW = defaultSize;
-      finalH = defaultSize / ratio;
-      if (finalH < requiredMinSide) {
-        finalH = requiredMinSide;
-        finalW = finalH * ratio;
+    if (aspectStyle === 'auto') {
+      if (!image || !imageDimensions?.w || !imageDimensions?.h) {
+        return { width: `${defaultSize}px`, height: '600px' };
+      }
+      // Auto Aspect Ratio logic: The canvas perfectly wraps the image + decorations + padding on all sides.
+      const imageRatio = imageDimensions.w / imageDimensions.h;
+      const decorationW = glassBorder ? 2 * glassBorderWidth : 0;
+      const decorationH = (glassBorder ? 2 * glassBorderWidth : 0) + (showMacOsBar ? 40 : 0);
+      
+      if (imageRatio >= 1) {
+        const innerW = defaultSize;
+        const innerH = innerW / imageRatio;
+        finalW = innerW + decorationW + 2 * padding;
+        finalH = innerH + decorationH + 2 * padding;
+      } else {
+        const innerH = defaultSize;
+        const innerW = innerH * imageRatio;
+        finalW = innerW + decorationW + 2 * padding;
+        finalH = innerH + decorationH + 2 * padding;
       }
     } else {
-      finalH = defaultSize;
-      finalW = defaultSize * ratio;
-      if (finalW < requiredMinSide) {
-        finalW = requiredMinSide;
+      // Fixed Aspect Ratio logic
+      const [wStr, hStr] = aspectStyle.split('/');
+      const ratio = Number(wStr) / Number(hStr);
+
+      if (ratio >= 1) {
+        finalW = defaultSize + (padding * 2);
         finalH = finalW / ratio;
+      } else {
+        finalH = defaultSize + (padding * 2);
+        finalW = finalH * ratio;
       }
     }
 
     return {
       width: `${finalW}px`,
       height: `${finalH}px`
+    };
+  };
+
+  const getScreenshotCardDimensions = () => {
+    if (!image || !imageDimensions) return {};
+    
+    const canvasDims = getCanvasDimensions();
+    if (!canvasDims.width || !canvasDims.height) return {};
+    
+    const canvasW = parseFloat(canvasDims.width as string);
+    const canvasH = parseFloat(canvasDims.height as string);
+    
+    const availableW = Math.max(1, canvasW - 2 * padding) * (scale / 100);
+    const availableH = Math.max(1, canvasH - 2 * padding) * (scale / 100);
+    
+    const decorationW = glassBorder ? 2 * glassBorderWidth : 0;
+    const decorationH = (glassBorder ? 2 * glassBorderWidth : 0) + (showMacOsBar ? 40 : 0);
+    
+    const maxImageW = Math.max(1, availableW - decorationW);
+    const maxImageH = Math.max(1, availableH - decorationH);
+    
+    const imageRatio = imageDimensions.w / imageDimensions.h;
+    const availableImageRatio = maxImageW / maxImageH;
+    
+    let innerW, innerH;
+    
+    if (imageRatio > availableImageRatio) {
+      innerW = maxImageW;
+      innerH = innerW / imageRatio;
+    } else {
+      innerH = maxImageH;
+      innerW = innerH * imageRatio;
+    }
+    
+    const finalW = innerW + decorationW;
+    const finalH = innerH + decorationH;
+    
+    return {
+      width: `${finalW}px`,
+      height: `${finalH}px`,
+      percentW: (finalW / canvasW) * 100,
+      percentH: (finalH / canvasH) * 100,
+      paddingPercent: (padding / canvasW) * 100
     };
   };
   return (
@@ -2009,7 +2146,11 @@ export default function StudioPage() {
                           ].map((pos) => (
                             <button
                               key={pos.id}
-                              onClick={() => setWatermarkPosition(pos.id as any)}
+                              onClick={() => {
+                                setWatermarkPosition(pos.id as any);
+                                setWatermarkOffsetX(0);
+                                setWatermarkOffsetY(0);
+                              }}
                               className={`py-1 text-[10px] font-medium rounded-md transition-colors duration-200 active:scale-95 text-center cursor-pointer ${watermarkPosition === pos.id ? 'text-white font-semibold' : 'text-zinc-400 hover:text-zinc-200'}`}
                             >
                               {pos.label}
@@ -2469,7 +2610,7 @@ export default function StudioPage() {
 
       {/* Main Studio Workspace */}
       <main className="flex-grow flex flex-col bg-bg-dark h-full relative overflow-hidden">
-        <header className="h-16 border-b border-white/5 bg-panel flex items-center justify-between px-6 z-30 shrink-0">
+        <header className="h-16 border-b border-white/5 bg-panel flex items-center justify-between px-6 z-[200] shrink-0">
           {/* Left Actions: Undo / Redo */}
           <div className="flex-1 flex items-center gap-1.5">
             <button 
@@ -2570,6 +2711,8 @@ export default function StudioPage() {
                             onClick={() => {
                               setAspectRatio('custom');
                               setShowRatioMenu(false);
+                              setScale(100);
+                              setPos({ x: 0, y: 0 });
                             }}
                             className="px-3 h-7 rounded-md bg-white hover:bg-zinc-200 text-black text-xs font-semibold shadow-sm transition-colors shrink-0 active:scale-95"
                           >
@@ -2592,7 +2735,12 @@ export default function StudioPage() {
                                   return (
                                     <button
                                       key={r.id}
-                                      onClick={() => { setAspectRatio(r.id); setShowRatioMenu(false); }}
+                                      onClick={() => { 
+                                        setAspectRatio(r.id); 
+                                        setShowRatioMenu(false); 
+                                        setScale(100);
+                                        setPos({ x: 0, y: 0 });
+                                      }}
                                       className={`flex flex-col items-center justify-center p-2 rounded-lg text-center transition-all duration-150 active:scale-95 border min-h-[58px] ${
                                         isSelected 
                                           ? 'bg-white/10 border-white/20 text-white font-semibold shadow-sm ring-1 ring-white/10' 
@@ -2833,6 +2981,7 @@ export default function StudioPage() {
           onClick={(e) => {
             if (e.target === workspaceRef.current || (e.target as HTMLElement).getAttribute('data-workspace-bg') === 'true') {
               setImageSelected(false);
+              setWatermarkSelected(false);
             }
           }}
         >
@@ -2850,65 +2999,29 @@ export default function StudioPage() {
             <div className="absolute inset-0 flex items-center justify-center pointer-events-auto" data-workspace-bg="true">
               <div 
                 ref={canvasRef}
-                className={`relative flex items-center justify-center shadow-2xl shrink-0 ${isPanningWorkspace ? 'cursor-grabbing' : 'cursor-grab'}`}
-                onClick={() => setImageSelected(false)}
+                className={`relative flex items-center justify-center shadow-2xl shrink-0 overflow-hidden ${isPanningWorkspace ? 'cursor-grabbing' : 'cursor-grab'}`}
+                onClick={() => {
+                  setImageSelected(false);
+                  setWatermarkSelected(false);
+                }}
             style={{
               aspectRatio: aspectStyle,
               ...getCanvasDimensions()
             }}
           >
             {/* Background Layer (Strictly Clipped, 0 padding) */}
-            <div 
-              className="absolute inset-0 overflow-hidden z-0 pointer-events-none"
-              style={{
-                ...(bgBlur === 0 ? (
-                  background.startsWith('url(') 
+            <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none">
+              <div 
+                className="absolute inset-0 w-full h-full"
+                style={{
+                  ...(background.startsWith('url(') 
                     ? { backgroundImage: background, backgroundSize: 'cover', backgroundPosition: 'center' }
                     : { background: background }
-                ) : {})
-              }}
-            >
-              {bgBlur > 0 && (
-                bgImageUrl ? (
-                  <div className="absolute inset-0 w-full h-full pointer-events-none flex items-center justify-center overflow-hidden">
-                    <div 
-                      className="absolute w-full h-full"
-                      style={{
-                        top: `-${bgBlur}px`,
-                        left: `-${bgBlur}px`,
-                        right: `-${bgBlur}px`,
-                        bottom: `-${bgBlur}px`,
-                        width: `calc(100% + ${bgBlur * 2}px)`,
-                        height: `calc(100% + ${bgBlur * 2}px)`,
-                      }}
-                    >
-                      <img 
-                        src={bgImageUrl} 
-                        alt="" 
-                        draggable={false}
-                        className="w-full h-full object-cover pointer-events-none"
-                        style={{
-                          filter: `blur(${bgBlur}px)`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div 
-                    className="absolute pointer-events-none"
-                    style={{
-                      top: `-${bgBlur}px`,
-                      left: `-${bgBlur}px`,
-                      right: `-${bgBlur}px`,
-                      bottom: `-${bgBlur}px`,
-                      width: `calc(100% + ${bgBlur * 2}px)`,
-                      height: `calc(100% + ${bgBlur * 2}px)`,
-                      background: background,
-                      filter: `blur(${bgBlur}px)`,
-                    }}
-                  />
-                )
-              )}
+                  ),
+                  filter: bgBlur > 0 ? `blur(${bgBlur}px)` : 'none',
+                  transform: bgBlur > 0 ? `scale(${1 + (bgBlur / 100)})` : 'none',
+                }}
+              />
 
               {/* Background Noise & Grain Layer */}
               {(noiseIntensity > 0 || grainIntensity > 0) && (noiseTarget === 'canvas' || noiseTarget === 'both') && (
@@ -2932,135 +3045,23 @@ export default function StudioPage() {
             </div>
 
             {/* 1. Clipped Image Content Container (Applies padding exclusively to content) */}
-            <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none" style={{ padding: `${padding}px` }}>
+            <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none" style={!image ? { padding: `${padding}px` } : undefined}>
               {/* Image Frame inside content container */}
               <div 
                 ref={imageFrameRef}
-                className={`relative group z-10 pointer-events-auto ${isRotating || isDragging || isResizing ? 'transition-none' : 'transition duration-200 ease-out'} flex flex-col justify-center items-center ${!image ? 'w-full h-full' : ''} ${isDragging ? 'cursor-grabbing' : (image ? (isLocked ? 'cursor-default' : 'cursor-move') : 'cursor-default')}`}
+                className={`relative group z-10 pointer-events-auto ${isRotating || isDragging || isResizing ? 'transition-none' : 'transition duration-200 ease-out'} flex flex-col justify-center items-center max-w-full max-h-full ${!image ? 'w-full h-full' : ''} ${isDragging ? 'cursor-grabbing' : (image ? (isLocked ? 'cursor-default' : 'cursor-move') : 'cursor-default')}`}
                 style={{
-                  transform: `translate(${pos.x}px, ${pos.y}px) ${activePerspectiveTransform} ${rotation !== 0 ? `rotate(${rotation}deg)` : ''} scale(${scale / 100})`,
+                  transform: `translate(${pos.x}px, ${pos.y}px) ${activePerspectiveTransform} ${rotation !== 0 ? `rotate(${rotation}deg)` : ''}`,
                   transformStyle: 'preserve-3d',
                 }}
               >
-                {/* Floating image controls (Unclipped, attached directly to frame) */}
-                {!isExporting && image && (imageSelected || isRotating) && (
-                  <div 
-                    data-no-export="true"
-                    className="no-export absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-[#1C1C1E] border border-white/5 rounded-md px-2 py-1 shadow-2xl z-[70] pointer-events-auto animate-in fade-in slide-in-from-bottom-2 duration-200"
-                    style={{ bottom: 'calc(100% + 44px)' }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <button
-                      className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors"
-                      title="Rotate 90°"
-                      onClick={() => setRotation((r) => (r + 90) % 360)}
-                    >
-                      <RotateCw size={15} />
-                    </button>
-                    {isEditingRotation ? (
-                      <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          autoFocus
-                          className="w-12 h-6 px-1 bg-black/70 text-white border border-white/10 rounded text-center text-xs font-mono tabular-nums focus:outline-none focus:ring-1 focus:ring-white/10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          value={rotationInput}
-                          onChange={(e) => {
-                            const v = e.target.value;
-                            if (v === '' || v === '-' || !isNaN(Number(v))) {
-                              setRotationInput(v);
-                            }
-                          }}
-                          onFocus={(e) => e.target.select()}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              const val = parseFloat(rotationInput);
-                              if (!isNaN(val)) {
-                                setRotation(((Math.round(val) % 360) + 360) % 360);
-                              }
-                              setIsEditingRotation(false);
-                            } else if (e.key === 'Escape') {
-                              setIsEditingRotation(false);
-                            }
-                          }}
-                          onBlur={() => {
-                            const val = parseFloat(rotationInput);
-                            if (!isNaN(val)) {
-                              setRotation(((Math.round(val) % 360) + 360) % 360);
-                            }
-                            setIsEditingRotation(false);
-                          }}
-                        />
-                        <span className="text-[11px] font-mono tabular-nums text-white/50 ml-0.5">°</span>
-                      </div>
-                    ) : (
-                      <button 
-                        className="text-[11px] font-mono tabular-nums font-medium text-white/80 px-1.5 py-0.5 rounded bg-white/5 cursor-text hover:text-white hover:bg-white/10 hover:border-white/5 border border-transparent transition"
-                        title="Click to manually enter degree"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setRotationInput(String(rotation));
-                          setIsEditingRotation(true);
-                        }}
-                      >
-                        {rotation}°
-                      </button>
-                    )}
-                    <div className="w-px h-4 bg-white/15 mx-0.5" />
-                    <button
-                      className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
-                      title="Minimize / Scale Down (-1%)"
-                      onPointerDown={(e) => startScale(e, -1)}
-                      onPointerUp={stopScale}
-                      onPointerLeave={stopScale}
-                      onPointerCancel={stopScale}
-                    >
-                      <Minimize2 size={14} />
-                    </button>
-                    <button
-                      className="text-[11px] font-mono tabular-nums font-medium text-white/70 px-1.5 py-0.5 rounded bg-white/5 hover:text-white hover:bg-white/10 transition-colors"
-                      title="Click to reset size (100%)"
-                      onClick={() => setScale(100)}
-                    >
-                      {Math.round(scale)}%
-                    </button>
-                    <button
-                      className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
-                      title="Maximize / Scale Up (+1%)"
-                      onPointerDown={(e) => startScale(e, 1)}
-                      onPointerUp={stopScale}
-                      onPointerLeave={stopScale}
-                      onPointerCancel={stopScale}
-                    >
-                      <Maximize2 size={14} />
-                    </button>
-                    <div className="w-px h-4 bg-white/15 mx-0.5" />
-                    <button
-                      className={`flex items-center justify-center w-7 h-7 rounded-md transition-colors ${
-                        isLocked 
-                          ? 'bg-white/20 text-white' 
-                          : 'hover:bg-white/10 text-white/80 hover:text-white'
-                      }`}
-                      title={isLocked ? "Unlock Position (Currently Locked)" : "Lock Position on Canvas"}
-                      onClick={() => setIsLocked(!isLocked)}
-                    >
-                      {isLocked ? <Lock size={14} className="text-white" /> : <Unlock size={14} />}
-                    </button>
-                    <div className="w-px h-4 bg-white/15 mx-0.5" />
-                    <button
-                      className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
-                      title="Remove image"
-                      onClick={() => { setImage(null); setImageSelected(false); setRotation(0); setPos({ x: 0, y: 0 }); }}
-                    >
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
-                )}
+                {/* Floating controls have been moved to the workspace level */}
 
                 {/* Screenshot Card Container */}
                 <div 
-                  className={`relative flex flex-col ${!image ? 'w-full h-full' : ''} ${image && isDragging ? 'opacity-90 transition-none cursor-grabbing' : image ? 'cursor-grab' : ''}`}
+                  className={`relative flex flex-col items-center max-w-full max-h-full ${!image ? 'w-full h-full' : ''} ${image && isDragging ? 'opacity-90 transition-none cursor-grabbing' : image ? 'cursor-grab' : ''}`}
                   style={image ? {
+                    ...getScreenshotCardDimensions(),
                     borderRadius: `${radius}px`,
                     boxShadow: activePerspectiveTransform 
                       ? `20px 20px ${shadow * 3}px rgba(0,0,0,0.45)` 
@@ -3080,7 +3081,7 @@ export default function StudioPage() {
                   onPointerUp={image ? handlePointerUp : undefined}
                 >
                   {/* Clipped screenshot content */}
-                  <div className={`relative flex flex-col overflow-hidden w-full h-full ${image ? 'bg-[#18181b]' : ''}`} style={{ borderRadius: `${Math.max(0, radius - (glassBorder ? glassBorderWidth : 0))}px` }}>
+                  <div className={`relative flex flex-col items-center overflow-hidden max-w-full max-h-full ${!image ? 'w-full h-full' : ''} ${image ? 'w-full h-full' : ''}`} style={{ borderRadius: `${Math.max(0, radius - (glassBorder ? glassBorderWidth : 0))}px` }}>
                     {/* Image Noise & Grain Layer */}
                     {image && (noiseIntensity > 0 || grainIntensity > 0) && (noiseTarget === 'image' || noiseTarget === 'both') && (
                       <div className="absolute inset-0 pointer-events-none mix-blend-overlay z-20">
@@ -3123,7 +3124,7 @@ export default function StudioPage() {
                     
                     {image ? (
                       <div 
-                        className="relative overflow-hidden w-full h-full bg-[#18181b]" 
+                        className="relative overflow-hidden flex items-center justify-center w-full h-full min-w-0 min-h-0" 
                         style={{ 
                           contain: 'paint', 
                           isolation: 'isolate',
@@ -3131,9 +3132,10 @@ export default function StudioPage() {
                           backgroundSize: 'contain',
                           backgroundPosition: 'center',
                           backgroundRepeat: 'no-repeat',
+                          aspectRatio: imageDimensions?.w && imageDimensions?.h ? `${imageDimensions.w}/${imageDimensions.h}` : undefined,
                         }}
                       >
-                        <img src={image} alt="Uploaded screenshot" draggable={false} className="max-w-full max-h-full object-contain block transition relative z-10" style={{
+                        <img src={image} alt="Uploaded screenshot" draggable={false} className="w-full h-full object-contain block transition relative z-10" style={{
                           borderRadius: showMacOsBar 
                             ? `0 0 ${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px ${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px` 
                             : `${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px`,
@@ -3143,15 +3145,24 @@ export default function StudioPage() {
                         {/* Watermark Overlay on Screenshot */}
                         {watermark && watermarkTarget === 'screenshot' && (
                           <div 
-                            className={`absolute pointer-events-none z-20 w-fit max-w-full inline-flex isolate ${
+                            className={`absolute z-20 w-fit max-w-full inline-flex isolate ${isDraggingWatermark ? 'cursor-grabbing' : 'cursor-grab'} pointer-events-auto ${
                               watermarkPosition === 'bottom-right' ? 'bottom-4 right-4' :
                               watermarkPosition === 'bottom-left' ? 'bottom-4 left-4' :
-                              watermarkPosition === 'bottom-center' ? 'bottom-4 left-1/2 -translate-x-1/2' :
+                              watermarkPosition === 'bottom-center' ? 'bottom-4 left-1/2' :
                               'top-4 right-4'
                             }`}
+                            onPointerDown={handleWatermarkPointerDown}
+                            onPointerMove={handleWatermarkPointerMove}
+                            onPointerUp={handleWatermarkPointerUp}
+                            onPointerLeave={handleWatermarkPointerUp}
+                            onClick={(e) => e.stopPropagation()}
+                            onWheel={handleWatermarkWheel}
+                            style={{
+                              transform: `translate(${watermarkPosition === 'bottom-center' ? `calc(-50% + ${watermarkOffsetX}px)` : `${watermarkOffsetX}px`}, ${watermarkOffsetY}px)`
+                            }}
                           >
                             <div 
-                              className="px-3.5 py-1.5 rounded-full text-[11px] font-medium tracking-wide inline-flex items-center gap-1.5 whitespace-nowrap overflow-hidden leading-none select-none shrink-0"
+                              className="relative px-3.5 py-1.5 rounded-full text-[11px] font-medium tracking-wide inline-flex items-center gap-1.5 whitespace-nowrap overflow-hidden leading-none select-none shrink-0"
                               style={{
                                 transform: watermarkScale !== 100 ? `scale(${watermarkScale / 100})` : undefined,
                                 transformOrigin: watermarkPosition.includes('right') ? 'right center' : watermarkPosition.includes('left') ? 'left center' : 'center center',
@@ -3172,6 +3183,11 @@ export default function StudioPage() {
                                 {renderPlatformIcon(watermarkPlatform, 11)}
                               </div>
                               <span className="leading-none">{watermarkPlatform === 'x' && !watermark.startsWith('@') ? `@${watermark}` : watermark}</span>
+                              
+                              {/* Selection Outline */}
+                              {!isExporting && watermarkSelected && (
+                                <div data-no-export="true" className="no-export absolute inset-0 border-[1.5px] border-white/70 rounded-full pointer-events-none shadow-[0_0_0_1px_rgba(0,0,0,0.1)] z-50" />
+                              )}
                             </div>
                           </div>
                         )}
@@ -3265,15 +3281,24 @@ export default function StudioPage() {
             
             {watermark && watermarkTarget === 'canvas' && (
               <div 
-                className={`absolute pointer-events-none z-20 w-fit max-w-full inline-flex isolate ${
+                className={`absolute z-20 w-fit max-w-full inline-flex isolate ${isDraggingWatermark ? 'cursor-grabbing' : 'cursor-grab'} pointer-events-auto ${
                   watermarkPosition === 'bottom-right' ? 'bottom-6 right-6' :
                   watermarkPosition === 'bottom-left' ? 'bottom-6 left-6' :
-                  watermarkPosition === 'bottom-center' ? 'bottom-6 left-1/2 -translate-x-1/2' :
+                  watermarkPosition === 'bottom-center' ? 'bottom-6 left-1/2' :
                   'top-6 right-6'
                 }`}
+                onPointerDown={handleWatermarkPointerDown}
+                onPointerMove={handleWatermarkPointerMove}
+                onPointerUp={handleWatermarkPointerUp}
+                onPointerLeave={handleWatermarkPointerUp}
+                onClick={(e) => e.stopPropagation()}
+                onWheel={handleWatermarkWheel}
+                style={{
+                  transform: `translate(${watermarkPosition === 'bottom-center' ? `calc(-50% + ${watermarkOffsetX}px)` : `${watermarkOffsetX}px`}, ${watermarkOffsetY}px)`
+                }}
               >
                 <div 
-                  className="px-4 py-2 rounded-full text-xs font-medium tracking-wide inline-flex items-center gap-1.5 whitespace-nowrap overflow-hidden leading-none select-none shrink-0"
+                  className="relative px-4 py-2 rounded-full text-xs font-medium tracking-wide inline-flex items-center gap-1.5 whitespace-nowrap overflow-hidden leading-none select-none shrink-0"
                   style={{
                     transform: watermarkScale !== 100 ? `scale(${watermarkScale / 100})` : undefined,
                     transformOrigin: watermarkPosition.includes('right') ? 'right center' : watermarkPosition.includes('left') ? 'left center' : 'center center',
@@ -3294,12 +3319,218 @@ export default function StudioPage() {
                     {renderPlatformIcon(watermarkPlatform, 12)}
                   </div>
                   <span className="leading-none">{watermarkPlatform === 'x' && !watermark.startsWith('@') ? `@${watermark}` : watermark}</span>
+                  
+                  {/* Selection Outline */}
+                  {!isExporting && watermarkSelected && (
+                    <div data-no-export="true" className="no-export absolute inset-0 border-[1.5px] border-white/70 rounded-full pointer-events-none shadow-[0_0_0_1px_rgba(0,0,0,0.1)] z-50" />
+                  )}
                 </div>
               </div>
             )}
           </div>
           </div>
         </div>
+
+        {/* Floating Image Editor Controls (Top Center) */}
+        {!isExporting && image && (imageSelected || isRotating) && (
+          <div 
+            data-no-export="true"
+            className="no-export absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-[#1C1C1E]/95 backdrop-blur-md border border-white/10 rounded-xl px-2.5 py-1.5 shadow-2xl z-[150] pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-200"
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <button
+              className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors"
+              title="Rotate 90°"
+              onClick={() => setRotation((r) => (r + 90) % 360)}
+            >
+              <RotateCw size={15} />
+            </button>
+            {isEditingRotation ? (
+              <div className="flex items-center mx-1">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoFocus
+                  className="w-12 h-7 px-1 bg-black/70 text-white border border-white/10 rounded-md text-center text-xs font-mono tabular-nums focus:outline-none focus:ring-1 focus:ring-white/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  value={rotationInput}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === '' || v === '-' || !isNaN(Number(v))) {
+                      setRotationInput(v);
+                    }
+                  }}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const val = parseFloat(rotationInput);
+                      if (!isNaN(val)) {
+                        setRotation(((Math.round(val) % 360) + 360) % 360);
+                      }
+                      setIsEditingRotation(false);
+                    } else if (e.key === 'Escape') {
+                      setIsEditingRotation(false);
+                    }
+                  }}
+                  onBlur={() => {
+                    const val = parseFloat(rotationInput);
+                    if (!isNaN(val)) {
+                      setRotation(((Math.round(val) % 360) + 360) % 360);
+                    }
+                    setIsEditingRotation(false);
+                  }}
+                />
+                <span className="text-[11px] font-mono tabular-nums text-white/50 ml-1">°</span>
+              </div>
+            ) : (
+              <button 
+                className="text-xs font-mono tabular-nums font-semibold text-white/90 mx-1 px-2 py-1 rounded-md bg-white/5 cursor-text hover:text-white hover:bg-white/10 hover:border-white/10 border border-transparent transition"
+                title="Click to manually enter degree"
+                onClick={() => {
+                  setRotationInput(String(rotation));
+                  setIsEditingRotation(true);
+                }}
+              >
+                {rotation}°
+              </button>
+            )}
+            <div className="w-px h-5 bg-white/10 mx-1" />
+            <button
+              className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
+              title="Minimize / Scale Down (-1%)"
+              onPointerDown={(e) => startScale(e, -1)}
+              onPointerUp={stopScale}
+              onPointerLeave={stopScale}
+              onPointerCancel={stopScale}
+            >
+              <Minimize2 size={15} />
+            </button>
+            <button
+              className="text-xs font-mono tabular-nums font-semibold text-white/90 px-2 py-1 mx-0.5 rounded-md bg-white/5 hover:text-white hover:bg-white/10 transition-colors"
+              title="Click to reset size (100%)"
+              onClick={() => setScale(100)}
+            >
+              {Math.round(scale)}%
+            </button>
+            <button
+              className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
+              title="Maximize / Scale Up (+1%)"
+              onPointerDown={(e) => startScale(e, 1)}
+              onPointerUp={stopScale}
+              onPointerLeave={stopScale}
+              onPointerCancel={stopScale}
+            >
+              <Maximize2 size={15} />
+            </button>
+            <div className="w-px h-5 bg-white/10 mx-1" />
+            <button
+              className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${
+                isLocked 
+                  ? 'bg-white/20 text-white' 
+                  : 'hover:bg-white/10 text-white/80 hover:text-white'
+              }`}
+              title={isLocked ? "Unlock Position (Currently Locked)" : "Lock Position on Canvas"}
+              onClick={() => setIsLocked(!isLocked)}
+            >
+              {isLocked ? <Lock size={15} className="text-white" /> : <Unlock size={15} />}
+            </button>
+            <div className="w-px h-5 bg-white/10 mx-1" />
+            <button
+              className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-red-500/20 text-zinc-400 hover:text-red-400 transition-colors"
+              title="Remove image"
+              onClick={() => { setImage(null); setImageSelected(false); setRotation(0); setPos({ x: 0, y: 0 }); }}
+            >
+              <Trash2 size={15} />
+            </button>
+          </div>
+        )}
+
+        {/* Floating Watermark Editor Controls (Top Center) */}
+        {!isExporting && watermark && watermarkSelected && (
+          <div 
+            data-no-export="true"
+            className="no-export absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-[#1C1C1E]/95 backdrop-blur-md border border-white/10 rounded-xl px-2.5 py-1.5 shadow-2xl z-[150] pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-200"
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <button
+              className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
+              title="Scale Down (-5%)"
+              onPointerDown={(e) => startWatermarkScale(e, -5)}
+              onPointerUp={stopWatermarkScale}
+              onPointerLeave={stopWatermarkScale}
+              onPointerCancel={stopWatermarkScale}
+            >
+              <Minimize2 size={15} />
+            </button>
+            <button
+              className="text-xs font-mono tabular-nums font-semibold text-white/90 px-2 py-1 mx-0.5 rounded-md bg-white/5 hover:text-white hover:bg-white/10 transition-colors"
+              title="Click to reset size (100%)"
+              onClick={() => setWatermarkScale(100)}
+            >
+              {Math.round(watermarkScale)}%
+            </button>
+            <button
+              className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
+              title="Scale Up (+5%)"
+              onPointerDown={(e) => startWatermarkScale(e, 5)}
+              onPointerUp={stopWatermarkScale}
+              onPointerLeave={stopWatermarkScale}
+              onPointerCancel={stopWatermarkScale}
+            >
+              <Maximize2 size={15} />
+            </button>
+            <div className="w-px h-5 bg-white/10 mx-1" />
+            <div className="flex gap-0.5">
+              <button 
+                className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors" 
+                onPointerDown={(e) => startWatermarkNudge(e, 0, -1)}
+                onPointerUp={stopWatermarkNudge}
+                onPointerLeave={stopWatermarkNudge}
+                onPointerCancel={stopWatermarkNudge}
+                title="Nudge Up (1px)"
+              >
+                <ArrowUp size={14} />
+              </button>
+              <button 
+                className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors" 
+                onPointerDown={(e) => startWatermarkNudge(e, 0, 1)}
+                onPointerUp={stopWatermarkNudge}
+                onPointerLeave={stopWatermarkNudge}
+                onPointerCancel={stopWatermarkNudge}
+                title="Nudge Down (1px)"
+              >
+                <ArrowDown size={14} />
+              </button>
+              <button 
+                className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors" 
+                onPointerDown={(e) => startWatermarkNudge(e, -1, 0)}
+                onPointerUp={stopWatermarkNudge}
+                onPointerLeave={stopWatermarkNudge}
+                onPointerCancel={stopWatermarkNudge}
+                title="Nudge Left (1px)"
+              >
+                <ArrowLeft size={14} />
+              </button>
+              <button 
+                className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors" 
+                onPointerDown={(e) => startWatermarkNudge(e, 1, 0)}
+                onPointerUp={stopWatermarkNudge}
+                onPointerLeave={stopWatermarkNudge}
+                onPointerCancel={stopWatermarkNudge}
+                title="Nudge Right (1px)"
+              >
+                <ArrowRight size={14} />
+              </button>
+            </div>
+            <div className="w-px h-5 bg-white/10 mx-1" />
+            <button
+              className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-red-500/20 text-zinc-400 hover:text-red-400 transition-colors"
+              title="Remove watermark"
+              onClick={() => { setWatermark(''); setWatermarkSelected(false); setWatermarkOffsetX(0); setWatermarkOffsetY(0); }}
+            >
+              <Trash2 size={15} />
+            </button>
+          </div>
+        )}
 
         {/* Floating Viewport Zoom HUD Controls (Bottom Center) */}
         <div 
@@ -3573,18 +3804,76 @@ export default function StudioPage() {
                       title={p.desc}
                       aria-label={p.name}
                     >
-                      {/* Clean Minimal Preview Box - Full Width */}
-                      <div className="w-full h-24 flex items-center justify-center p-3 relative overflow-hidden bg-black/30">
+                      {/* Clean Minimal Preview Box - Dynamic Aspect Ratio */}
+                      <div 
+                        className="w-full flex items-center justify-center relative overflow-hidden bg-black/30"
+                        style={{
+                          aspectRatio: aspectStyle === 'auto' ? (imageDimensions ? `${imageDimensions.width}/${imageDimensions.height}` : '16/9') : aspectStyle,
+                        }}
+                      >
                         {image ? (
                           <div 
-                            className="w-full h-full flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
-                            style={{ transform: p.previewTransform || p.transform }}
+                            className="w-full h-full flex items-center justify-center overflow-hidden shadow-sm relative"
+                            style={{ 
+                              padding: `${(padding / parseFloat(getCanvasDimensions().width as string)) * 100}%`,
+                            }}
                           >
-                            <img 
-                              src={image} 
-                              alt={p.name} 
-                              className="max-w-full max-h-full object-contain rounded shadow-lg border border-white/10" 
-                            />
+                            {/* Background Layer with Blur */}
+                            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                              <div 
+                                className="absolute inset-0 w-full h-full"
+                                style={{
+                                  ...(background.startsWith('url(') 
+                                    ? { backgroundImage: background, backgroundSize: 'cover', backgroundPosition: 'center' }
+                                    : { background: background }),
+                                  filter: bgBlur > 0 ? `blur(${bgBlur / 4}px)` : 'none',
+                                  transform: bgBlur > 0 ? `scale(${1 + (bgBlur / 100)})` : 'none',
+                                }}
+                              />
+                            </div>
+                            
+                            <div 
+                              className="flex items-center justify-center transition-transform duration-300 w-full h-full z-10"
+                              style={{ 
+                                transform: p.previewTransform || p.transform,
+                                transformStyle: 'preserve-3d',
+                              }}
+                            >
+                                {/* Miniaturized Screenshot Card */}
+                                <div 
+                                  className="relative flex flex-col"
+                                  style={{
+                                    maxWidth: 'none',
+                                    maxHeight: 'none',
+                                    width: `${scale}%`,
+                                    height: aspectStyle === 'auto' ? 'auto' : `${scale}%`,
+                                    borderRadius: `${radius / 4}px`,
+                                    boxShadow: 'none',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    backdropFilter: 'none',
+                                    WebkitBackdropFilter: 'none',
+                                    padding: '0',
+                                    filter: imageBlur > 0 ? `blur(${imageBlur / 4}px)` : 'none',
+                                    isolation: 'isolate'
+                                  }}
+                                >
+                                  <div className={`relative flex flex-col overflow-hidden w-full h-full`} style={{ borderRadius: `${radius / 4}px` }}>
+                                    {showMacOsBar && (
+                                      <div className={`shrink-0 bg-[#1C1C1E] flex items-center px-1.5 py-0.5 gap-0.5 ${view === 'browser' ? 'border-b border-white/10' : ''}`}>
+                                        <div className="w-[3px] h-[3px] rounded-full bg-[#ff5f56]" />
+                                        <div className="w-[3px] h-[3px] rounded-full bg-[#ffbd2e]" />
+                                        <div className="w-[3px] h-[3px] rounded-full bg-[#27c93f]" />
+                                      </div>
+                                    )}
+                                    <img 
+                                      src={image} 
+                                      alt={p.name} 
+                                      className="w-full h-full object-contain block"
+                                    />
+                                  </div>
+                                </div>
+                            </div>
                           </div>
                         ) : (
                           <div className={`flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 ${isActive ? 'text-white' : 'text-zinc-500'}`}>
