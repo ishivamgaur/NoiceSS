@@ -2922,73 +2922,73 @@ export default function StudioPage() {
                       </label>
                     )}
                   </div>
-
-                  {/* Selection Outline & Corner Handles (Directly on Screenshot with 0 gap) */}
-                  {!isExporting && image && (
-                    <div 
-                      data-no-export="true"
-                      className={`no-export absolute inset-0 pointer-events-none transition-opacity duration-200 z-50 ${isResizing || isRotating || imageSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
-                    >
-                      {/* Outline box */}
-                      <div 
-                        className={`absolute inset-0 border-2 pointer-events-none shadow-sm transition-colors ${isLocked ? 'border-white/40 border-dashed' : 'border-white/20'}`} 
-                        style={{ borderRadius: `${radius}px` }} 
-                      />
-
-                      {/* Locked Badge Pill */}
-                      {isLocked && (
-                        <div className="absolute top-2 right-2 bg-black/80 border border-white/20 text-white text-[10px] font-mono tabular-nums font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg z-50 pointer-events-none">
-                          <Lock size={10} className="text-white" />
-                          <span>LOCKED</span>
-                        </div>
-                      )}
-
-                      {/* Corner Resize Handles & Rotation Knob (Only active when NOT locked) */}
-                      {!isLocked && (
-                        <>
-                          <div 
-                            className="absolute -top-2 -left-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-white/10 pointer-events-auto cursor-nwse-resize hover:scale-125 active:scale-110 transition-transform z-50" 
-                            onPointerDown={(e) => handleResizeDown(e, 'tl')} 
-                            title="Drag to minimize / maximize size" 
-                          />
-                          <div 
-                            className="absolute -top-2 -right-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-white/10 pointer-events-auto cursor-nesw-resize hover:scale-125 active:scale-110 transition-transform z-50" 
-                            onPointerDown={(e) => handleResizeDown(e, 'tr')} 
-                            title="Drag to minimize / maximize size" 
-                          />
-                          <div 
-                            className="absolute -bottom-2 -left-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-white/10 pointer-events-auto cursor-nesw-resize hover:scale-125 active:scale-110 transition-transform z-50" 
-                            onPointerDown={(e) => handleResizeDown(e, 'bl')} 
-                            title="Drag to minimize / maximize size" 
-                          />
-                          <div 
-                            className="absolute -bottom-2 -right-2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-white/10 pointer-events-auto cursor-nwse-resize hover:scale-125 active:scale-110 transition-transform z-50" 
-                            onPointerDown={(e) => handleResizeDown(e, 'br')} 
-                            title="Drag to minimize / maximize size" 
-                          />
-
-                          {/* Top Rotation Stalk & Knob */}
-                          <div className="absolute -top-9 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-auto z-50">
-                            <div 
-                              role="slider"
-                              aria-label="Rotate Image drag handle"
-                              aria-valuemin={0}
-                              aria-valuemax={360}
-                              aria-valuenow={rotation}
-                              tabIndex={0}
-                              className="w-6 h-6 rounded-full bg-white text-black shadow-lg border border-black/20 flex items-center justify-center cursor-grab active:cursor-grabbing hover:scale-115 transition-transform"
-                              title="Drag to rotate (Hold Shift for 15° snap)"
-                              onPointerDown={handleRotateDown}
-                            >
-                              <RotateCw size={12} className="text-black/80" aria-hidden="true" />
-                            </div>
-                            <div className="w-0.5 h-3 bg-white/50" />
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  )}
                 </div>
+
+                {/* Selection Outline & Corner Handles (Directly on Screenshot with 0 gap) */}
+                {!isExporting && image && (
+                  <div 
+                    data-no-export="true"
+                    className={`no-export absolute inset-0 pointer-events-none transition-opacity duration-200 z-50 ${isResizing || isRotating || imageSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                  >
+                    {/* Outline box */}
+                    <div 
+                      className={`absolute -inset-[1px] border-[1.5px] pointer-events-none shadow-sm transition-colors ${isLocked ? 'border-white/50 border-dashed' : 'border-white/70'}`} 
+                      style={{ borderRadius: `${radius + 1}px` }} 
+                    />
+
+                    {/* Locked Badge Pill */}
+                    {isLocked && (
+                      <div className="absolute top-2 right-2 bg-black/80 border border-white/20 text-white text-[10px] font-mono tabular-nums font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg z-50 pointer-events-none">
+                        <Lock size={10} className="text-white" />
+                        <span>LOCKED</span>
+                      </div>
+                    )}
+
+                    {/* Corner Resize Handles & Rotation Knob (Only active when NOT locked) */}
+                    {!isLocked && (
+                      <>
+                        <div 
+                          className="absolute -top-1.5 -left-1.5 w-3 h-3 bg-white rounded-full shadow-md border-[1.5px] border-black/10 pointer-events-auto cursor-nwse-resize hover:scale-125 active:scale-110 transition-transform z-50" 
+                          onPointerDown={(e) => handleResizeDown(e, 'tl')} 
+                          title="Drag to minimize / maximize size" 
+                        />
+                        <div 
+                          className="absolute -top-1.5 -right-1.5 w-3 h-3 bg-white rounded-full shadow-md border-[1.5px] border-black/10 pointer-events-auto cursor-nesw-resize hover:scale-125 active:scale-110 transition-transform z-50" 
+                          onPointerDown={(e) => handleResizeDown(e, 'tr')} 
+                          title="Drag to minimize / maximize size" 
+                        />
+                        <div 
+                          className="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-white rounded-full shadow-md border-[1.5px] border-black/10 pointer-events-auto cursor-nesw-resize hover:scale-125 active:scale-110 transition-transform z-50" 
+                          onPointerDown={(e) => handleResizeDown(e, 'bl')} 
+                          title="Drag to minimize / maximize size" 
+                        />
+                        <div 
+                          className="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white rounded-full shadow-md border-[1.5px] border-black/10 pointer-events-auto cursor-nwse-resize hover:scale-125 active:scale-110 transition-transform z-50" 
+                          onPointerDown={(e) => handleResizeDown(e, 'br')} 
+                          title="Drag to minimize / maximize size" 
+                        />
+
+                        {/* Top Rotation Stalk & Knob */}
+                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-auto z-50">
+                          <div 
+                            role="slider"
+                            aria-label="Rotate Image drag handle"
+                            aria-valuemin={0}
+                            aria-valuemax={360}
+                            aria-valuenow={rotation}
+                            tabIndex={0}
+                            className="w-5 h-5 rounded-full bg-white text-black shadow-md border border-black/15 flex items-center justify-center cursor-grab active:cursor-grabbing hover:scale-110 transition-transform"
+                            title="Drag to rotate (Hold Shift for 15° snap)"
+                            onPointerDown={handleRotateDown}
+                          >
+                            <RotateCw size={10} className="text-black/80" aria-hidden="true" />
+                          </div>
+                          <div className="w-[1.5px] h-3 bg-white/50" />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
