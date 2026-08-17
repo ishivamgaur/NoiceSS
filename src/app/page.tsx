@@ -563,6 +563,10 @@ export default function StudioPage() {
   const viewportPanRef = useRef(viewportPan);
   viewportPanRef.current = viewportPan;
 
+  // Multi-touch tracking for native mobile pinch-to-zoom
+  const activePointersRef = useRef<Map<number, { clientX: number, clientY: number }>>(new Map());
+  const pinchRef = useRef<{ startDist: number, startZoom: number, startPanX: number, startPanY: number, centerX: number, centerY: number } | null>(null);
+
   // Screenshot element drag state
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -1300,9 +1304,37 @@ export default function StudioPage() {
   }, []);
 
   const handleWorkspacePointerDown = (e: React.PointerEvent) => {
-    // Check if the event originated inside the screenshot image frame or floating controls
+    // Register pointer for multi-touch tracking
+    activePointersRef.current.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
+
+    // Check if the event originated inside the screenshot image frame
     const isInsideScreenshotFrame = imageFrameRef.current?.contains(e.target as Node);
     
+    // If two fingers are down, initiate pinch-to-zoom
+    if (activePointersRef.current.size === 2) {
+      const pts = Array.from(activePointersRef.current.values());
+      const dist = Math.hypot(pts[0].clientX - pts[1].clientX, pts[0].clientY - pts[1].clientY);
+      
+      const centerX = (pts[0].clientX + pts[1].clientX) / 2;
+      const centerY = (pts[0].clientY + pts[1].clientY) / 2;
+      
+      pinchRef.current = {
+        startDist: dist,
+        startZoom: viewportZoom,
+        startPanX: viewportPan.x,
+        startPanY: viewportPan.y,
+        centerX,
+        centerY
+      };
+      
+      // Stop normal panning if it was active
+      setIsPanningWorkspace(false);
+      workspacePanRef.current = null;
+      try { (workspaceRef.current as HTMLElement)?.setPointerCapture?.(e.pointerId); } catch {}
+      return;
+    }
+
+    // Normal pan logic (1 finger or mouse)
     if (isLocked || !isInsideScreenshotFrame || isSpacePressed || e.button === 1) {
       if (!isInsideScreenshotFrame) {
         setImageSelected(false);
@@ -1314,28 +1346,69 @@ export default function StudioPage() {
         initialPanX: viewportPan.x,
         initialPanY: viewportPan.y,
       };
-      (workspaceRef.current as HTMLElement)?.setPointerCapture?.(e.pointerId);
+      try { (workspaceRef.current as HTMLElement)?.setPointerCapture?.(e.pointerId); } catch {}
     }
   };
 
   const handleWorkspacePointerMove = (e: React.PointerEvent) => {
-    if (!isPanningWorkspace || !workspacePanRef.current) return;
-    const dx = e.clientX - workspacePanRef.current.startX;
-    const dy = e.clientY - workspacePanRef.current.startY;
-    setViewportPan({
-      x: workspacePanRef.current.initialPanX + dx,
-      y: workspacePanRef.current.initialPanY + dy,
-    });
+    // Update pointer position
+    if (activePointersRef.current.has(e.pointerId)) {
+      activePointersRef.current.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
+    }
+
+    // Handle Pinch to Zoom
+    if (activePointersRef.current.size === 2 && pinchRef.current) {
+      const pts = Array.from(activePointersRef.current.values());
+      const dist = Math.hypot(pts[0].clientX - pts[1].clientX, pts[0].clientY - pts[1].clientY);
+      const scaleDelta = dist / pinchRef.current.startDist;
+      
+      let newZoom = pinchRef.current.startZoom * scaleDelta;
+      newZoom = Math.max(0.1, Math.min(newZoom, 5)); // Clamp zoom between 10% and 500%
+      
+      // Calculate new pan to zoom around the pinch center (Figma style)
+      if (workspaceRef.current) {
+        const rect = workspaceRef.current.getBoundingClientRect();
+        const pointerX = pinchRef.current.centerX - rect.left;
+        const pointerY = pinchRef.current.centerY - rect.top;
+        
+        // Adjust pan to zoom into the pinch center
+        const zoomRatio = newZoom / pinchRef.current.startZoom;
+        const newPanX = pointerX - (pointerX - pinchRef.current.startPanX) * zoomRatio;
+        const newPanY = pointerY - (pointerY - pinchRef.current.startPanY) * zoomRatio;
+        
+        setViewportZoom(newZoom);
+        setViewportPan({ x: newPanX, y: newPanY });
+      }
+      return;
+    }
+
+    // Handle normal Pan
+    if (isPanningWorkspace && workspacePanRef.current) {
+      const dx = e.clientX - workspacePanRef.current.startX;
+      const dy = e.clientY - workspacePanRef.current.startY;
+      setViewportPan({
+        x: workspacePanRef.current.initialPanX + dx,
+        y: workspacePanRef.current.initialPanY + dy,
+      });
+    }
   };
 
   const handleWorkspacePointerUp = (e: React.PointerEvent) => {
+    activePointersRef.current.delete(e.pointerId);
+    
+    // If we dropped below 2 fingers, end pinch
+    if (activePointersRef.current.size < 2) {
+      pinchRef.current = null;
+    }
+
     if (isPanningWorkspace) {
       setIsPanningWorkspace(false);
       workspacePanRef.current = null;
-      try {
-        (e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
-      } catch {}
     }
+    
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
+    } catch {}
   };
 
   const handleSheetDrag = (e: React.PointerEvent<HTMLDivElement>, closeSetter: (v: boolean) => void) => {
@@ -3115,7 +3188,7 @@ export default function StudioPage() {
         <div 
           ref={workspaceRef}
           data-workspace-bg="true"
-          className={`flex-grow overflow-hidden relative select-none ${isPanningWorkspace ? 'cursor-grabbing' : 'cursor-grab'}`}
+          className={`flex-grow overflow-hidden relative select-none touch-none ${isPanningWorkspace ? 'cursor-grabbing' : 'cursor-grab'}`}
           onPointerDown={handleWorkspacePointerDown}
           onPointerMove={handleWorkspacePointerMove}
           onPointerUp={handleWorkspacePointerUp}
