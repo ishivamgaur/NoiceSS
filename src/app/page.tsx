@@ -8,7 +8,7 @@ import {
   Wand2, Box, Orbit, Compass, Eye, RefreshCw, Sun, Moon, Laptop, Globe, CheckCircle2,
   Loader2, Aperture, SlidersHorizontal, Droplets, Droplet, Tv, Radio, Film, 
   Focus, Pipette, Paintbrush, Flame, Zap, SunMedium, Type, Scan, Scaling, 
-  AppWindow, Gauge, EyeOff, SlidersVertical, X, Lock, Unlock, Bookmark, Save, Plus
+  AppWindow, Gauge, EyeOff, SlidersVertical, X, Lock, Unlock, Bookmark, Save, Plus, Star, Camera, Undo2, Redo2
 } from 'lucide-react';
 import { toPng, toJpeg, toBlob } from 'html-to-image';
 import { Slider } from "@/components/ui/slider";
@@ -530,8 +530,8 @@ export default function StudioPage() {
   const [shadow, setShadow] = useState(25);
   const [scale, setScale] = useState(100);
   const [aspectRatio, setAspectRatio] = useState('auto');
-  const [customRatioW, setCustomRatioW] = useState<number>(16);
-  const [customRatioH, setCustomRatioH] = useState<number>(9);
+  const [customRatioW, setCustomRatioW] = useState<number | string>(16);
+  const [customRatioH, setCustomRatioH] = useState<number | string>(9);
   const [showRatioMenu, setShowRatioMenu] = useState(false);
   const [showPresetsMenu, setShowPresetsMenu] = useState(false);
   const [showMacOsBar, setShowMacOsBar] = useState(false);
@@ -556,6 +556,7 @@ export default function StudioPage() {
   const workspacePanRef = useRef<{ startX: number, startY: number, initialPanX: number, initialPanY: number } | null>(null);
 
   const viewportZoomRef = useRef(viewportZoom);
+  const lastDiscreteZoomTime = useRef<number>(0);
   viewportZoomRef.current = viewportZoom;
   const viewportPanRef = useRef(viewportPan);
   viewportPanRef.current = viewportPan;
@@ -619,6 +620,97 @@ export default function StudioPage() {
   const [watermarkOffsetX, setWatermarkOffsetX] = useState<number>(16);
   const [watermarkOffsetY, setWatermarkOffsetY] = useState<number>(16);
   const [watermarkScale, setWatermarkScale] = useState<number>(100);
+
+  // --- History (Undo / Redo) ---
+  const [history, setHistory] = useState<any[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const skipHistoryRecord = useRef(false);
+  const historyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const currentConfigSnapshot = React.useMemo(() => ({
+    background, padding, radius, shadow, bgBlur, aspectRatio, customRatioW, customRatioH,
+    showMacOsBar, view, glassBorder, glassBorderWidth, glassBorderOpacity, glassBorderBlur, glassBorderColor,
+    perspective, rotateX, rotateY, rotateZ, perspectiveDepth, brightness, contrast, saturation, hueRotate, filter,
+    noiseIntensity, grainIntensity, noiseTarget, watermark, watermarkPlatform, watermarkPosition, watermarkTarget,
+    watermarkOpacity, watermarkBlur, watermarkGlass, watermarkBorderWidth, watermarkBorderOpacity, watermarkOffsetX,
+    watermarkOffsetY, watermarkScale, pos, rotation, scale, imageBlur, image, imageDimensions
+  }), [
+    background, padding, radius, shadow, bgBlur, aspectRatio, customRatioW, customRatioH,
+    showMacOsBar, view, glassBorder, glassBorderWidth, glassBorderOpacity, glassBorderBlur, glassBorderColor,
+    perspective, rotateX, rotateY, rotateZ, perspectiveDepth, brightness, contrast, saturation, hueRotate, filter,
+    noiseIntensity, grainIntensity, noiseTarget, watermark, watermarkPlatform, watermarkPosition, watermarkTarget,
+    watermarkOpacity, watermarkBlur, watermarkGlass, watermarkBorderWidth, watermarkBorderOpacity, watermarkOffsetX,
+    watermarkOffsetY, watermarkScale, pos, rotation, scale, imageBlur, image, imageDimensions
+  ]);
+
+  useEffect(() => {
+    if (skipHistoryRecord.current) return;
+    
+    if (historyTimeoutRef.current) clearTimeout(historyTimeoutRef.current);
+    
+    historyTimeoutRef.current = setTimeout(() => {
+      setHistory(prev => {
+        const newHistory = prev.slice(0, historyIndex + 1);
+        const lastConfig = newHistory[newHistory.length - 1];
+        if (lastConfig && JSON.stringify(lastConfig) === JSON.stringify(currentConfigSnapshot)) {
+          return prev;
+        }
+        setTimeout(() => setHistoryIndex(newHistory.length), 0);
+        return [...newHistory, currentConfigSnapshot];
+      });
+    }, 400);
+    
+  }, [currentConfigSnapshot, historyIndex]);
+
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      skipHistoryRecord.current = true;
+      if (historyTimeoutRef.current) clearTimeout(historyTimeoutRef.current);
+      setTimeout(() => { skipHistoryRecord.current = false; }, 600);
+      const prevConfig = history[historyIndex - 1];
+      setHistoryIndex(historyIndex - 1);
+      handleApplyPreset(prevConfig);
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      skipHistoryRecord.current = true;
+      if (historyTimeoutRef.current) clearTimeout(historyTimeoutRef.current);
+      setTimeout(() => { skipHistoryRecord.current = false; }, 600);
+      const nextConfig = history[historyIndex + 1];
+      setHistoryIndex(historyIndex + 1);
+      handleApplyPreset(nextConfig);
+    }
+  };
+
+  const latestUndo = useRef(handleUndo);
+  const latestRedo = useRef(handleRedo);
+  latestUndo.current = handleUndo;
+  latestRedo.current = handleRedo;
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          latestRedo.current();
+        } else {
+          latestUndo.current();
+        }
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        latestRedo.current();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+  // -----------------------------
   
   // Collapsible sidebar accordion sections
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({
@@ -758,6 +850,13 @@ export default function StudioPage() {
   useEffect(() => {
     if (!isStorageInitialized) return;
 
+    if (!image) {
+      try {
+        localStorage.removeItem('noicess_studio_state');
+      } catch (err) {}
+      return;
+    }
+
     try {
       const stateToSave = {
         background,
@@ -862,6 +961,7 @@ export default function StudioPage() {
     watermarkScale,
     leftTab,
     expandedSections,
+    image,
   ]);
 
   // 3. Auto-save or remove uploaded screenshot
@@ -988,6 +1088,12 @@ export default function StudioPage() {
     if (config.watermarkOffsetX !== undefined) setWatermarkOffsetX(config.watermarkOffsetX);
     if (config.watermarkOffsetY !== undefined) setWatermarkOffsetY(config.watermarkOffsetY);
     if (config.watermarkScale !== undefined) setWatermarkScale(config.watermarkScale);
+    if (config.pos !== undefined) setPos(config.pos);
+    if (config.rotation !== undefined) setRotation(config.rotation);
+    if (config.scale !== undefined) setScale(config.scale);
+    if (config.imageBlur !== undefined) setImageBlur(config.imageBlur);
+    if (config.image !== undefined) setImage(config.image);
+    if (config.imageDimensions !== undefined) setImageDimensions(config.imageDimensions);
   };
 
   // Delete saved preset
@@ -1006,6 +1112,18 @@ export default function StudioPage() {
   const [exportScale, setExportScale] = useState<number>(2);
   const [isExporting, setIsExporting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [starCount, setStarCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch('https://api.github.com/repos/ishivamgaur/noiceSS')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.stargazers_count !== undefined) {
+          setStarCount(data.stargazers_count);
+        }
+      })
+      .catch(() => {});
+  }, []);
   const [showExportModal, setShowExportModal] = useState(false);
 
   // Generate real pixel noise texture
@@ -1033,6 +1151,27 @@ export default function StudioPage() {
   const canvasRef = useRef<HTMLDivElement>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
 
+  const scaleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scaleIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const startScale = (e: React.PointerEvent<HTMLButtonElement>, delta: number) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    setScale((s) => Math.min(Math.max(s + delta, 20), 300));
+    scaleTimeoutRef.current = setTimeout(() => {
+      scaleIntervalRef.current = setInterval(() => {
+        setScale((s) => Math.min(Math.max(s + delta, 20), 300));
+      }, 30); // 30ms interval for extremely smooth continuous scaling
+    }, 300);
+  };
+
+  const stopScale = (e?: React.PointerEvent<HTMLButtonElement>) => {
+    if (e && e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+    if (scaleTimeoutRef.current) clearTimeout(scaleTimeoutRef.current);
+    if (scaleIntervalRef.current) clearInterval(scaleIntervalRef.current);
+  };
+
   // Spacebar key listener for canvas panning
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -1053,7 +1192,7 @@ export default function StudioPage() {
     };
   }, []);
 
-  // Cursor-Anchored Wheel Zoom for Canvas Workspace
+  // Cursor-Anchored Wheel Zoom & Pan for Canvas Workspace
   useEffect(() => {
     const workspace = workspaceRef.current;
     if (!workspace) return;
@@ -1061,24 +1200,46 @@ export default function StudioPage() {
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
       
-      const rect = workspace.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-
       const currentZoom = viewportZoomRef.current;
       const currentPan = viewportPanRef.current;
 
-      const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
-      const newZoom = Math.min(Math.max(currentZoom * zoomFactor, 0.2), 4.0);
+      if (e.ctrlKey || e.metaKey) {
+        // Pinch-to-zoom or Ctrl+Wheel
+        let zoomAmount = 0;
+        if (Math.abs(e.deltaY) > 50) {
+          // Discrete mouse wheel: apply a fixed, extremely precise 10% step per tick
+          zoomAmount = Math.sign(e.deltaY) * 0.1;
+          lastDiscreteZoomTime.current = Date.now();
+        } else {
+          // Smooth trackpad: apply proportional scaling
+          zoomAmount = e.deltaY * 0.002;
+        }
+        
+        const newZoom = Math.min(Math.max(currentZoom * (1 - zoomAmount), 0.1), 5.0);
+        
+        const rect = workspace.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
 
-      const pointX = (mouseX - currentPan.x) / currentZoom;
-      const pointY = (mouseY - currentPan.y) / currentZoom;
+        const pointX = (mouseX - currentPan.x) / currentZoom;
+        const pointY = (mouseY - currentPan.y) / currentZoom;
 
-      const newPanX = mouseX - pointX * newZoom;
-      const newPanY = mouseY - pointY * newZoom;
+        const newPanX = mouseX - pointX * newZoom;
+        const newPanY = mouseY - pointY * newZoom;
 
-      setViewportZoom(newZoom);
-      setViewportPan({ x: newPanX, y: newPanY });
+        setViewportZoom(newZoom);
+        setViewportPan({ x: newPanX, y: newPanY });
+        
+        // Update refs immediately so subsequent rapid wheel events within the same frame use correct math
+        viewportZoomRef.current = newZoom;
+        viewportPanRef.current = { x: newPanX, y: newPanY };
+      } else {
+        // Two-finger trackpad pan or Mouse wheel scroll
+        const newPanX = currentPan.x - e.deltaX;
+        const newPanY = currentPan.y - e.deltaY;
+        setViewportPan({ x: newPanX, y: newPanY });
+        viewportPanRef.current = { x: newPanX, y: newPanY };
+      }
     };
 
     workspace.addEventListener('wheel', handleWheel, { passive: false });
@@ -1129,7 +1290,10 @@ export default function StudioPage() {
     setViewportPan({ x: 0, y: 0 });
   };
 
-  const zoomCanvasAtCenter = (factor: number) => {
+  const viewportZoomTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const viewportZoomIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const zoomCanvasAtCenter = (delta: number) => {
     const workspace = workspaceRef.current;
     if (!workspace) return;
     const rect = workspace.getBoundingClientRect();
@@ -1142,12 +1306,32 @@ export default function StudioPage() {
     const pointX = (centerX - currentPan.x) / currentZoom;
     const pointY = (centerY - currentPan.y) / currentZoom;
 
-    const newZoom = Math.min(Math.max(currentZoom * factor, 0.2), 4.0);
+    const newZoom = Math.min(Math.max(currentZoom + delta, 0.1), 5.0);
     const newPanX = centerX - pointX * newZoom;
     const newPanY = centerY - pointY * newZoom;
 
     setViewportZoom(newZoom);
     setViewportPan({ x: newPanX, y: newPanY });
+    viewportZoomRef.current = newZoom;
+    viewportPanRef.current = { x: newPanX, y: newPanY };
+  };
+
+  const startViewportZoom = (e: React.PointerEvent<HTMLButtonElement>, delta: number) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    zoomCanvasAtCenter(delta);
+    viewportZoomTimeoutRef.current = setTimeout(() => {
+      viewportZoomIntervalRef.current = setInterval(() => {
+        zoomCanvasAtCenter(delta);
+      }, 30);
+    }, 300);
+  };
+
+  const stopViewportZoom = (e?: React.PointerEvent<HTMLButtonElement>) => {
+    if (e && e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+    if (viewportZoomTimeoutRef.current) clearTimeout(viewportZoomTimeoutRef.current);
+    if (viewportZoomIntervalRef.current) clearInterval(viewportZoomIntervalRef.current);
   };
 
   // Corner resize handling
@@ -1408,12 +1592,15 @@ export default function StudioPage() {
     return parts.length > 0 ? parts.join(' ') : 'none';
   };
 
+  const safeCustomW = Number(customRatioW) || 1;
+  const safeCustomH = Number(customRatioH) || 1;
+
   const activeRatioData = aspectRatio === 'custom'
-    ? { id: 'custom', aspect: `${customRatioW}/${customRatioH}`, name: `Custom (${customRatioW}:${customRatioH})`, desc: `${customRatioW}:${customRatioH}`, icon: Scaling }
+    ? { id: 'custom', aspect: `${safeCustomW}/${safeCustomH}`, name: `Custom (${safeCustomW}:${safeCustomH})`, desc: `${safeCustomW}:${safeCustomH}`, icon: Scaling }
     : (FLAT_RATIOS.find(r => r.id === aspectRatio) || FLAT_RATIOS[0]);
 
   const aspectStyle = aspectRatio === 'custom'
-    ? `${customRatioW}/${customRatioH}`
+    ? `${safeCustomW}/${safeCustomH}`
     : (activeRatioData.id === 'auto' 
         ? (imageDimensions.w && imageDimensions.h ? `${imageDimensions.w}/${imageDimensions.h}` : 'auto')
         : activeRatioData.aspect);
@@ -1425,13 +1612,57 @@ export default function StudioPage() {
   const bgUrlMatch = background.match(/^url\(['"]?(.*?)['"]?\)$/);
   const bgImageUrl = bgUrlMatch ? bgUrlMatch[1] : null;
 
+  const getCanvasDimensions = () => {
+    const defaultSize = 800;
+    const minInnerSize = image ? 64 : 200; 
+    const requiredMinSide = padding * 2 + minInnerSize;
+
+    if (aspectStyle === 'auto') {
+      return image ? { width: `${defaultSize}px`, maxHeight: `${defaultSize}px` } : { width: `${defaultSize}px`, height: '600px' };
+    }
+
+    const [wStr, hStr] = aspectStyle.split('/');
+    const ratioW = Number(wStr);
+    const ratioH = Number(hStr);
+    const ratio = ratioW / ratioH;
+
+    let finalW, finalH;
+
+    if (ratio >= 1) {
+      finalW = defaultSize;
+      finalH = defaultSize / ratio;
+      if (finalH < requiredMinSide) {
+        finalH = requiredMinSide;
+        finalW = finalH * ratio;
+      }
+    } else {
+      finalH = defaultSize;
+      finalW = defaultSize * ratio;
+      if (finalW < requiredMinSide) {
+        finalW = requiredMinSide;
+        finalH = finalW / ratio;
+      }
+    }
+
+    return {
+      width: `${finalW}px`,
+      height: `${finalH}px`
+    };
+  };
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-bg-dark text-text-main font-sans antialiased">
       
       {/* Left Sidebar */}
       <aside className="w-[300px] min-w-[300px] flex flex-col bg-panel border-r border-white/5 z-20 select-none h-full overflow-hidden">
-        {/* Top Tab Bar aligned with h-16 main header */}
-        <div className="h-16 border-b border-white/5 px-3.5 flex items-center shrink-0">
+        {/* Top Header Bar aligned with h-16 main header */}
+        <div className="h-16 border-b border-white/5 px-6 flex items-center shrink-0">
+          <span className="font-bold text-base tracking-[0.2em] text-white uppercase select-none drop-shadow-sm">
+            NOICESS
+          </span>
+        </div>
+
+        {/* Sticky Tabs Header */}
+        <div className="px-3 py-3 border-b border-white/5 shrink-0">
           <div className="relative grid grid-cols-3 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04] w-full isolate">
             {/* Sliding Translucent Whitish Glass Active Pill */}
             <div 
@@ -1481,6 +1712,7 @@ export default function StudioPage() {
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto [scrollbar-gutter:stable] p-3 pb-8 flex flex-col">
+
           {/* Tab 1: Layout & Frame */}
           {leftTab === 'layout' && (
           <div className="animate-in fade-in duration-100 flex flex-col gap-3">
@@ -2237,16 +2469,29 @@ export default function StudioPage() {
 
       {/* Main Studio Workspace */}
       <main className="flex-grow flex flex-col bg-bg-dark h-full relative overflow-hidden">
-        {/* Top Control Bar */}
         <header className="h-16 border-b border-white/5 bg-panel flex items-center justify-between px-6 z-30 shrink-0">
-          <div className="flex items-center">
-            <span className="font-bold text-sm tracking-[0.22em] text-white uppercase select-none">
-              NOICESS
-            </span>
+          {/* Left Actions: Undo / Redo */}
+          <div className="flex-1 flex items-center gap-1.5">
+            <button 
+              onClick={handleUndo}
+              disabled={historyIndex <= 0}
+              className="flex items-center justify-center w-[34px] h-[34px] rounded-lg border border-transparent hover:bg-white/[0.04] hover:border-white/5 text-zinc-400 hover:text-white transition-all active:scale-[0.96] disabled:opacity-30 disabled:hover:bg-transparent disabled:active:scale-100 disabled:cursor-not-allowed" 
+              title="Undo" aria-label="Undo"
+            >
+              <Undo2 size={15} />
+            </button>
+            <button 
+              onClick={handleRedo}
+              disabled={historyIndex >= history.length - 1}
+              className="flex items-center justify-center w-[34px] h-[34px] rounded-lg border border-transparent hover:bg-white/[0.04] hover:border-white/5 text-zinc-400 hover:text-white transition-all active:scale-[0.96] disabled:opacity-30 disabled:hover:bg-transparent disabled:active:scale-100 disabled:cursor-not-allowed" 
+              title="Redo" aria-label="Redo"
+            >
+              <Redo2 size={15} />
+            </button>
           </div>
 
           {/* Center Hub: Aspect Ratio + Presets */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-2">
             {/* Aspect Ratio Selector */}
             <div className="relative">
               <button
@@ -2254,7 +2499,7 @@ export default function StudioPage() {
                   setShowRatioMenu(!showRatioMenu);
                   setShowPresetsMenu(false);
                 }}
-                className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/5 text-xs font-medium transition shadow-inner text-zinc-200 hover:text-white"
+                className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/5 text-xs font-medium transition shadow-inner text-zinc-200 hover:text-white active:scale-[0.96]"
               >
                 <div className="w-4 h-4 flex items-center justify-center text-white shrink-0">
                   {renderAspectBox(aspectStyle)}
@@ -2288,8 +2533,13 @@ export default function StudioPage() {
                               aria-label="Custom ratio width"
                               value={customRatioW}
                               onChange={(e) => {
-                                const val = Math.max(1, parseInt(e.target.value) || 1);
-                                setCustomRatioW(val);
+                                const raw = e.target.value;
+                                if (raw === '') {
+                                  setCustomRatioW('');
+                                } else {
+                                  const val = parseInt(raw);
+                                  if (!isNaN(val)) setCustomRatioW(Math.max(1, val));
+                                }
                                 setAspectRatio('custom');
                               }}
                               className="w-12 h-7 px-1 bg-black/40 border border-white/10 rounded-md text-center text-xs font-mono tabular-nums text-white focus:outline-none focus:border-white/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -2302,8 +2552,13 @@ export default function StudioPage() {
                               aria-label="Custom ratio height"
                               value={customRatioH}
                               onChange={(e) => {
-                                const val = Math.max(1, parseInt(e.target.value) || 1);
-                                setCustomRatioH(val);
+                                const raw = e.target.value;
+                                if (raw === '') {
+                                  setCustomRatioH('');
+                                } else {
+                                  const val = parseInt(raw);
+                                  if (!isNaN(val)) setCustomRatioH(Math.max(1, val));
+                                }
                                 setAspectRatio('custom');
                               }}
                               className="w-12 h-7 px-1 bg-black/40 border border-white/10 rounded-md text-center text-xs font-mono tabular-nums text-white focus:outline-none focus:border-white/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -2376,7 +2631,7 @@ export default function StudioPage() {
                   setShowPresetsMenu(!showPresetsMenu);
                   setShowRatioMenu(false);
                 }}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/5 text-xs font-medium transition shadow-inner text-zinc-200 hover:text-white"
+                className="flex items-center gap-2 px-3.5 py-2 rounded-lg border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/5 text-xs font-medium transition shadow-inner text-zinc-200 hover:text-white active:scale-[0.96]"
                 title="Custom Presets & Studio Styles"
               >
                 <Bookmark size={13} className="text-zinc-300" />
@@ -2417,7 +2672,8 @@ export default function StudioPage() {
                             />
                             <button
                               onClick={() => handleSavePreset()}
-                              className="h-7 px-2.5 rounded-md bg-white hover:bg-zinc-200 text-black text-xs font-semibold flex items-center gap-1 shrink-0 transition-colors shadow-sm active:scale-95"
+                              disabled={!image}
+                              className="h-7 px-2.5 rounded-md bg-white hover:bg-zinc-200 text-black text-xs font-semibold flex items-center gap-1 shrink-0 transition-colors shadow-sm active:scale-95 disabled:opacity-40 disabled:hover:bg-white disabled:cursor-not-allowed disabled:active:scale-100"
                             >
                               <Plus size={12} />
                               <span>Save</span>
@@ -2530,7 +2786,8 @@ export default function StudioPage() {
           </div>
 
           {/* Header Action Controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex-1 flex items-center justify-end gap-3">
+
             {/* Copy to Clipboard */}
             <button
               onClick={handleCopyClipboard}
@@ -2544,11 +2801,11 @@ export default function StudioPage() {
 
             {/* Clear Button */}
             <button 
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium border border-white/5 text-zinc-400 hover:text-white hover:bg-white/[0.08] hover:border-white/10 transition disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.96]" 
-              onClick={() => { setImage(null); setImageSelected(false); setRotation(0); setPos({ x: 0, y: 0 }); }} 
+              className="group flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium border border-white/5 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-zinc-400 disabled:hover:border-white/5 disabled:cursor-not-allowed active:scale-[0.96]" 
+              onClick={() => { setImage(null); setImageSelected(false); setRotation(0); setPos({ x: 0, y: 0 }); setWatermark(''); }} 
               disabled={!image}
             >
-              <Trash2 size={13} />
+              <Trash2 size={13} className={`transition-colors ${image ? 'text-red-500/80 group-hover:text-red-500' : ''}`} />
               <span>Clear</span>
             </button>
 
@@ -2563,12 +2820,13 @@ export default function StudioPage() {
             </button>
           </div>
         </header>
+        {/* Top Control Bar */}
 
         {/* Canvas Workspace (Figma / Canva style zoom & pan viewport) */}
         <div 
           ref={workspaceRef}
           data-workspace-bg="true"
-          className={`flex-grow flex items-center justify-center overflow-hidden relative select-none ${isPanningWorkspace ? 'cursor-grabbing' : 'cursor-grab'}`}
+          className={`flex-grow overflow-hidden relative select-none ${isPanningWorkspace ? 'cursor-grabbing' : 'cursor-grab'}`}
           onPointerDown={handleWorkspacePointerDown}
           onPointerMove={handleWorkspacePointerMove}
           onPointerUp={handleWorkspacePointerUp}
@@ -2580,24 +2838,23 @@ export default function StudioPage() {
         >
           {/* Transformed Canvas Viewport */}
           <div
-            className="flex items-center justify-center pointer-events-auto"
+            className="absolute inset-0 pointer-events-none"
             style={{
-              transform: `translate(${viewportPan.x}px, ${viewportPan.y}px) scale(${viewportZoom})`,
+              translate: `${viewportPan.x}px ${viewportPan.y}px`,
+              scale: viewportZoom,
               transformOrigin: '0 0',
-              transition: isPanningWorkspace ? 'none' : 'transform 0.05s cubic-bezier(0,0,0.2,1)',
+              transition: 'none',
             }}
           >
-            <div 
-              ref={canvasRef}
-              className={`relative flex items-center justify-center shadow-2xl shrink-0 ${isPanningWorkspace ? 'cursor-grabbing' : 'cursor-grab'}`}
-              onClick={() => setImageSelected(false)}
+            {/* Flex container to center the canvas inside the scaled viewport */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-auto" data-workspace-bg="true">
+              <div 
+                ref={canvasRef}
+                className={`relative flex items-center justify-center shadow-2xl shrink-0 ${isPanningWorkspace ? 'cursor-grabbing' : 'cursor-grab'}`}
+                onClick={() => setImageSelected(false)}
             style={{
               aspectRatio: aspectStyle,
-              ...(aspectStyle !== 'auto' ? (
-                Number(aspectStyle.split('/')[0]) >= Number(aspectStyle.split('/')[1])
-                  ? { width: '800px', maxHeight: '800px' }
-                  : { height: '800px', maxWidth: '800px' }
-              ) : (image ? { width: '800px', maxHeight: '800px' } : { width: '800px', height: '600px' }))
+              ...getCanvasDimensions()
             }}
           >
             {/* Background Layer (Strictly Clipped, 0 padding) */}
@@ -2751,9 +3008,12 @@ export default function StudioPage() {
                     )}
                     <div className="w-px h-4 bg-white/15 mx-0.5" />
                     <button
-                      className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors"
-                      title="Minimize / Scale Down (-15%)"
-                      onClick={() => setScale((s) => Math.max(s - 15, 20))}
+                      className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
+                      title="Minimize / Scale Down (-1%)"
+                      onPointerDown={(e) => startScale(e, -1)}
+                      onPointerUp={stopScale}
+                      onPointerLeave={stopScale}
+                      onPointerCancel={stopScale}
                     >
                       <Minimize2 size={14} />
                     </button>
@@ -2765,9 +3025,12 @@ export default function StudioPage() {
                       {Math.round(scale)}%
                     </button>
                     <button
-                      className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors"
-                      title="Maximize / Scale Up (+15%)"
-                      onClick={() => setScale((s) => Math.min(s + 15, 300))}
+                      className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-white/10 text-white/80 hover:text-white transition-colors select-none"
+                      title="Maximize / Scale Up (+1%)"
+                      onPointerDown={(e) => startScale(e, 1)}
+                      onPointerUp={stopScale}
+                      onPointerLeave={stopScale}
+                      onPointerCancel={stopScale}
                     >
                       <Maximize2 size={14} />
                     </button>
@@ -2914,10 +3177,14 @@ export default function StudioPage() {
                         )}
                       </div>
                     ) : (
-                      <label className={`flex-grow flex flex-col items-center justify-center gap-4 text-white drop-shadow-md w-full h-full cursor-pointer transition relative z-10 rounded-xl ${background === 'transparent' ? 'border-2 border-dashed border-white/5 bg-black/20 backdrop-blur-md hover:bg-white/10 hover:border-white/5' : 'hover:bg-white/5'}`}>
-                        <Upload size={48} className="opacity-70 text-zinc-400" />
-                        <h2 className="text-xl font-semibold text-balance">Drop an image here</h2>
-                        <p className="opacity-80 text-sm">Or paste from clipboard (Ctrl+V)</p>
+                      <label className={`group flex flex-col items-center justify-center gap-2 md:gap-4 text-white drop-shadow-md w-full h-full cursor-pointer transition-all relative z-10 rounded-xl p-4 text-center overflow-hidden ${background === 'transparent' ? 'border-2 border-dashed border-white/10 bg-black/20 backdrop-blur-md hover:bg-white/10 hover:border-white/20' : 'hover:bg-white/5'}`}>
+                        <div className="p-3 rounded-full bg-white/5 group-hover:bg-white/10 transition-all duration-300 border border-white/5 group-hover:border-white/10 group-active:scale-95 shrink-0">
+                          <Upload size={32} className="opacity-90 text-white drop-shadow-sm transition-transform duration-300 group-hover:-translate-y-1" strokeWidth={1.5} />
+                        </div>
+                        <div className="flex flex-col gap-1 items-center justify-center max-w-[95%] shrink overflow-hidden">
+                          <h2 className="text-base md:text-lg font-bold tracking-tight text-white truncate w-full">Drop an image here</h2>
+                          <p className="text-zinc-400 text-[10px] md:text-xs font-medium truncate w-full">Or paste from clipboard (Ctrl+V)</p>
+                        </div>
                         <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                       </label>
                     )}
@@ -3031,17 +3298,22 @@ export default function StudioPage() {
               </div>
             )}
           </div>
+          </div>
         </div>
 
         {/* Floating Viewport Zoom HUD Controls (Bottom Center) */}
         <div 
           data-no-export="true"
-          className="no-export absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-[#1C1C1E]/90 border border-white/5 backdrop-blur-md rounded-lg px-2 py-1 shadow-2xl z-40"
+          className="no-export absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-[#1C1C1E]/90 border border-white/5 backdrop-blur-md rounded-lg px-2 py-1 shadow-2xl z-40 pointer-events-auto"
+          onPointerDown={(e) => e.stopPropagation()}
         >
           <button
-            onClick={() => zoomCanvasAtCenter(0.85)}
-            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white/10 text-zinc-300 hover:text-white transition-colors"
-            title="Zoom Out (Scroll Down)"
+            onPointerDown={(e) => startViewportZoom(e, -0.01)}
+            onPointerUp={stopViewportZoom}
+            onPointerLeave={stopViewportZoom}
+            onPointerCancel={stopViewportZoom}
+            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white/10 text-zinc-300 hover:text-white transition-colors select-none"
+            title="Zoom Out (-1%)"
           >
             <ZoomOut size={14} />
           </button>
@@ -3053,9 +3325,12 @@ export default function StudioPage() {
             {Math.round(viewportZoom * 100)}%
           </button>
           <button
-            onClick={() => zoomCanvasAtCenter(1.15)}
-            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white/10 text-zinc-300 hover:text-white transition-colors"
-            title="Zoom In (Scroll Up)"
+            onPointerDown={(e) => startViewportZoom(e, 0.01)}
+            onPointerUp={stopViewportZoom}
+            onPointerLeave={stopViewportZoom}
+            onPointerCancel={stopViewportZoom}
+            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white/10 text-zinc-300 hover:text-white transition-colors select-none"
+            title="Zoom In (+1%)"
           >
             <ZoomIn size={14} />
           </button>
@@ -3074,12 +3349,42 @@ export default function StudioPage() {
       {/* Right Sidebar - 3D Camera, Studio Presets & Collapsible Studio Controls */}
       <aside className="w-[300px] min-w-[300px] bg-panel border-l border-white/5 flex flex-col z-20 shadow-lg select-none h-full overflow-hidden">
         {/* Top Header Bar aligned with h-16 main header */}
-        <div className="h-16 border-b border-white/5 px-3.5 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2">
-            <Orbit size={14} className="text-zinc-300" />
-            <span className="text-xs font-semibold text-zinc-200 tracking-tight">Camera & Angles</span>
+        <div className="h-16 border-b border-white/5 px-6 flex items-center justify-end shrink-0 gap-3">
+          {/* GitHub Star Button (Minimal) */}
+          <a 
+            href="https://github.com/ishivamgaur/noiceSS" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/10 text-xs font-medium transition text-zinc-200 hover:text-white active:scale-[0.96]"
+            title="Star NoiceSS on GitHub"
+          >
+            <Star size={13} className={starCount !== null ? "fill-yellow-500 text-yellow-500" : ""} />
+            <span>Star</span>
+            {starCount !== null && (
+              <>
+                <span className="w-px h-3 bg-white/20 mx-0.5"></span>
+                <span className="font-mono tabular-nums">{starCount}</span>
+              </>
+            )}
+          </a>
+          {/* X (Twitter) Button */}
+          <a 
+            href="https://twitter.com/ishivgaur" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center justify-center w-[34px] h-[34px] rounded-lg border border-white/5 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/10 transition text-zinc-200 hover:text-white active:scale-[0.96]"
+            title="Follow on X"
+          >
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+        </div>
+
+        {/* Sticky Camera Header */}
+        <div className="px-3 py-3 border-b border-white/5 shrink-0">
+          <div className="relative flex items-center justify-center gap-2 bg-white/[0.02] p-2.5 rounded-lg border border-white/[0.04] w-full">
+            <Camera size={15} className="text-white" />
+            <span className="text-[12px] font-bold text-white uppercase tracking-[0.1em]">Camera & Angles</span>
           </div>
-          <span className="text-[10px] text-zinc-500 font-mono">3D Studio</span>
         </div>
 
         {/* Scrollable Content Container with clean symmetrical padding */}
@@ -3092,7 +3397,7 @@ export default function StudioPage() {
                 className="flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors group cursor-pointer leading-none"
               >
                 <ChevronDown size={13} className={`shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-transform duration-200 ${expandedSections.perspectives ? 'rotate-0' : '-rotate-90'}`} />
-                <span className="leading-none">3D Orbit & Tilt</span>
+                <span className="leading-none">3D ORBIT & TILT</span>
               </button>
               {(rotateX !== 0 || rotateY !== 0 || rotateZ !== 0) ? (
                 <button 
@@ -3247,7 +3552,7 @@ export default function StudioPage() {
             >
               <div className="flex items-center gap-1.5">
                 <ChevronDown size={13} className={`shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-transform duration-200 ${expandedSections.themes ? 'rotate-0' : '-rotate-90'}`} />
-                <span className="leading-none">Angles & Perspective</span>
+                <span className="leading-none">ANGLES & PERSPECTIVE</span>
               </div>
               <span className="text-[10px] text-zinc-500 font-mono tabular-nums leading-none">{PERSPECTIVES.length} Angles</span>
             </button>
@@ -3302,7 +3607,7 @@ export default function StudioPage() {
             >
               <div className="flex items-center gap-1.5">
                 <ChevronDown size={13} className={`shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-transform duration-200 ${expandedSections.templates ? 'rotate-0' : '-rotate-90'}`} />
-                <span className="leading-none">Window Chrome</span>
+                <span className="leading-none">WINDOW CHROME</span>
               </div>
               <span className="text-[10px] text-zinc-500 font-mono tabular-nums leading-none">4 Themes</span>
             </button>
@@ -3399,7 +3704,7 @@ export default function StudioPage() {
                 className="flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors group cursor-pointer leading-none"
               >
                 <ChevronDown size={13} className={`shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-transform duration-200 ${expandedSections.filters ? 'rotate-0' : '-rotate-90'}`} />
-                <span className="leading-none">Studio Lighting</span>
+                <span className="leading-none">STUDIO LIGHTING</span>
               </button>
               {isCustomLighting ? (
                 <button 
