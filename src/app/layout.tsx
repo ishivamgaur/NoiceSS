@@ -14,13 +14,53 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NOICESS - Pro Screenshot & Mockup Studio",
-  description: "Create stunning screenshot mockups with 3D perspectives, macOS frames, radiant backdrops, and multi-resolution exports.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://noicess.com"),
+  title: {
+    default: "NoiceSS - Beautiful Screenshot Mockup Studio",
+    template: "%s | NoiceSS",
+  },
+  description: "Create stunning, beautiful screenshot mockups with NoiceSS. Add 3D perspectives, macOS frames, radiant backdrops, and export in high-resolution.",
+  keywords: ["noice ss", "noicess", "noice screenshot", "beautiful screenshot noice", "screenshot mockup generator", "3d screenshot", "app presentation maker", "screenshot editor", "macOS frame generator"],
+  authors: [{ name: "NoiceSS Team" }],
+  creator: "NoiceSS",
   ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && {
     verification: {
       google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
     },
   }),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: process.env.NEXT_PUBLIC_APP_URL || "https://noicess.com",
+    title: "NoiceSS - Beautiful Screenshot Mockup Studio",
+    description: "Create stunning, beautiful screenshot mockups with NoiceSS. Add 3D perspectives, macOS frames, and radiant backdrops.",
+    siteName: "NoiceSS",
+    images: [
+      {
+        url: "/noice-og.webp",
+        width: 1200,
+        height: 630,
+        alt: "NoiceSS Beautiful Screenshot Studio",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "NoiceSS - Beautiful Screenshot Mockup Studio",
+    description: "Create stunning, beautiful screenshot mockups with NoiceSS. Add 3D perspectives, macOS frames, and radiant backdrops.",
+    images: ["/noice-og.webp"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
@@ -28,9 +68,31 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "NoiceSS",
+    "alternateName": ["noice ss", "noicess", "noice screenshot", "beautiful screenshot noice"],
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Any",
+    "description": "Create stunning, beautiful screenshot mockups with NoiceSS. Add 3D perspectives, macOS frames, radiant backdrops, and export in high-resolution.",
+    "url": process.env.NEXT_PUBLIC_APP_URL || "https://noicess.com",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  };
+
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body>
         {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
           <Script
