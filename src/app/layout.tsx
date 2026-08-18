@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: "NOICESS - Pro Screenshot & Mockup Studio",
   description: "Create stunning screenshot mockups with 3D perspectives, macOS frames, radiant backdrops, and multi-resolution exports.",
   verification: {
-    google: "fc97ca20fc908ab7",
+    google: "Aj3W2R2Ilx2nYKVso0_yzr5R7dDOjl-g3OTNhyJGxUk",
   },
   icons: {
     icon: "/favicon.svg",
@@ -30,7 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>
-        <meta name="google-site-verification" content="fc97ca20fc908ab7" />
+        <meta name="google-site-verification" content="Aj3W2R2Ilx2nYKVso0_yzr5R7dDOjl-g3OTNhyJGxUk" />
       </head>
       <body>
         <Script
