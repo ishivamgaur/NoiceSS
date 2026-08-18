@@ -1,24 +1,29 @@
 <div align="center">
   <a href="https://noicess.vercel.app" target="_blank">
-    <img src="https://noicess.vercel.app/noice-og.webp" alt="NoiceSS - Beautiful Screenshot Mockup Studio" width="100%" />
+    <img src="https://noicess.vercel.app/noice-og.webp" alt="NoiceSS - Beautiful Screenshot Mockup Studio" width="800" style="border-radius: 12px; margin-bottom: 24px;" />
   </a>
 
-  <br />
-  <br />
+  # ✨ NoiceSS
 
-  <h1>NoiceSS</h1>
-  <p><strong>Open-source screenshot mockup studio. Turn flat screenshots into stunning 3D presentations.</strong></p>
+  **An open-source screenshot mockup studio.**<br/>
+  *Turn flat, boring screenshots into stunning 3D presentations.*
 
-  <p>
-    <a href="https://noicess.vercel.app"><b>Try it Live →</b></a>
-  </p>
+  [![Try it Live](https://img.shields.io/badge/Try_it_Live_→-000000?style=for-the-badge&logo=vercel)](https://noicess.vercel.app)
 
-  <p>
-    <img src="https://img.shields.io/github/license/ishivgaur/noiceSS?style=for-the-badge" alt="License" />
-    <img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js" alt="Next.js" />
-    <img src="https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind" />
-    <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen?style=for-the-badge" alt="PRs Welcome" />
-  </p>
+  <div style="margin-top: 16px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+    <a href="https://github.com/ishivgaur/noiceSS/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/ishivgaur/noiceSS?style=flat-square&color=blue" alt="License" />
+    </a>
+    <img src="https://img.shields.io/badge/Next.js_15-black?style=flat-square&logo=next.js" alt="Next.js" />
+    <img src="https://img.shields.io/badge/React_19-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React" />
+    <img src="https://img.shields.io/badge/Tailwind_v4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white" alt="Tailwind" />
+    <img src="https://img.shields.io/badge/Zustand-443E38?style=flat-square&logo=react&logoColor=white" alt="Zustand" />
+    <img src="https://img.shields.io/badge/Serwist_PWA-5A0FC8?style=flat-square&logo=pwa&logoColor=white" alt="Serwist PWA" />
+    <img src="https://img.shields.io/badge/Radix_UI-161618?style=flat-square&logo=radix-ui&logoColor=white" alt="Radix UI" />
+    <a href="#contributing">
+      <img src="https://img.shields.io/badge/PRs_Welcome-brightgreen?style=flat-square" alt="PRs Welcome" />
+    </a>
+  </div>
 </div>
 
 ---
