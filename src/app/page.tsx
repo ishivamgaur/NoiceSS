@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { toast } from 'sonner';
 import { 
   Upload, Download, Layers, Monitor, Image as ImageIcon, Filter, 
   ChevronDown, Maximize, Square, LayoutTemplate, Smartphone, RotateCw, RotateCcw, Trash2, 
@@ -1769,8 +1770,43 @@ export default function StudioPage() {
       link.download = `noicess-${randomNum}.${ext}`;
       link.href = dataUrl;
       link.click();
+      const memes = [
+        "Pixel perfect 🤌",
+        "Ship it 🚀",
+        "LGTM 👍",
+        "Design team is shaking",
+        "Figma who? 🎨",
+        "Absolute cinema 🎥",
+        "Ready for Product Hunt 🚀",
+        "CSS is my passion ✨",
+        "That drop shadow though",
+        "10x engineer vibes",
+        "Ready for the README 📖",
+        "CEO will love this 📈",
+        "Noicesss! 🧊",
+        "Clean code, clean UI",
+        "Looks good on my machine 🤷‍♂️",
+        "Another one 🔑",
+        "Stunning ✨",
+        "Exported faster than Webpack",
+        "Too much sauce 🌶️",
+        "Looks like a million bucks 💸"
+      ];
+      const randomMeme = memes[Math.floor(Math.random() * memes.length)];
+
+      toast('Downloaded', {
+        description: randomMeme,
+        icon: '🎉',
+        style: {
+          background: 'rgba(20, 20, 20, 0.8)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          color: '#fff',
+        }
+      });
     } catch (err) {
       console.error('Failed to export image', err);
+      toast.error('Export Failed', { description: 'Something went wrong while exporting.' });
     } finally {
       setIsExporting(false);
     }
@@ -1793,9 +1829,19 @@ export default function StudioPage() {
         ]);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+        toast('Copied', {
+          icon: '✨',
+          style: {
+            background: 'rgba(20, 20, 20, 0.8)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            color: '#fff',
+          }
+        });
       }
     } catch (err) {
       console.error('Failed to copy to clipboard', err);
+      toast.error('Copy Failed', { description: 'Could not copy image to clipboard.' });
     } finally {
       setIsExporting(false);
     }
