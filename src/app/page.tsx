@@ -42,25 +42,24 @@ const ASPECT_CATEGORIES = [
 ];
 
 const FLAT_RATIOS = ASPECT_CATEGORIES.flatMap(c => c.ratios);
-
 const MACOS_BACKGROUNDS = [
-  { name: 'Dark Green 8K', url: '/wallpapers/wp14135599-8k-mac-dark-green-wallpapers.webp' },
-  { name: 'Big Sur Dark', url: '/wallpapers/macos-big-sur-apple-layers-fluidic-colorful-dark-wwdc-2020-6016x6016-1432.webp' },
-  { name: 'Big Sur Light', url: '/wallpapers/macos-big-sur-apple-layers-fluidic-colorful-wwdc-stock-4096x2304-1455.webp' },
-  { name: 'Monterey Dark', url: '/wallpapers/macos-monterey-stock-black-dark-mode-layers-5k-6016x6016-5889.webp' },
-  { name: 'Monterey WWDC', url: '/wallpapers/macos-monterey-wwdc-21-stock-dark-mode-5k-6016x6016-5585.webp' },
-  { name: 'Sequoia', url: '/wallpapers/macos-sequoia-forest-3840x2160-24082.webp' },
-  { name: 'Tahoe Light', url: '/wallpapers/macos-tahoe-26-5120x2880-22675.webp' },
-  { name: 'Tahoe Dark', url: '/wallpapers/macos-tahoe-26-5k-6016x6016-22672.webp' },
-  { name: 'Abstract Waves', url: '/wallpapers/abstract-waves-3840x2160-26731.webp' },
-  { name: 'Blue Abstract', url: '/wallpapers/blue-abstract-3840x2160-24798.webp' },
-  { name: 'Iridescent', url: '/wallpapers/iridescent-spheres-3840x2160-26346.webp' },
-  { name: 'Golden', url: '/wallpapers/macos-27-golden-4480x3088-26625.webp' },
-  { name: 'Surface', url: '/wallpapers/microsoft-surface-3840x2160-26627.webp' },
-  { name: 'MacBook Abstract', url: '/wallpapers/wp14041666-macbook-abstract-wallpapers.webp' },
-  { name: 'Emerald Dark', url: '/wallpapers/wp14135646-8k-mac-dark-green-wallpapers.webp' },
-  { name: 'Dark macOS 4K', url: '/wallpapers/wp16202777-dark-4k-macos-wallpapers.webp' },
-  { name: 'Apple Retina', url: '/wallpapers/wp8994371-apple-4k-retina-wallpapers.webp' }
+  { name: 'Dark Green 8K', url: '/wallpapers/dark-green-8k.webp' },
+  { name: 'Big Sur Dark', url: '/wallpapers/macos-big-sur-dark.webp' },
+  { name: 'Big Sur Light', url: '/wallpapers/macos-big-sur-light.webp' },
+  { name: 'Monterey Dark', url: '/wallpapers/macos-monterey-dark.webp' },
+  { name: 'Monterey WWDC', url: '/wallpapers/macos-monterey-wwdc.webp' },
+  { name: 'Sequoia', url: '/wallpapers/macos-sequoia.webp' },
+  { name: 'Tahoe Light', url: '/wallpapers/macos-tahoe-light.webp' },
+  { name: 'Tahoe Dark', url: '/wallpapers/macos-tahoe-dark.webp' },
+  { name: 'Abstract Waves', url: '/wallpapers/abstract-waves.webp' },
+  { name: 'Blue Abstract', url: '/wallpapers/blue-abstract.webp' },
+  { name: 'Iridescent', url: '/wallpapers/iridescent-spheres.webp' },
+  { name: 'Golden', url: '/wallpapers/macos-golden.webp' },
+  { name: 'Surface', url: '/wallpapers/surface-abstract.webp' },
+  { name: 'MacBook Abstract', url: '/wallpapers/macbook-abstract.webp' },
+  { name: 'Emerald Dark', url: '/wallpapers/emerald-dark.webp' },
+  { name: 'Dark macOS 4K', url: '/wallpapers/macos-dark-4k.webp' },
+  { name: 'Apple Retina', url: '/wallpapers/apple-retina.webp' }
 ];
 
 const GRADIENTS = [
@@ -232,7 +231,7 @@ const PRESETS = [
     desc: 'Forest 4K • Frosted Glass',
     icon: Layers,
     config: {
-      background: 'url("/wallpapers/macos-sequoia-forest-3840x2160-24082.webp")',
+      background: 'url("/wallpapers/macos-sequoia.webp")',
       showMacOsBar: false,
       view: 'default',
       perspective: 'front',
@@ -263,7 +262,7 @@ const PRESETS = [
     desc: 'Isometric Left • Deep Shadow',
     icon: Orbit,
     config: {
-      background: 'url("/wallpapers/wp14135599-8k-mac-dark-green-wallpapers.webp")',
+      background: 'url("/wallpapers/dark-green-8k.webp")',
       showMacOsBar: false,
       view: 'default',
       perspective: 'isometric-left',
@@ -294,7 +293,7 @@ const PRESETS = [
     desc: '5K Flow • Subtle Tilt',
     icon: Moon,
     config: {
-      background: 'url("/wallpapers/macos-monterey-stock-black-dark-mode-layers-5k-6016x6016-5889.webp")',
+      background: 'url("/wallpapers/macos-monterey-dark.webp")',
       showMacOsBar: false,
       view: 'default',
       perspective: 'subtle',
@@ -322,7 +321,7 @@ const PRESETS = [
     desc: 'Clean Wave • Smooth Frame',
     icon: Globe,
     config: {
-      background: 'url("/wallpapers/blue-abstract-3840x2160-24798.webp")',
+      background: 'url("/wallpapers/blue-abstract.webp")',
       showMacOsBar: false,
       view: 'default',
       perspective: 'front',
@@ -350,7 +349,7 @@ const PRESETS = [
     desc: 'Alpine Dusk • Frosted Frame',
     icon: Sun,
     config: {
-      background: 'url("/wallpapers/macos-tahoe-26-5120x2880-22675.webp")',
+      background: 'url("/wallpapers/macos-tahoe-light.webp")',
       showMacOsBar: false,
       view: 'default',
       perspective: 'front',
@@ -412,7 +411,7 @@ const PRESETS = [
     desc: 'WWDC Colors • Right Tilt',
     icon: Flame,
     config: {
-      background: 'url("/wallpapers/macos-big-sur-apple-layers-fluidic-colorful-dark-wwdc-2020-6016x6016-1432.webp")',
+      background: 'url("/wallpapers/macos-big-sur-dark.webp")',
       showMacOsBar: false,
       view: 'default',
       perspective: 'isometric-right',
@@ -541,7 +540,7 @@ export default function StudioPage() {
   const [glassBorderBlur, setGlassBorderBlur] = useState(20);
   const [glassBorderColor, setGlassBorderColor] = useState('#ffffff');
   const [glassBorderOpacity, setGlassBorderOpacity] = useState(20);
-  const [background, setBackground] = useState('url("/wallpapers/wp14135599-8k-mac-dark-green-wallpapers.webp")');
+  const [background, setBackground] = useState('url("/wallpapers/dark-green-8k.webp")');
   const [isStorageInitialized, setIsStorageInitialized] = useState(false);
   
   const hexToRgb = (hex: string) => {
@@ -598,6 +597,11 @@ export default function StudioPage() {
   const [lightingTarget, setLightingTarget] = useState('image');
   
   const [filter, setFilter] = useState('none');
+  const [imageBrightness, setImageBrightness] = useState(100);
+  const [imageContrast, setImageContrast] = useState(100);
+  const [imageSaturation, setImageSaturation] = useState(100);
+  const [imageHueRotate, setImageHueRotate] = useState(0);
+  const [imageFilter, setImageFilter] = useState('none');
 
   const resetLighting = () => {
     setBrightness(100);
@@ -605,9 +609,14 @@ export default function StudioPage() {
     setSaturation(100);
     setHueRotate(0);
     setFilter('none');
+    setImageBrightness(100);
+    setImageContrast(100);
+    setImageSaturation(100);
+    setImageHueRotate(0);
+    setImageFilter('none');
   };
 
-  const isCustomLighting = brightness !== 100 || contrast !== 100 || saturation !== 100 || hueRotate !== 0 || filter !== 'none';
+  const isCustomLighting = brightness !== 100 || contrast !== 100 || saturation !== 100 || hueRotate !== 0 || filter !== 'none' || imageBrightness !== 100 || imageContrast !== 100 || imageSaturation !== 100 || imageHueRotate !== 0 || imageFilter !== 'none';
 
   // Mobile layout state
   const [showLeftSidebar, setShowLeftSidebar] = useState(false);
@@ -803,7 +812,35 @@ export default function StudioPage() {
       const savedState = localStorage.getItem('noicess_studio_state');
       if (savedState) {
         const s = JSON.parse(savedState);
-        if (s.background !== undefined) setBackground(s.background);
+        if (s.background !== undefined) {
+          let bg = s.background;
+          const bgMap: Record<string, string> = {
+            'abstract-waves.webp': 'abstract-waves.webp',
+            'blue-abstract.webp': 'blue-abstract.webp',
+            'iridescent-spheres.webp': 'iridescent-spheres.webp',
+            'macos-golden.webp': 'macos-golden.webp',
+            'macos-big-sur-dark.webp': 'macos-big-sur-dark.webp',
+            'macos-big-sur-light.webp': 'macos-big-sur-light.webp',
+            'macos-monterey-dark.webp': 'macos-monterey-dark.webp',
+            'macos-monterey-wwdc.webp': 'macos-monterey-wwdc.webp',
+            'macos-sequoia.webp': 'macos-sequoia.webp',
+            'macos-tahoe-light.webp': 'macos-tahoe-light.webp',
+            'macos-tahoe-dark.webp': 'macos-tahoe-dark.webp',
+            'surface-abstract.webp': 'surface-abstract.webp',
+            'macbook-abstract.webp': 'macbook-abstract.webp',
+            'dark-green-8k.webp': 'dark-green-8k.webp',
+            'emerald-dark.webp': 'emerald-dark.webp',
+            'macos-dark-4k.webp': 'macos-dark-4k.webp',
+            'apple-retina.webp': 'apple-retina.webp'
+          };
+          
+          for (const [oldName, newName] of Object.entries(bgMap)) {
+            if (bg.includes(oldName)) {
+              bg = bg.replace(oldName, newName);
+            }
+          }
+          setBackground(bg);
+        }
         if (s.padding !== undefined) setPadding(s.padding);
         if (s.radius !== undefined) setRadius(s.radius);
         if (s.shadow !== undefined) setShadow(s.shadow);
@@ -1080,11 +1117,16 @@ export default function StudioPage() {
     setRotateY(config.rotateY ?? 0);
     setRotateZ(config.rotateZ ?? 0);
     setPerspectiveDepth(config.perspectiveDepth ?? 1200);
-    setBrightness(config.brightness ?? 100);
+        setBrightness(config.brightness ?? 100);
     setContrast(config.contrast ?? 100);
     setSaturation(config.saturation ?? 100);
     setHueRotate(config.hueRotate ?? 0);
     setFilter(config.filter || 'none');
+    setImageBrightness(100);
+    setImageContrast(100);
+    setImageSaturation(100);
+    setImageHueRotate(0);
+    setImageFilter('none');
     setNoiseIntensity(config.noiseIntensity ?? 0);
     setGrainIntensity(config.grainIntensity ?? 0);
     if (config.noiseTarget) setNoiseTarget(config.noiseTarget);
@@ -1836,24 +1878,31 @@ export default function StudioPage() {
     e.stopPropagation();
   };
 
-  const getLightingFilterStyle = () => {
-    const selectedFilter = FILTERS.find(f => f.id === filter);
+  const getLightingFilterStyle = (target: 'canvas' | 'image' = 'canvas') => {
+    const activeFilter = target === 'image' ? imageFilter : filter;
+    const selectedFilter = FILTERS.find(f => f.id === activeFilter);
     const parts: string[] = [];
     
     if (selectedFilter && selectedFilter.filterStyle !== 'none') {
       parts.push(selectedFilter.filterStyle);
     }
-    if (brightness !== 100) {
-      parts.push(`brightness(${brightness}%)`);
+
+    const activeBrightness = target === 'image' ? imageBrightness : brightness;
+    const activeContrast = target === 'image' ? imageContrast : contrast;
+    const activeSaturation = target === 'image' ? imageSaturation : saturation;
+    const activeHueRotate = target === 'image' ? imageHueRotate : hueRotate;
+
+    if (activeBrightness !== 100) {
+      parts.push(`brightness(${activeBrightness}%)`);
     }
-    if (contrast !== 100) {
-      parts.push(`contrast(${contrast}%)`);
+    if (activeContrast !== 100) {
+      parts.push(`contrast(${activeContrast}%)`);
     }
-    if (saturation !== 100) {
-      parts.push(`saturate(${saturation}%)`);
+    if (activeSaturation !== 100) {
+      parts.push(`saturate(${activeSaturation}%)`);
     }
-    if (hueRotate !== 0) {
-      parts.push(`hue-rotate(${hueRotate}deg)`);
+    if (activeHueRotate !== 0) {
+      parts.push(`hue-rotate(${activeHueRotate}deg)`);
     }
     
     return parts.length > 0 ? parts.join(' ') : 'none';
@@ -1995,8 +2044,8 @@ export default function StudioPage() {
         </div>
 
         {/* Sticky Tabs Header */}
-        <div className="px-3 py-3 border-b border-white/5 shrink-0">
-          <div className="relative grid grid-cols-3 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04] w-full isolate">
+        <div className="px-3 h-[61px] flex items-center border-b border-white/5 shrink-0">
+          <div className="relative grid grid-cols-3 gap-1 bg-white/[0.02] p-1 h-[36px] rounded-lg border border-white/[0.04] w-full isolate">
             {/* Sliding Translucent Whitish Glass Active Pill */}
             <div 
               className="absolute top-1 bottom-1 w-[calc((100%-16px)/3)] bg-white/10 border border-white/20 rounded-md shadow-sm ring-1 ring-white/10 transition-transform duration-250 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none -z-10"
@@ -2010,7 +2059,7 @@ export default function StudioPage() {
             <button 
               onClick={() => setLeftTab('layout')}
               aria-label="Layout settings"
-              className={`py-1.5 text-xs font-medium rounded-md transition-colors duration-200 active:scale-95 text-center cursor-pointer ${
+              className={`h-full flex items-center justify-center text-xs font-medium rounded-md transition-colors duration-200 active:scale-95 cursor-pointer ${
                 leftTab === 'layout' 
                   ? 'text-white font-semibold' 
                   : 'text-zinc-400 hover:text-zinc-200'
@@ -2021,7 +2070,7 @@ export default function StudioPage() {
             <button 
               onClick={() => setLeftTab('background')}
               aria-label="Backdrop settings"
-              className={`py-1.5 text-xs font-medium rounded-md transition-colors duration-200 active:scale-95 text-center cursor-pointer ${
+              className={`h-full flex items-center justify-center text-xs font-medium rounded-md transition-colors duration-200 active:scale-95 cursor-pointer ${
                 leftTab === 'background' 
                   ? 'text-white font-semibold' 
                   : 'text-zinc-400 hover:text-zinc-200'
@@ -2032,7 +2081,7 @@ export default function StudioPage() {
             <button 
               onClick={() => setLeftTab('effects')}
               aria-label="Effects and filters"
-              className={`py-1.5 text-xs font-medium rounded-md transition-colors duration-200 active:scale-95 text-center cursor-pointer ${
+              className={`h-full flex items-center justify-center text-xs font-medium rounded-md transition-colors duration-200 active:scale-95 cursor-pointer ${
                 leftTab === 'effects' 
                   ? 'text-white font-semibold' 
                   : 'text-zinc-400 hover:text-zinc-200'
@@ -2358,14 +2407,14 @@ export default function StudioPage() {
                       {/* Size Selector */}
                       <div>
                         <label className="text-[11px] text-zinc-400 font-medium mb-1.5 block">Size</label>
-                        <div className="relative grid grid-cols-3 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04] isolate">
+                        <div className="relative grid grid-cols-2 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04] isolate">
                           {(() => {
                             const sizes = [85, 100, 125];
                             const idx = sizes.indexOf(watermarkScale);
                             if (idx !== -1) {
                               return (
                                 <div 
-                                  className="absolute top-1 bottom-1 w-[calc((100%-16px)/3)] bg-white/10 border border-white/20 rounded-md shadow-sm ring-1 ring-white/10 transition-transform duration-250 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none -z-10"
+                                  className="absolute top-1 bottom-1 w-[calc((100%-8px)/2)] bg-white/10 border border-white/20 rounded-md shadow-sm ring-1 ring-white/10 transition-transform duration-250 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none -z-10"
                                   style={{
                                     transform: `translateX(calc(${idx * 100}% + ${idx * 4}px))`,
                                     left: '4px'
@@ -2506,7 +2555,7 @@ export default function StudioPage() {
                   {image && (
                     <button
                       onClick={() => {
-                        setBackground(`url("${image}")`);
+                        setBackground('CURRENT_IMAGE');
                         if (bgBlur === 0) setBgBlur(25);
                       }}
                       className="w-full py-2 px-3 rounded-lg border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.07] text-white text-xs font-medium flex items-center justify-center gap-2 transition-all duration-150 active:scale-[0.98]"
@@ -2533,7 +2582,7 @@ export default function StudioPage() {
               </button>
               
               {expandedSections.wallpapers && (
-                <div className="p-2.5 rounded-xl bg-white/[0.015] border border-white/[0.04] animate-in fade-in slide-in-from-top-1 duration-150">
+                <div className="p-2.5 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-2.5 animate-in fade-in slide-in-from-top-1 duration-150">
                   <div className="grid grid-cols-6 gap-2">
                     {MACOS_BACKGROUNDS.map((bg, idx) => {
                       const bgUrl = `url("${bg.url}")`;
@@ -2554,6 +2603,17 @@ export default function StudioPage() {
                       );
                     })}
                   </div>
+                  <label className="py-2 px-3 rounded-lg border border-white/[0.06] hover:border-white/20 flex items-center justify-center gap-2 cursor-pointer bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-150 active:scale-[0.98] text-xs font-medium text-zinc-300 hover:text-white mt-1">
+                    <Upload size={13} />
+                    <span>Upload Custom Wallpaper</span>
+                    <input type="file" aria-label="Upload custom background image" accept="image/*" className="hidden" onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => { if (ev.target?.result) setBackground(`url("${ev.target.result}")`); };
+                        reader.readAsDataURL(e.target.files[0]);
+                      }
+                    }} />
+                  </label>
                 </div>
               )}
             </div>
@@ -2630,22 +2690,11 @@ export default function StudioPage() {
                     })}
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-2 mt-1">
-                    <label className="py-2 px-3 rounded-lg border border-white/[0.06] hover:border-white/20 flex items-center justify-center gap-2 cursor-pointer bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-150 active:scale-[0.98] text-xs font-medium text-zinc-300 hover:text-white relative overflow-hidden">
+                  <div className="mt-1">
+                    <label className="w-full py-2 px-3 rounded-lg border border-white/[0.06] hover:border-white/20 flex items-center justify-center gap-2 cursor-pointer bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-150 active:scale-[0.98] text-xs font-medium text-zinc-300 hover:text-white relative overflow-hidden">
                       <Pipette size={13} />
                       <span>Custom Color</span>
                       <input type="color" aria-label="Pick custom background color" className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" onChange={(e) => setBackground(e.target.value)} />
-                    </label>
-                    <label className="py-2 px-3 rounded-lg border border-white/[0.06] hover:border-white/20 flex items-center justify-center gap-2 cursor-pointer bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-150 active:scale-[0.98] text-xs font-medium text-zinc-300 hover:text-white">
-                      <Upload size={13} />
-                      <span>Upload Image</span>
-                      <input type="file" aria-label="Upload custom background image" accept="image/*" className="hidden" onChange={(e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          const reader = new FileReader();
-                          reader.onload = (ev) => { if (ev.target?.result) setBackground(`url("${ev.target.result}")`); };
-                          reader.readAsDataURL(e.target.files[0]);
-                        }
-                      }} />
                     </label>
                   </div>
                 </div>
@@ -2778,11 +2827,11 @@ export default function StudioPage() {
                 <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] animate-in fade-in slide-in-from-top-1 duration-150">
                   <div className="grid grid-cols-2 gap-2">
                     {FILTERS.map((f) => {
-                      const isSelected = filter === f.id;
+                      const isSelected = (lightingTarget === 'image' ? imageFilter : filter) === f.id;
                       return (
                         <button
                           key={f.id}
-                          onClick={() => setFilter(f.id)}
+                          onClick={() => { if (lightingTarget === 'canvas' || lightingTarget === 'both') setFilter(f.id); if (lightingTarget === 'image' || lightingTarget === 'both') setImageFilter(f.id); }}
                           className={`flex flex-col text-left p-2.5 rounded-lg border transition-all duration-150 active:scale-[0.98] ${
                             isSelected 
                               ? 'bg-white/10 border-white/20 text-white shadow-sm ring-1 ring-white/10' 
@@ -3162,7 +3211,21 @@ export default function StudioPage() {
             {/* Clear Button */}
             <button 
               className="group flex items-center gap-0 sm:gap-1.5 md:gap-1.5 px-2.5 sm:px-3 md:px-3.5 py-2 rounded-lg text-xs font-medium border border-white/5 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-zinc-400 disabled:hover:border-white/5 disabled:cursor-not-allowed active:scale-[0.96]" 
-              onClick={() => { setImage(null); setImageSelected(false); setRotation(0); setPos({ x: 0, y: 0 }); setWatermark(''); }} 
+              onClick={() => { 
+                setImage(null); 
+                setImageSelected(false); 
+                setRotation(0); 
+                setPos({ x: 0, y: 0 }); 
+                setWatermark(''); 
+                handleApplyPreset({
+                  background: 'url("/wallpapers/dark-green-8k.webp")',
+                  showMacOsBar: false, view: 'default', perspective: 'front',
+                  rotateX: 0, rotateY: 0, rotateZ: 0, perspectiveDepth: 1200,
+                  glassBorder: true, glassBorderWidth: 4, glassBorderOpacity: 20, glassBorderBlur: 20,
+                  padding: 64, radius: 16, shadow: 25, bgBlur: 0, filter: 'none',
+                  noiseIntensity: 0, grainIntensity: 0, brightness: 100, contrast: 100, saturation: 100, hueRotate: 0,
+                });
+              }}
               disabled={!image}
               title="Clear Image"
             >
@@ -3228,11 +3291,13 @@ export default function StudioPage() {
               <div 
                 className="absolute inset-0 w-full h-full"
                 style={{
-                  ...(background.startsWith('url(') 
+                  ...(background === 'CURRENT_IMAGE'
+                    ? { backgroundImage: image ? `url("${image}")` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }
+                    : background.startsWith('url(') 
                     ? { backgroundImage: background, backgroundSize: 'cover', backgroundPosition: 'center' }
                     : { background: background }
                   ),
-                  filter: `${lightingTarget === 'canvas' || lightingTarget === 'both' ? getLightingFilterStyle() : ''} ${bgBlur > 0 ? `blur(${bgBlur}px)` : ''}`.trim() || 'none',
+                  filter: `${getLightingFilterStyle('canvas')} ${bgBlur > 0 ? `blur(${bgBlur}px)` : ''}`.trim() || 'none',
                   transform: bgBlur > 0 ? `scale(${1 + (bgBlur / 100)})` : 'none',
                 }}
               />
@@ -3353,7 +3418,7 @@ export default function StudioPage() {
                           borderRadius: showMacOsBar 
                             ? `0 0 ${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px ${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px` 
                             : `${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px`,
-                          filter: `${lightingTarget === 'image' || lightingTarget === 'both' ? getLightingFilterStyle() : ''} ${imageBlur > 0 ? `blur(${imageBlur}px)` : ''}`.trim() || 'none',
+                          filter: `${getLightingFilterStyle('image')} ${imageBlur > 0 ? `blur(${imageBlur}px)` : ''}`.trim() || 'none',
                         }} />
                         
                         {/* Watermark Overlay on Screenshot */}
@@ -3651,7 +3716,20 @@ export default function StudioPage() {
             <button
               className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg hover:bg-red-500/20 text-zinc-400 hover:text-red-400 transition-colors"
               title="Remove image"
-              onClick={() => { setImage(null); setImageSelected(false); setRotation(0); setPos({ x: 0, y: 0 }); }}
+              onClick={() => { 
+                setImage(null); 
+                setImageSelected(false); 
+                setRotation(0); 
+                setPos({ x: 0, y: 0 }); 
+                handleApplyPreset({
+                  background: 'url("/wallpapers/dark-green-8k.webp")',
+                  showMacOsBar: false, view: 'default', perspective: 'front',
+                  rotateX: 0, rotateY: 0, rotateZ: 0, perspectiveDepth: 1200,
+                  glassBorder: true, glassBorderWidth: 4, glassBorderOpacity: 20, glassBorderBlur: 20,
+                  padding: 64, radius: 16, shadow: 25, bgBlur: 0, filter: 'none',
+                  noiseIntensity: 0, grainIntensity: 0, brightness: 100, contrast: 100, saturation: 100, hueRotate: 0,
+                });
+              }}
             >
               <Trash2 className="w-4 h-4 sm:w-[15px] sm:h-[15px]" />
             </button>
@@ -3837,10 +3915,10 @@ export default function StudioPage() {
         </div>
 
         {/* Sticky Camera Header */}
-        <div className="px-3 py-3 border-b border-white/5 shrink-0">
-          <div className="relative flex items-center justify-center gap-2 bg-white/[0.02] p-2.5 rounded-lg border border-white/[0.04] w-full">
+        <div className="px-3 h-[61px] flex items-center border-b border-white/5 shrink-0">
+          <div className="relative flex items-center justify-center gap-2 bg-white/[0.02] h-[36px] rounded-lg border border-white/[0.04] w-full">
             <Camera size={15} className="text-white" />
-            <span className="text-[12px] font-bold text-white uppercase tracking-[0.1em]">Camera & Angles</span>
+            <span className="text-[12px] font-bold text-white uppercase tracking-[0.1em] leading-none mt-[1px]">Camera & Angles</span>
           </div>
         </div>
 
@@ -4049,7 +4127,9 @@ export default function StudioPage() {
                               <div 
                                 className="absolute inset-0 w-full h-full"
                                 style={{
-                                  ...(background.startsWith('url(') 
+                                  ...(background === 'CURRENT_IMAGE'
+                                    ? { backgroundImage: image ? `url("${image}")` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }
+                                    : background.startsWith('url(') 
                                     ? { backgroundImage: background, backgroundSize: 'cover', backgroundPosition: 'center' }
                                     : { background: background }),
                                   filter: bgBlur > 0 ? `blur(${bgBlur / 4}px)` : 'none',
@@ -4108,7 +4188,9 @@ export default function StudioPage() {
                               <div 
                                 className="absolute inset-0 w-full h-full"
                                 style={{
-                                  ...(background.startsWith('url(') 
+                                  ...(background === 'CURRENT_IMAGE'
+                                    ? { backgroundImage: image ? `url("${image}")` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }
+                                    : background.startsWith('url(') 
                                     ? { backgroundImage: background, backgroundSize: 'cover', backgroundPosition: 'center' }
                                     : { background: background }),
                                   filter: bgBlur > 0 ? `blur(${bgBlur / 4}px)` : 'none',
@@ -4129,7 +4211,7 @@ export default function StudioPage() {
                                   className="relative flex flex-col w-[75%] aspect-video rounded-sm overflow-hidden shadow-2xl border border-white/20 bg-black/50"
                                 >
                                   <img 
-                                    src="/wallpapers/wp14135599-8k-mac-dark-green-wallpapers.webp" 
+                                    src="/wallpapers/dark-green-8k.webp" 
                                     alt="Mock Preview" 
                                     className="w-full h-full object-cover block"
                                   />
@@ -4278,13 +4360,13 @@ export default function StudioPage() {
                 {/* Application Layer Target */}
                 <div>
                   <label className="text-[11px] text-zinc-400 block mb-2 font-medium">Lighting Target</label>
-                  <div className="relative grid grid-cols-3 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04] isolate">
+                  <div className="relative grid grid-cols-2 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04] isolate">
                     {(() => {
-                      const targets = ['canvas', 'image', 'both'];
+                      const targets = ['canvas', 'image'];
                       const idx = targets.indexOf(lightingTarget);
                       return (
                         <div 
-                          className="absolute top-1 bottom-1 w-[calc((100%-16px)/3)] bg-white/10 border border-white/20 rounded-md shadow-sm ring-1 ring-white/10 transition-transform duration-250 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none -z-10"
+                          className="absolute top-1 bottom-1 w-[calc((100%-8px)/2)] bg-white/10 border border-white/20 rounded-md shadow-sm ring-1 ring-white/10 transition-transform duration-250 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none -z-10"
                           style={{
                             transform: `translateX(calc(${idx * 100}% + ${idx * 4}px))`,
                             left: '4px'
@@ -4292,7 +4374,7 @@ export default function StudioPage() {
                         />
                       );
                     })()}
-                    {['canvas', 'image', 'both'].map((t) => (
+                    {['canvas', 'image'].map((t) => (
                       <button
                         key={t}
                         onClick={() => setLightingTarget(t)}
@@ -4317,9 +4399,9 @@ export default function StudioPage() {
                         <Sun size={12} className="text-zinc-400" />
                         <span>Brightness</span>
                       </label>
-                      <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{brightness}%</span>
+                      <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{lightingTarget === 'image' ? imageBrightness : brightness}%</span>
                     </div>
-                    <Slider min={50} max={150} step={1} value={[brightness]} onValueChange={(v) => setBrightness(Array.isArray(v) ? v[0] : v as number)} />
+                    <Slider min={50} max={150} step={1} value={[lightingTarget === 'image' ? imageBrightness : brightness]} onValueChange={(v) => { const val = Array.isArray(v) ? v[0] : v as number; if (lightingTarget === 'canvas' || lightingTarget === 'both') setBrightness(val); if (lightingTarget === 'image' || lightingTarget === 'both') setImageBrightness(val); }} />
                   </div>
 
                   {/* Contrast */}
@@ -4329,9 +4411,9 @@ export default function StudioPage() {
                         <Sliders size={12} className="text-zinc-400" />
                         <span>Contrast</span>
                       </label>
-                      <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{contrast}%</span>
+                      <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{lightingTarget === 'image' ? imageContrast : contrast}%</span>
                     </div>
-                    <Slider min={50} max={150} step={1} value={[contrast]} onValueChange={(v) => setContrast(Array.isArray(v) ? v[0] : v as number)} />
+                    <Slider min={50} max={150} step={1} value={[lightingTarget === 'image' ? imageContrast : contrast]} onValueChange={(v) => { const val = Array.isArray(v) ? v[0] : v as number; if (lightingTarget === 'canvas' || lightingTarget === 'both') setContrast(val); if (lightingTarget === 'image' || lightingTarget === 'both') setImageContrast(val); }} />
                   </div>
 
                   {/* Saturation */}
@@ -4341,9 +4423,9 @@ export default function StudioPage() {
                         <Droplet size={12} className="text-zinc-400" />
                         <span>Saturation</span>
                       </label>
-                      <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{saturation}%</span>
+                      <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{lightingTarget === 'image' ? imageSaturation : saturation}%</span>
                     </div>
-                    <Slider min={0} max={200} step={1} value={[saturation]} onValueChange={(v) => setSaturation(Array.isArray(v) ? v[0] : v as number)} />
+                    <Slider min={0} max={200} step={1} value={[lightingTarget === 'image' ? imageSaturation : saturation]} onValueChange={(v) => { const val = Array.isArray(v) ? v[0] : v as number; if (lightingTarget === 'canvas' || lightingTarget === 'both') setSaturation(val); if (lightingTarget === 'image' || lightingTarget === 'both') setImageSaturation(val); }} />
                   </div>
 
                   {/* Hue Shift / Tone */}
@@ -4353,9 +4435,9 @@ export default function StudioPage() {
                         <Palette size={12} className="text-zinc-400" />
                         <span>Color Tone (Hue)</span>
                       </label>
-                      <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{hueRotate}°</span>
+                      <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{lightingTarget === 'image' ? imageHueRotate : hueRotate}°</span>
                     </div>
-                    <Slider min={0} max={360} step={1} value={[hueRotate]} onValueChange={(v) => setHueRotate(Array.isArray(v) ? v[0] : v as number)} />
+                    <Slider min={0} max={360} step={1} value={[lightingTarget === 'image' ? imageHueRotate : hueRotate]} onValueChange={(v) => { const val = Array.isArray(v) ? v[0] : v as number; if (lightingTarget === 'canvas' || lightingTarget === 'both') setHueRotate(val); if (lightingTarget === 'image' || lightingTarget === 'both') setImageHueRotate(val); }} />
                   </div>
                 </div>
               </div>
