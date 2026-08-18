@@ -31,6 +31,10 @@ export interface StudioState {
   setShowPresetsMenu: (v: boolean | ((prev: boolean) => boolean)) => void;
   showMacOsBar: boolean;
   setShowMacOsBar: (v: boolean | ((prev: boolean) => boolean)) => void;
+  showBrowserBar: boolean;
+  setShowBrowserBar: (v: boolean | ((prev: boolean) => boolean)) => void;
+  browserUrl: string;
+  setBrowserUrl: (v: string | ((prev: string) => string)) => void;
   glassBorder: boolean;
   setGlassBorder: (v: boolean | ((prev: boolean) => boolean)) => void;
   glassBorderWidth: number;
@@ -184,6 +188,10 @@ export const useStudioStore = create<StudioState>((set) => ({
   setShowPresetsMenu: (v) => set((state) => ({ showPresetsMenu: typeof v === 'function' ? (v as Function)(state.showPresetsMenu) : v })),
   showMacOsBar: false,
   setShowMacOsBar: (v) => set((state) => ({ showMacOsBar: typeof v === 'function' ? (v as Function)(state.showMacOsBar) : v })),
+  showBrowserBar: false,
+  setShowBrowserBar: (v) => set((state) => ({ showBrowserBar: typeof v === 'function' ? (v as Function)(state.showBrowserBar) : v })),
+  browserUrl: 'example.com',
+  setBrowserUrl: (v) => set((state) => ({ browserUrl: typeof v === 'function' ? (v as Function)(state.browserUrl) : v })),
   glassBorder: false,
   setGlassBorder: (v) => set((state) => ({ glassBorder: typeof v === 'function' ? (v as Function)(state.glassBorder) : v })),
   glassBorderWidth: 8,

@@ -535,6 +535,8 @@ export default function StudioPage() {
   const [showRatioMenu, setShowRatioMenu] = useState(false);
   const [showPresetsMenu, setShowPresetsMenu] = useState(false);
   const [showMacOsBar, setShowMacOsBar] = useState(false);
+  const [showBrowserBar, setShowBrowserBar] = useState(false);
+  const [browserUrl, setBrowserUrl] = useState('example.com');
   const [glassBorder, setGlassBorder] = useState(false);
   const [glassBorderWidth, setGlassBorderWidth] = useState(8);
   const [glassBorderBlur, setGlassBorderBlur] = useState(20);
@@ -650,14 +652,14 @@ export default function StudioPage() {
 
   const currentConfigSnapshot = React.useMemo(() => ({
     background, padding, radius, shadow, bgBlur, aspectRatio, customRatioW, customRatioH,
-    showMacOsBar, view, glassBorder, glassBorderWidth, glassBorderOpacity, glassBorderBlur, glassBorderColor,
+    showMacOsBar, showBrowserBar, browserUrl, view, glassBorder, glassBorderWidth, glassBorderOpacity, glassBorderBlur, glassBorderColor,
     perspective, rotateX, rotateY, rotateZ, perspectiveDepth, brightness, contrast, saturation, hueRotate, filter,
     noiseIntensity, grainIntensity, noiseTarget, watermark, watermarkPlatform, watermarkPosition, watermarkTarget,
     watermarkOpacity, watermarkBlur, watermarkGlass, watermarkBorderWidth, watermarkBorderOpacity, watermarkOffsetX,
     watermarkOffsetY, watermarkScale, pos, rotation, scale, imageBlur, image, imageDimensions
   }), [
     background, padding, radius, shadow, bgBlur, aspectRatio, customRatioW, customRatioH,
-    showMacOsBar, view, glassBorder, glassBorderWidth, glassBorderOpacity, glassBorderBlur, glassBorderColor,
+    showMacOsBar, showBrowserBar, browserUrl, view, glassBorder, glassBorderWidth, glassBorderOpacity, glassBorderBlur, glassBorderColor,
     perspective, rotateX, rotateY, rotateZ, perspectiveDepth, brightness, contrast, saturation, hueRotate, filter,
     noiseIntensity, grainIntensity, noiseTarget, watermark, watermarkPlatform, watermarkPosition, watermarkTarget,
     watermarkOpacity, watermarkBlur, watermarkGlass, watermarkBorderWidth, watermarkBorderOpacity, watermarkOffsetX,
@@ -852,6 +854,8 @@ export default function StudioPage() {
         if (s.customRatioW !== undefined) setCustomRatioW(s.customRatioW);
         if (s.customRatioH !== undefined) setCustomRatioH(s.customRatioH);
         if (s.showMacOsBar !== undefined) setShowMacOsBar(s.showMacOsBar);
+        if (s.showBrowserBar !== undefined) setShowBrowserBar(s.showBrowserBar);
+        if (s.browserUrl !== undefined) setBrowserUrl(s.browserUrl);
         if (s.view !== undefined) setView(s.view);
         if (s.glassBorder !== undefined) setGlassBorder(s.glassBorder);
         if (s.glassBorderWidth !== undefined) setGlassBorderWidth(s.glassBorderWidth);
@@ -920,6 +924,8 @@ export default function StudioPage() {
         customRatioW,
         customRatioH,
         showMacOsBar,
+        showBrowserBar,
+        browserUrl,
         view,
         glassBorder,
         glassBorderWidth,
@@ -975,6 +981,8 @@ export default function StudioPage() {
     customRatioW,
     customRatioH,
     showMacOsBar,
+    showBrowserBar,
+    browserUrl,
     view,
     glassBorder,
     glassBorderWidth,
@@ -1106,6 +1114,8 @@ export default function StudioPage() {
     if (config.customRatioW) setCustomRatioW(config.customRatioW);
     if (config.customRatioH) setCustomRatioH(config.customRatioH);
     setShowMacOsBar(config.showMacOsBar ?? false);
+    setShowBrowserBar(config.showBrowserBar ?? false);
+    setBrowserUrl(config.browserUrl || 'example.com');
     setView(config.view || 'default');
     setGlassBorder(config.glassBorder ?? false);
     setGlassBorderWidth(config.glassBorderWidth ?? 4);
@@ -1940,7 +1950,7 @@ export default function StudioPage() {
       // Auto Aspect Ratio logic: The canvas perfectly wraps the image + decorations + padding on all sides.
       const imageRatio = imageDimensions.w / imageDimensions.h;
       const decorationW = glassBorder ? 2 * glassBorderWidth : 0;
-      const decorationH = (glassBorder ? 2 * glassBorderWidth : 0) + (showMacOsBar ? 40 : 0);
+      const decorationH = (glassBorder ? 2 * glassBorderWidth : 0) + (showMacOsBar ? (showBrowserBar ? 52 : 40) : 0);
       
       if (imageRatio >= 1) {
         const innerW = defaultSize;
@@ -1986,7 +1996,7 @@ export default function StudioPage() {
     const availableH = Math.max(1, canvasH - 2 * padding) * (scale / 100);
     
     const decorationW = glassBorder ? 2 * glassBorderWidth : 0;
-    const decorationH = (glassBorder ? 2 * glassBorderWidth : 0) + (showMacOsBar ? 40 : 0);
+    const decorationH = (glassBorder ? 2 * glassBorderWidth : 0) + (showMacOsBar ? (showBrowserBar ? 52 : 40) : 0);
     
     const maxImageW = Math.max(1, availableW - decorationW);
     const maxImageH = Math.max(1, availableH - decorationH);
@@ -2200,6 +2210,27 @@ export default function StudioPage() {
                     <label htmlFor="macos-bar-toggle" className="text-zinc-300 font-medium cursor-pointer">macOS Titlebar</label>
                     <Checkbox id="macos-bar-toggle" checked={showMacOsBar} onCheckedChange={(c) => setShowMacOsBar(c as boolean)} />
                   </div>
+
+                  {showMacOsBar && (
+                    <div className="flex items-center justify-between py-0.5">
+                      <label htmlFor="browser-bar-toggle" className="text-zinc-300 font-medium cursor-pointer">Browser Address Bar</label>
+                      <Checkbox id="browser-bar-toggle" checked={showBrowserBar} onCheckedChange={(c) => setShowBrowserBar(c as boolean)} />
+                    </div>
+                  )}
+                  
+                  {showMacOsBar && showBrowserBar && (
+                    <div className="flex flex-col gap-1.5 mt-1 mb-2">
+                      <label htmlFor="browser-url-input" className="text-[11px] text-zinc-400 font-medium">Browser URL</label>
+                      <input 
+                        id="browser-url-input"
+                        type="text" 
+                        value={browserUrl}
+                        onChange={(e) => setBrowserUrl(e.target.value)}
+                        placeholder="example.com"
+                        className="bg-white/[0.03] border border-white/[0.05] rounded-md px-2.5 py-1.5 text-xs text-zinc-300 w-full focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all placeholder:text-zinc-600"
+                      />
+                    </div>
+                  )}
                   
                   <div className="flex items-center justify-between py-0.5">
                     <label htmlFor="glass-border-toggle" className="text-zinc-300 font-medium cursor-pointer">Frosted Glass Border</label>
@@ -3424,21 +3455,23 @@ export default function StudioPage() {
 
                     {image && showMacOsBar && (
                       <div 
-                        className={`shrink-0 h-10 bg-[#1C1C1E] flex items-center px-4 gap-3 ${view === 'browser' ? 'border-b border-white/10' : ''}`}
+                        className={`w-full shrink-0 ${showBrowserBar ? 'h-[52px]' : 'h-[40px]'} bg-[#1C1C1E] flex items-center justify-between px-[20px] relative overflow-hidden ${showBrowserBar ? 'border-b border-black/40' : ''}`}
                         style={{ borderRadius: glassBorder ? `${Math.max(0, radius - glassBorderWidth)}px ${Math.max(0, radius - glassBorderWidth)}px 0 0` : '0' }}
                       >
-                        <div className="flex gap-2">
-                          <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
-                          <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-                          <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
+                        <div className="flex gap-[8px] shrink-0 w-[52px]">
+                          <div className="w-[12px] h-[12px] rounded-full bg-[#ff5f56] border border-black/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] shrink-0" />
+                          <div className="w-[12px] h-[12px] rounded-full bg-[#ffbd2e] border border-black/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] shrink-0" />
+                          <div className="w-[12px] h-[12px] rounded-full bg-[#27c93f] border border-black/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] shrink-0" />
                         </div>
-                        {view === 'browser' && (
-                          <div className="flex-grow flex justify-center ml-2">
-                            <div className="bg-black/20 rounded-md h-6 w-2/3 max-w-sm flex items-center justify-center text-xs text-white/50 border border-white/5 shadow-inner">
-                              example.com
+                        {showBrowserBar && (
+                          <div className="flex-1 flex justify-center min-w-0 px-4">
+                            <div className="w-full max-w-[400px] h-[28px] bg-[#2C2C2E] rounded-[6px] flex items-center justify-center text-[13px] text-white/70 border border-white/[0.06] shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] px-3 overflow-hidden pointer-events-none">
+                              <Lock size={12} className="mr-1.5 opacity-50 shrink-0" />
+                              <span className="truncate font-sans tracking-wide leading-none">{browserUrl}</span>
                             </div>
                           </div>
                         )}
+                        <div className="shrink-0 w-[52px]"></div>
                       </div>
                     )}
                     
@@ -3458,7 +3491,7 @@ export default function StudioPage() {
                         <img src={image} alt="NoiceSS - Beautiful Screenshot Mockup Preview" draggable={false} className="w-full h-full object-contain block transition relative z-10" style={{
                           borderRadius: showMacOsBar 
                             ? `0 0 ${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px ${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px` 
-                            : `${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px`,
+                            : undefined,
                           filter: `${getLightingFilterStyle('image')} ${imageBlur > 0 ? `blur(${imageBlur}px)` : ''}`.trim() || 'none',
                         }} />
                         
@@ -4291,9 +4324,9 @@ export default function StudioPage() {
             {expandedSections.templates && (
               <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-2 animate-in fade-in slide-in-from-top-1 duration-150">
                 <button 
-                  onClick={() => { setView('default'); setShowMacOsBar(true); setGlassBorder(false); }}
+                  onClick={() => { setView('default'); setShowMacOsBar(true); setShowBrowserBar(false); setGlassBorder(false); }}
                   className={`flex items-center gap-2.5 p-2 rounded-lg border text-left transition-all duration-150 active:scale-[0.98] ${
-                    view === 'default' && showMacOsBar && !glassBorder 
+                    view === 'default' && showMacOsBar && !showBrowserBar && !glassBorder 
                       ? 'bg-white/10 border-white/20 text-white shadow-sm ring-1 ring-white/10' 
                       : 'bg-white/[0.02] border-white/[0.04] hover:bg-white/[0.05] hover:border-white/10 text-zinc-400 hover:text-zinc-200'
                   }`}
@@ -4308,9 +4341,9 @@ export default function StudioPage() {
                 </button>
 
                 <button 
-                  onClick={() => { setView('browser'); setShowMacOsBar(true); setGlassBorder(false); }}
+                  onClick={() => { setView('browser'); setShowMacOsBar(true); setShowBrowserBar(true); setGlassBorder(false); }}
                   className={`flex items-center gap-2.5 p-2 rounded-lg border text-left transition-all duration-150 active:scale-[0.98] ${
-                    view === 'browser' 
+                    view === 'browser' || showBrowserBar
                       ? 'bg-white/10 border-white/20 text-white shadow-sm ring-1 ring-white/10' 
                       : 'bg-white/[0.02] border-white/[0.04] hover:bg-white/[0.05] hover:border-white/10 text-zinc-400 hover:text-zinc-200'
                   }`}
@@ -4325,11 +4358,11 @@ export default function StudioPage() {
                 </button>
 
                 <button 
-                  onClick={() => { setView('minimal'); setShowMacOsBar(false); setGlassBorder(false); }}
+                  onClick={() => { setView('minimal'); setShowMacOsBar(false); setShowBrowserBar(false); setGlassBorder(false); }}
                   className={`flex items-center gap-2.5 p-2 rounded-lg border text-left transition-all duration-150 active:scale-[0.98] ${
                     view === 'minimal' && !showMacOsBar && !glassBorder 
-                    ? 'bg-white/10 border-white/20 text-white shadow-sm ring-1 ring-white/10' 
-                    : 'bg-white/[0.02] border-white/[0.04] hover:bg-white/[0.05] hover:border-white/10 text-zinc-400 hover:text-zinc-200'
+                      ? 'bg-white/10 border-white/20 text-white shadow-sm ring-1 ring-white/10' 
+                      : 'bg-white/[0.02] border-white/[0.04] hover:bg-white/[0.05] hover:border-white/10 text-zinc-400 hover:text-zinc-200'
                   }`}
                 >
                   <div className="w-7 h-7 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center shrink-0">
@@ -4337,7 +4370,7 @@ export default function StudioPage() {
                   </div>
                   <div className="flex flex-col min-w-0">
                     <span className="text-xs font-semibold text-white">Minimal Frameless</span>
-                    <span className="text-[10px] text-zinc-500">Zero chrome focus</span>
+                    <span className="text-[10px] text-zinc-500">Clean rounded image only</span>
                   </div>
                 </button>
 
@@ -4345,6 +4378,7 @@ export default function StudioPage() {
                   onClick={() => { 
                     setView('default'); 
                     setShowMacOsBar(true); 
+                    setShowBrowserBar(false);
                     setGlassBorder(true); 
                     setGlassBorderWidth(10); 
                     setGlassBorderOpacity(40); 
