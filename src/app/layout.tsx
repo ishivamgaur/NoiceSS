@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://noicess.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://noicess.vercel.app"),
   title: {
     default: "NoiceSS - Beautiful Screenshot Mockup Studio",
     template: "%s | NoiceSS",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: process.env.NEXT_PUBLIC_APP_URL || "https://noicess.com",
+    url: process.env.NEXT_PUBLIC_APP_URL || "https://noicess.vercel.app",
     title: "NoiceSS - Beautiful Screenshot Mockup Studio",
     description: "Create stunning, beautiful screenshot mockups with NoiceSS. Add 3D perspectives, macOS frames, and radiant backdrops.",
     siteName: "NoiceSS",
@@ -77,7 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     "applicationCategory": "MultimediaApplication",
     "operatingSystem": "Any",
     "description": "Create stunning, beautiful screenshot mockups with NoiceSS. Add 3D perspectives, macOS frames, radiant backdrops, and export in high-resolution.",
-    "url": process.env.NEXT_PUBLIC_APP_URL || "https://noicess.com",
+    "url": process.env.NEXT_PUBLIC_APP_URL || "https://noicess.vercel.app",
     "offers": {
       "@type": "Offer",
       "price": "0",

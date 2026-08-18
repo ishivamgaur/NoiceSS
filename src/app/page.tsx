@@ -2855,6 +2855,33 @@ export default function StudioPage() {
 
       {/* Main Studio Workspace */}
       <main className="flex-grow flex flex-col bg-bg-dark h-full relative overflow-hidden">
+        
+        {/* Advanced SEO Content Block (Visually Hidden) */}
+        <div className="sr-only">
+          <h1>NoiceSS - Beautiful Screenshot Mockup Studio & 3D App Presentation Maker</h1>
+          <h2>The Ultimate Noice Screenshot Editor for Product Hunt & App Stores</h2>
+          <p>
+            Create stunning, beautiful screenshot mockups with NoiceSS. Whether you need a sleek macOS frame, 
+            a 3D isometric perspective, or a radiant glassmorphism backdrop, Noice SS has you covered. 
+            Transform your standard images into a noice screenshot ready for social media, portfolios, and pitch decks.
+          </p>
+          <p>
+            Features include custom aspect ratios, dark mode studio lighting, noise and grain filters, 
+            and high-resolution webp exports. Rank your app on the App Store or Product Hunt with the perfect, noicess presentation.
+          </p>
+          <h3>Core Features & Keywords</h3>
+          <ul>
+            <li>noicess</li>
+            <li>noice ss</li>
+            <li>beautiful screenshot noice</li>
+            <li>noice screenshot</li>
+            <li>screenshot mockup generator</li>
+            <li>3d app screenshot</li>
+            <li>macOS frame mockup</li>
+            <li>product presentation maker</li>
+          </ul>
+        </div>
+
         <header className="h-16 border-b border-white/5 bg-panel flex items-center justify-between px-3 md:px-6 z-[200] shrink-0 overflow-x-auto md:overflow-visible no-scrollbar gap-1">
           {/* Left Actions: Undo / Redo */}
           <div className="flex-1 flex items-center gap-1.5 md:gap-2">
@@ -3414,7 +3441,7 @@ export default function StudioPage() {
                           aspectRatio: imageDimensions?.w && imageDimensions?.h ? `${imageDimensions.w}/${imageDimensions.h}` : undefined,
                         }}
                       >
-                        <img src={image} alt="Uploaded screenshot" draggable={false} className="w-full h-full object-contain block transition relative z-10" style={{
+                        <img src={image} alt="NoiceSS - Beautiful Screenshot Mockup Preview" draggable={false} className="w-full h-full object-contain block transition relative z-10" style={{
                           borderRadius: showMacOsBar 
                             ? `0 0 ${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px ${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px` 
                             : `${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px`,
@@ -4212,7 +4239,7 @@ export default function StudioPage() {
                                 >
                                   <img 
                                     src="/wallpapers/dark-green-8k.webp" 
-                                    alt="Mock Preview" 
+                                    alt="NoiceSS 3D Screenshot Mockup Generator Preview" 
                                     className="w-full h-full object-cover block"
                                   />
                                 </div>
