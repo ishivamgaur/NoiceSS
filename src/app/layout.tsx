@@ -26,7 +26,14 @@ export const metadata: Metadata = {
     template: "%s | NoiceSS",
   },
   description: "Create stunning, beautiful screenshot mockups with NoiceSS. Add 3D perspectives, macOS frames, radiant backdrops, and export in high-resolution.",
-  keywords: ["noice ss", "noicess", "noice screenshot", "beautiful screenshot noice", "screenshot mockup generator", "3d screenshot", "app presentation maker", "screenshot editor", "macOS frame generator"],
+  keywords: [
+    "noice ss", "noicess", "noice screenshot", "beautiful screenshot noice", 
+    "beautiful ss", "beautiful screenshot", "noice", "noice.ss", "noicess app",
+    "screenshot mockup generator", "3d screenshot", "app presentation maker", 
+    "screenshot editor", "macOS frame generator", "aesthetic screenshot mockup",
+    "stunning screenshot", "glassmorphism screenshot", "beautiful screenshot maker",
+    "best screenshot editor", "beautiful UI presentation", "clean screenshot editor"
+  ],
   authors: [{ name: "NoiceSS Team" }],
   creator: "NoiceSS",
   ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && {
@@ -80,7 +87,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "NoiceSS",
-      "alternateName": ["noice ss", "noicess", "noice screenshot", "beautiful screenshot noice"],
+      "alternateName": [
+        "noice ss", "noicess", "noice screenshot", "beautiful screenshot noice", 
+        "beautiful ss", "beautiful screenshot", "noice", "noice.ss", 
+        "aesthetic screenshot generator", "screenshot mockup generator"
+      ],
       "applicationCategory": "MultimediaApplication",
       "operatingSystem": "Any",
       "description": "Create stunning, beautiful screenshot mockups with NoiceSS. Add 3D perspectives, macOS frames, radiant backdrops, and export in high-resolution. 100% free and open-source.",
