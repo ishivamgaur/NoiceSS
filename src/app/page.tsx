@@ -1949,8 +1949,8 @@ export default function StudioPage() {
       }
       // Auto Aspect Ratio logic: The canvas perfectly wraps the image + decorations + padding on all sides.
       const imageRatio = imageDimensions.w / imageDimensions.h;
-      const decorationW = glassBorder ? 2 * glassBorderWidth : 0;
-      const decorationH = (glassBorder ? 2 * glassBorderWidth : 0) + (showMacOsBar ? (showBrowserBar ? 52 : 40) : 0);
+      const decorationW = glassBorder ? 2 * glassBorderWidth + 2 : 0;
+      const decorationH = (glassBorder ? 2 * glassBorderWidth + 2 : 0) + (showMacOsBar ? (showBrowserBar ? 52 : 40) : 0);
       
       if (imageRatio >= 1) {
         const innerW = defaultSize;
@@ -1995,8 +1995,8 @@ export default function StudioPage() {
     const availableW = Math.max(1, canvasW - 2 * padding) * (scale / 100);
     const availableH = Math.max(1, canvasH - 2 * padding) * (scale / 100);
     
-    const decorationW = glassBorder ? 2 * glassBorderWidth : 0;
-    const decorationH = (glassBorder ? 2 * glassBorderWidth : 0) + (showMacOsBar ? (showBrowserBar ? 52 : 40) : 0);
+    const decorationW = glassBorder ? 2 * glassBorderWidth + 2 : 0;
+    const decorationH = (glassBorder ? 2 * glassBorderWidth + 2 : 0) + (showMacOsBar ? (showBrowserBar ? 52 : 40) : 0);
     
     const maxImageW = Math.max(1, availableW - decorationW);
     const maxImageH = Math.max(1, availableH - decorationH);
@@ -3432,7 +3432,7 @@ export default function StudioPage() {
                   onPointerUp={image ? handlePointerUp : undefined}
                 >
                   {/* Clipped screenshot content */}
-                  <div className={`relative flex flex-col items-center overflow-hidden max-w-full max-h-full ${!image ? 'w-full h-full' : ''} ${image ? 'w-full h-full' : ''}`} style={{ borderRadius: `${Math.max(0, radius - (glassBorder ? glassBorderWidth : 0))}px` }}>
+                  <div className={`relative flex flex-col items-center overflow-hidden max-w-full max-h-full ${!image ? 'w-full h-full' : ''} ${image ? 'w-full h-full' : ''}`} style={{ borderRadius: `${Math.max(0, radius - (glassBorder ? glassBorderWidth + 1 : 0))}px` }}>
                     {/* Image Noise & Grain Layer */}
                     {image && (noiseIntensity > 0 || grainIntensity > 0) && (noiseTarget === 'image' || noiseTarget === 'both') && (
                       <div className="absolute inset-0 pointer-events-none mix-blend-overlay z-20">
@@ -3456,7 +3456,7 @@ export default function StudioPage() {
                     {image && showMacOsBar && (
                       <div 
                         className={`w-full shrink-0 ${showBrowserBar ? 'h-[52px]' : 'h-[40px]'} bg-[#1C1C1E] flex items-center justify-between px-[20px] relative overflow-hidden ${showBrowserBar ? 'border-b border-black/40' : ''}`}
-                        style={{ borderRadius: glassBorder ? `${Math.max(0, radius - glassBorderWidth)}px ${Math.max(0, radius - glassBorderWidth)}px 0 0` : '0' }}
+                        style={{ borderRadius: glassBorder ? `${Math.max(0, radius - glassBorderWidth - 1)}px ${Math.max(0, radius - glassBorderWidth - 1)}px 0 0` : '0' }}
                       >
                         <div className="flex gap-[8px] shrink-0 w-[52px]">
                           <div className="w-[12px] h-[12px] rounded-full bg-[#ff5f56] border border-black/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] shrink-0" />
@@ -3481,17 +3481,12 @@ export default function StudioPage() {
                         style={{ 
                           contain: 'paint', 
                           isolation: 'isolate',
-                          backgroundImage: `url("${image}")`,
-                          backgroundSize: 'contain',
-                          backgroundPosition: 'center',
-                          backgroundRepeat: 'no-repeat',
-                          aspectRatio: imageDimensions?.w && imageDimensions?.h ? `${imageDimensions.w}/${imageDimensions.h}` : undefined,
+                          borderRadius: showMacOsBar 
+                            ? `0 0 ${glassBorder ? Math.max(0, radius - glassBorderWidth - 1) : radius}px ${glassBorder ? Math.max(0, radius - glassBorderWidth - 1) : radius}px` 
+                            : `${glassBorder ? Math.max(0, radius - glassBorderWidth - 1) : radius}px`,
                         }}
                       >
                         <img src={image} alt="NoiceSS - Beautiful Screenshot Mockup Preview" draggable={false} className="w-full h-full object-contain block transition relative z-10" style={{
-                          borderRadius: showMacOsBar 
-                            ? `0 0 ${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px ${glassBorder ? Math.max(0, radius - glassBorderWidth) : radius}px` 
-                            : undefined,
                           filter: `${getLightingFilterStyle('image')} ${imageBlur > 0 ? `blur(${imageBlur}px)` : ''}`.trim() || 'none',
                         }} />
                         
@@ -3566,7 +3561,6 @@ export default function StudioPage() {
                     data-no-export="true"
                     className={`no-export absolute inset-0 pointer-events-none transition-opacity duration-200 z-50 ${isResizing || isRotating || imageSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                   >
-                    {/* Outline box */}
                     <div 
                       className={`absolute -inset-[1px] border-[1.5px] pointer-events-none shadow-sm transition-colors ${isLocked ? 'border-white/50 border-dashed' : 'border-white/70'}`} 
                       style={{ borderRadius: `${radius + 1}px` }} 
