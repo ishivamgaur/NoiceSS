@@ -16,9 +16,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "NOICESS - Pro Screenshot & Mockup Studio",
   description: "Create stunning screenshot mockups with 3D perspectives, macOS frames, radiant backdrops, and multi-resolution exports.",
-  verification: {
-    google: "Aj3W2R2Ilx2nYKVso0_yzr5R7dDOjl-g3OTNhyJGxUk",
-  },
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && {
+    verification: {
+      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    },
+  }),
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
@@ -29,15 +31,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <head>
-        <meta name="google-site-verification" content="Aj3W2R2Ilx2nYKVso0_yzr5R7dDOjl-g3OTNhyJGxUk" />
-      </head>
       <body>
-        <Script
-          defer
-          src="https://cloud.umami.is/script.js"
-          data-website-id="67628db1-54ae-4324-8bec-8959f6fff94c"
-        />
+        {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
+          <Script
+            defer
+            src="https://cloud.umami.is/script.js"
+            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
+          />
+        )}
         {children}
       </body>
     </html>
