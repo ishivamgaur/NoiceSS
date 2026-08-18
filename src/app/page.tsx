@@ -1905,7 +1905,7 @@ export default function StudioPage() {
       parts.push(`hue-rotate(${activeHueRotate}deg)`);
     }
     
-    return parts.length > 0 ? parts.join(' ') : 'none';
+    return parts.length > 0 ? parts.join(' ') : '';
   };
 
   const safeCustomW = Number(customRatioW) || 1;
