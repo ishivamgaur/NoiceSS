@@ -15,6 +15,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://noicess.vercel.app"),
+  applicationName: "NoiceSS",
+  appleWebApp: {
+    title: "NoiceSS",
+    statusBarStyle: "black-translucent",
+    capable: true,
+  },
   title: {
     default: "NoiceSS - Beautiful Screenshot Mockup Studio",
     template: "%s | NoiceSS",
@@ -69,21 +75,52 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "NoiceSS",
-    "alternateName": ["noice ss", "noicess", "noice screenshot", "beautiful screenshot noice"],
-    "applicationCategory": "MultimediaApplication",
-    "operatingSystem": "Any",
-    "description": "Create stunning, beautiful screenshot mockups with NoiceSS. Add 3D perspectives, macOS frames, radiant backdrops, and export in high-resolution.",
-    "url": process.env.NEXT_PUBLIC_APP_URL || "https://noicess.vercel.app",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "NoiceSS",
+      "alternateName": ["noice ss", "noicess", "noice screenshot", "beautiful screenshot noice"],
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any",
+      "description": "Create stunning, beautiful screenshot mockups with NoiceSS. Add 3D perspectives, macOS frames, radiant backdrops, and export in high-resolution. 100% free and open-source.",
+      "url": process.env.NEXT_PUBLIC_APP_URL || "https://noicess.vercel.app",
+      "sameAs": ["https://github.com/ishivgaur/noiceSS"],
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How to create a beautiful 3D screenshot mockup",
+      "description": "Learn how to turn a standard screenshot into a stunning, beautiful 3D app presentation using NoiceSS.",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "name": "Upload Screenshot",
+          "text": "Paste or upload your raw app screenshot into the NoiceSS editor."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Add macOS Frame & 3D Perspective",
+          "text": "Enable the macOS window frame and adjust the 3D tilt sliders to give your image depth."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Apply Radiant Backdrop",
+          "text": "Select a glassmorphism background and adjust the studio lighting."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Export High Resolution",
+          "text": "Click export to download a 2x or 4x high-resolution WebP image for your portfolio or Product Hunt launch."
+        }
+      ]
     }
-  };
+  ];
 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>

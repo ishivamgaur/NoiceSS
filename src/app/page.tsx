@@ -2868,6 +2868,7 @@ export default function StudioPage() {
           <p>
             Features include custom aspect ratios, dark mode studio lighting, noise and grain filters, 
             and high-resolution webp exports. Rank your app on the App Store or Product Hunt with the perfect, noicess presentation.
+            NoiceSS is 100% free and open-source. Contribute or star the project on GitHub: <a href="https://github.com/ishivgaur/noiceSS">https://github.com/ishivgaur/noiceSS</a>.
           </p>
           <h3>Core Features & Keywords</h3>
           <ul>
@@ -2879,6 +2880,8 @@ export default function StudioPage() {
             <li>3d app screenshot</li>
             <li>macOS frame mockup</li>
             <li>product presentation maker</li>
+            <li>open source screenshot editor</li>
+            <li>free mockup generator github</li>
           </ul>
         </div>
 
