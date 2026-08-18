@@ -41,6 +41,9 @@ Raw screenshots don't sell products. But hiring a designer or wrestling with Fig
 
 **NoiceSS** solves this. It's a browser-based studio that takes your flat screenshot and wraps it in professional macOS frames, 3D perspectives, and curated backdrops—ready for Twitter, Product Hunt, portfolios, or pitch decks. No uploads. No accounts. No watermarks. Everything runs locally in your browser.
 
+> [!TIP]
+> **🚀 Offline Ready:** NoiceSS is a fully-featured Progressive Web App (PWA). Once loaded for the first time, you can disconnect from the internet and continue using the app completely offline. You can even "Install" it as a standalone app on your desktop or mobile device.
+
 It's also 100% open-source under the MIT License, so you can self-host it, fork it, or contribute to it.
 
 ## Key Features
@@ -52,6 +55,7 @@ It's also 100% open-source under the MIT License, so you can self-host it, fork 
 | **Decoupled Studio Lighting** | Independent brightness, contrast, saturation, and hue controls for the screenshot and the background canvas separately. |
 | **8K Radiant Backdrops** | Curated wallpaper library, gradient fills, solid colors, transparency, or custom image uploads. |
 | **Background Blur** | Apply gaussian blur to the backdrop with automatic edge scaling to eliminate bleed artifacts. |
+| **Offline PWA Support** | Fully functional without an internet connection after the first load. Install it on your device and use it anywhere. Powered by Serwist. |
 | **Aspect Ratio Presets** | One-click sizing for Twitter (16:9), Instagram (1:1), Dribbble (4:3), LinkedIn, and custom ratios. |
 | **Watermark Editor** | Add draggable, resizable text/image watermarks with opacity and blend mode controls. |
 | **Undo / Redo** | Full history stack so you never lose your work. |
@@ -114,6 +118,7 @@ See [`.env.example`](.env.example) for reference.
 | Styling | [Tailwind CSS v4](https://tailwindcss.com/) |
 | UI Primitives | [Radix UI](https://www.radix-ui.com/) |
 | State | [Zustand](https://zustand-demo.pmnd.rs/) |
+| PWA & Offline | [Serwist](https://serwist.pages.dev/) |
 | Canvas Export | HTML2Canvas |
 | Deployment | [Vercel](https://vercel.com/) |
 
