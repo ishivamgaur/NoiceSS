@@ -2407,14 +2407,14 @@ export default function StudioPage() {
                       {/* Size Selector */}
                       <div>
                         <label className="text-[11px] text-zinc-400 font-medium mb-1.5 block">Size</label>
-                        <div className="relative grid grid-cols-2 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04] isolate">
+                        <div className="relative grid grid-cols-3 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04] isolate">
                           {(() => {
                             const sizes = [85, 100, 125];
                             const idx = sizes.indexOf(watermarkScale);
                             if (idx !== -1) {
                               return (
                                 <div 
-                                  className="absolute top-1 bottom-1 w-[calc((100%-8px)/2)] bg-white/10 border border-white/20 rounded-md shadow-sm ring-1 ring-white/10 transition-transform duration-250 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none -z-10"
+                                  className="absolute top-1 bottom-1 w-[calc((100%-8px)/3)] bg-white/10 border border-white/20 rounded-md shadow-sm ring-1 ring-white/10 transition-transform duration-250 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none -z-10"
                                   style={{
                                     transform: `translateX(calc(${idx * 100}% + ${idx * 4}px))`,
                                     left: '4px'
