@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo as reactUseMemo } from 'react';
 import { toast } from 'sonner';
 import { 
   Upload, Download, Layers, Monitor, Image as ImageIcon, Filter, 
@@ -12,10 +12,11 @@ import {
   AppWindow, Gauge, EyeOff, SlidersVertical, X, Lock, Unlock, Bookmark, Save, Plus, Star, Camera, Undo2, Redo2,
   ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Menu
 } from 'lucide-react';
-import { toPng, toJpeg, toBlob } from 'html-to-image';
+
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { PanelButton } from "@/components/ui/panel-button";
 
 const ASPECT_CATEGORIES = [
   {
@@ -582,7 +583,8 @@ export default function StudioPage() {
   const [isRotating, setIsRotating] = useState(false);
   const [isEditingRotation, setIsEditingRotation] = useState(false);
   const [rotationInput, setRotationInput] = useState('0');
-  const rotateRef = useRef<{ startAngle: number, startRotation: number, centerX: number, centerY: number } | null>(null);
+  const rotateRef = useRef<{ startAngle: number; startRotation: number; centerX: number; centerY: number } | null>(null);
+  const pointerDownTargetRef = useRef<Node | null>(null);
   const imageFrameRef = useRef<HTMLDivElement>(null);
 
   // Noise & Blur state
@@ -900,74 +902,78 @@ export default function StudioPage() {
     }
   }, []);
 
-  // 2. Auto-save active studio state to localStorage on any state change
+  // 2. Auto-save active studio state to localStorage on any state change with 500ms debounce
   useEffect(() => {
     if (!isStorageInitialized) return;
 
     if (!image) {
       try {
         localStorage.removeItem('noicess_studio_state');
-      } catch (err) {}
+      } catch (e) {}
       return;
     }
 
-    try {
-      const stateToSave = {
-        background,
-        padding,
-        radius,
-        shadow,
-        scale,
-        rotation,
-        isLocked,
-        pos,
-        aspectRatio,
-        customRatioW,
-        customRatioH,
-        showMacOsBar,
-        showBrowserBar,
-        browserUrl,
-        view,
-        glassBorder,
-        glassBorderWidth,
-        glassBorderBlur,
-        glassBorderColor,
-        glassBorderOpacity,
-        perspective,
-        rotateX,
-        rotateY,
-        rotateZ,
-        perspectiveDepth,
-        brightness,
-        contrast,
-        saturation,
-        hueRotate,
-        filter,
-        noiseIntensity,
-        grainIntensity,
-        noiseTarget,
-        bgBlur,
-        imageBlur,
-        watermark,
-        watermarkPlatform,
-        watermarkPosition,
-        watermarkTarget,
-        watermarkOpacity,
-        watermarkBlur,
-        watermarkGlass,
-        watermarkBorderWidth,
-        watermarkBorderOpacity,
-        watermarkOffsetX,
-        watermarkOffsetY,
-        watermarkScale,
-        leftTab,
-        expandedSections,
-      };
+    const saveTimeout = setTimeout(() => {
+      try {
+        const stateToSave = {
+          background,
+          padding,
+          radius,
+          shadow,
+          scale,
+          rotation,
+          isLocked,
+          pos,
+          aspectRatio,
+          customRatioW,
+          customRatioH,
+          showMacOsBar,
+          showBrowserBar,
+          browserUrl,
+          view,
+          glassBorder,
+          glassBorderWidth,
+          glassBorderBlur,
+          glassBorderColor,
+          glassBorderOpacity,
+          perspective,
+          rotateX,
+          rotateY,
+          rotateZ,
+          perspectiveDepth,
+          brightness,
+          contrast,
+          saturation,
+          hueRotate,
+          filter,
+          noiseIntensity,
+          grainIntensity,
+          noiseTarget,
+          bgBlur,
+          imageBlur,
+          watermark,
+          watermarkPlatform,
+          watermarkPosition,
+          watermarkTarget,
+          watermarkOpacity,
+          watermarkBlur,
+          watermarkGlass,
+          watermarkBorderWidth,
+          watermarkBorderOpacity,
+          watermarkOffsetX,
+          watermarkOffsetY,
+          watermarkScale,
+          leftTab,
+          expandedSections,
+        };
 
-      localStorage.setItem('noicess_studio_state', JSON.stringify(stateToSave));
-    } catch (err) {
-      console.error('Failed to auto-save studio state', err);
-    }
+        localStorage.setItem('noicess_studio_state', JSON.stringify(stateToSave));
+      } catch (err) {
+        console.error('Failed to auto-save studio state', err);
+      }
+    }, 500);
+
+    return () => clearTimeout(saveTimeout);
   }, [
     isStorageInitialized,
     background,
@@ -1357,6 +1363,7 @@ export default function StudioPage() {
   }, []);
 
   const handleWorkspacePointerDown = (e: React.PointerEvent) => {
+    pointerDownTargetRef.current = e.target as Node;
     // Register pointer for multi-touch tracking
     activePointersRef.current.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
 
@@ -1501,7 +1508,7 @@ export default function StudioPage() {
         const workspaceH = workspace.clientHeight;
         
         // Use getCanvasDimensions() directly to avoid waiting for DOM updates
-        const dims = getCanvasDimensions();
+        const dims = canvasDimensions;
         const canvasW = parseFloat(dims.width as string);
         const canvasH = parseFloat(dims.height as string);
         
@@ -1745,6 +1752,7 @@ export default function StudioPage() {
     // Wait for React to commit the state update and purge ghost/handle layers from DOM
     await new Promise((resolve) => setTimeout(resolve, 80));
     try {
+      const { toPng, toJpeg, toBlob } = await import('html-to-image');
       let dataUrl = '';
       const options = {
         cacheBust: true,
@@ -1818,6 +1826,7 @@ export default function StudioPage() {
     setIsExporting(true);
     await new Promise((resolve) => setTimeout(resolve, 80));
     try {
+      const { toBlob } = await import('html-to-image');
       const blob = await toBlob(canvasRef.current, { 
         pixelRatio: 2, 
         cacheBust: true,
@@ -1877,10 +1886,10 @@ export default function StudioPage() {
   };
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (isLocked) return;
-    setIsDragging(true);
     setImageSelected(true);
     setWatermarkSelected(false);
+    if (isLocked) return;
+    setIsDragging(true);
     setDragStart({ 
       x: e.clientX - pos.x, 
       y: e.clientY - pos.y 
@@ -1897,7 +1906,9 @@ export default function StudioPage() {
   };
   const handlePointerUp = (e: React.PointerEvent) => {
     setIsDragging(false);
-    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    try {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch (err) {}
   };
 
   const [isDraggingWatermark, setIsDraggingWatermark] = useState(false);
@@ -1984,7 +1995,7 @@ export default function StudioPage() {
   const bgUrlMatch = background.match(/^url\(['"]?(.*?)['"]?\)$/);
   const bgImageUrl = bgUrlMatch ? bgUrlMatch[1] : null;
 
-  const getCanvasDimensions = () => {
+  const canvasDimensions = reactUseMemo(() => {
     const defaultSize = 800;
 
     let finalW, finalH;
@@ -2027,12 +2038,12 @@ export default function StudioPage() {
       width: `${finalW}px`,
       height: `${finalH}px`
     };
-  };
+  }, [aspectStyle, image, imageDimensions, glassBorder, glassBorderWidth, showMacOsBar, showBrowserBar, padding]);
 
-  const getScreenshotCardDimensions = () => {
+  const screenshotCardDimensions = reactUseMemo(() => {
     if (!image || !imageDimensions) return {};
     
-    const canvasDims = getCanvasDimensions();
+    const canvasDims = canvasDimensions;
     if (!canvasDims.width || !canvasDims.height) return {};
     
     const canvasW = parseFloat(canvasDims.width as string);
@@ -2069,7 +2080,7 @@ export default function StudioPage() {
       width: `${finalW}px`,
       height: `${finalH}px`
     };
-  };
+  }, [image, imageDimensions, canvasDimensions, padding, scale, glassBorder, glassBorderWidth, showMacOsBar, showBrowserBar]);
   return (
     <div className="flex flex-col md:flex-row h-[100dvh] w-[100dvw] overflow-hidden bg-bg-dark text-text-main font-sans antialiased">
       
@@ -3376,7 +3387,8 @@ export default function StudioPage() {
           onPointerMove={handleWorkspacePointerMove}
           onPointerUp={handleWorkspacePointerUp}
           onClick={(e) => {
-            if (e.target === workspaceRef.current || (e.target as HTMLElement).getAttribute('data-workspace-bg') === 'true') {
+            const isInsideScreenshotFrame = pointerDownTargetRef.current && imageFrameRef.current?.contains(pointerDownTargetRef.current);
+            if (!isInsideScreenshotFrame && (e.target === workspaceRef.current || (e.target as HTMLElement).getAttribute('data-workspace-bg') === 'true')) {
               setImageSelected(false);
               setWatermarkSelected(false);
             }
@@ -3397,13 +3409,16 @@ export default function StudioPage() {
               <div 
                 ref={canvasRef}
                 className={`relative flex items-center justify-center shadow-2xl shrink-0 overflow-hidden ${isPanningWorkspace ? 'cursor-grabbing' : 'cursor-grab'}`}
-                onClick={() => {
-                  setImageSelected(false);
-                  setWatermarkSelected(false);
+                onClick={(e) => {
+                  const isInsideScreenshotFrame = pointerDownTargetRef.current && imageFrameRef.current?.contains(pointerDownTargetRef.current);
+                  if (!isInsideScreenshotFrame) {
+                    setImageSelected(false);
+                    setWatermarkSelected(false);
+                  }
                 }}
             style={{
               aspectRatio: aspectStyle,
-              ...getCanvasDimensions()
+              ...canvasDimensions
             }}
           >
             {/* Background Layer (Strictly Clipped, 0 padding) */}
@@ -3460,7 +3475,7 @@ export default function StudioPage() {
                 <div 
                   className={`relative flex flex-col items-center ${scale <= 100 ? 'max-w-full max-h-full' : ''} ${!image ? 'w-full h-full' : ''} ${image && isDragging ? 'opacity-90 transition-none cursor-grabbing' : image ? 'cursor-grab' : ''}`}
                   style={image ? {
-                    ...getScreenshotCardDimensions(),
+                    ...screenshotCardDimensions,
                     borderRadius: `${radius}px`,
                     boxShadow: activePerspectiveTransform 
                       ? `20px 20px ${shadow * 3}px rgba(0,0,0,0.45)` 
@@ -4235,7 +4250,7 @@ export default function StudioPage() {
                           <div 
                             className="w-full h-full flex items-center justify-center overflow-hidden shadow-sm relative"
                             style={{ 
-                              padding: `${(padding / parseFloat(getCanvasDimensions().width as string)) * 100}%`,
+                              padding: `${(padding / parseFloat(canvasDimensions.width as string)) * 100}%`,
                             }}
                           >
                             {/* Background Layer with Blur */}
@@ -4324,13 +4339,19 @@ export default function StudioPage() {
                               }}
                             >
                                 <div 
-                                  className="relative flex flex-col w-[75%] aspect-video rounded-sm overflow-hidden shadow-2xl border border-white/20 bg-black/50"
+                                  className="relative flex flex-col w-[75%] rounded-sm overflow-hidden shadow-2xl border border-white/20 bg-white/5 backdrop-blur-sm"
+                                  style={{ aspectRatio: aspectStyle === 'auto' ? '16/9' : aspectStyle }}
                                 >
-                                  <img 
-                                    src="/wallpapers/dark-green-8k.webp" 
-                                    alt="NoiceSS 3D Screenshot Mockup Generator Preview" 
-                                    className="w-full h-full object-cover block"
-                                  />
+                                  {showMacOsBar && (
+                                    <div className="shrink-0 bg-[#1C1C1E] flex items-center px-1.5 py-0.5 gap-0.5">
+                                      <div className="w-[3px] h-[3px] rounded-full bg-[#ff5f56]" />
+                                      <div className="w-[3px] h-[3px] rounded-full bg-[#ffbd2e]" />
+                                      <div className="w-[3px] h-[3px] rounded-full bg-[#27c93f]" />
+                                    </div>
+                                  )}
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <ImageIcon size={16} className="text-white/20" />
+                                  </div>
                                 </div>
                             </div>
 
