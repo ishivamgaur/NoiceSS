@@ -1,6 +1,6 @@
 <div align="center">
-  <a href="https://noicess.vercel.app" target="_blank">
-    <img src="https://noicess.vercel.app/noice-og.webp" alt="NoiceSS - Beautiful Screenshot Mockup Studio" width="800" style="border-radius: 12px; margin-bottom: 24px;" />
+  <a href="https://noicess.fun" target="_blank">
+    <img src="https://noicess.fun/noice-og.webp" alt="NoiceSS - Beautiful Screenshot Mockup Studio" width="800" style="border-radius: 12px; margin-bottom: 24px;" />
   </a>
 
   # ✨ NoiceSS
@@ -8,7 +8,7 @@
   **An open-source screenshot mockup studio.**<br/>
   *Turn flat, boring screenshots into stunning 3D presentations.*
 
-  [![Try it Live](https://img.shields.io/badge/Try_it_Live_→-000000?style=for-the-badge&logo=vercel)](https://noicess.vercel.app)
+  [![Try it Live](https://img.shields.io/badge/Try_it_Live_→-000000?style=for-the-badge)](https://noicess.fun)
 
   <div style="margin-top: 16px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
     <a href="https://github.com/ishivgaur/noiceSS/blob/main/LICENSE">
@@ -125,7 +125,6 @@ See [`.env.example`](.env.example) for reference.
 | State | [Zustand](https://zustand-demo.pmnd.rs/) |
 | PWA & Offline | [Serwist](https://serwist.pages.dev/) |
 | Canvas Export | HTML2Canvas |
-| Deployment | [Vercel](https://vercel.com/) |
 
 ## Contributing
 
