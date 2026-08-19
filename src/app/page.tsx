@@ -1754,10 +1754,21 @@ export default function StudioPage() {
     try {
       const { toPng, toJpeg, toBlob } = await import('html-to-image');
       let dataUrl = '';
+      
+      // Calculate the optimal multiplier to preserve original image quality without loss
+      let optimalMultiplier = multiplier;
+      if (image && imageDimensions && imageDimensions.w) {
+        // The image is rendered at a base width of 800px on the canvas.
+        // We find the scale factor needed to make it match the original native resolution.
+        const neededRatio = imageDimensions.w / 800;
+        // Cap at 6x to prevent memory crashes on ridiculously large images
+        optimalMultiplier = Math.min(Math.max(multiplier, neededRatio), 6);
+      }
+
       const options = {
         cacheBust: true,
-        pixelRatio: multiplier,
-        quality: 0.95,
+        pixelRatio: optimalMultiplier,
+        quality: 1.0, // Maximum quality
         filter: filterExportNodes,
       };
       if (format === 'jpeg') {
@@ -1827,8 +1838,15 @@ export default function StudioPage() {
     await new Promise((resolve) => setTimeout(resolve, 80));
     try {
       const { toBlob } = await import('html-to-image');
+      
+      let optimalMultiplier = 3; // Enforce minimum 3x resolution for crisp clipboard copies
+      if (image && imageDimensions && imageDimensions.w) {
+        const neededRatio = imageDimensions.w / 800;
+        optimalMultiplier = Math.min(Math.max(3, neededRatio), 6);
+      }
+
       const blob = await toBlob(canvasRef.current, { 
-        pixelRatio: 2, 
+        pixelRatio: optimalMultiplier, 
         cacheBust: true,
         filter: filterExportNodes,
       });
