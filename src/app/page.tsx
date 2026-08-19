@@ -1556,7 +1556,7 @@ export default function StudioPage() {
       return () => clearTimeout(t);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [aspectRatio, customRatioW, customRatioH, padding, image]);
+  }, [aspectRatio, customRatioW, customRatioH, image]);
 
   // Auto-fit when workspace container resizes
   useEffect(() => {
@@ -1993,7 +1993,7 @@ export default function StudioPage() {
       if (!image || !imageDimensions?.w || !imageDimensions?.h) {
         return { width: `${defaultSize}px`, height: '600px' };
       }
-      // Auto Aspect Ratio logic: The canvas perfectly wraps the image + decorations + padding on all sides.
+      // Auto Aspect Ratio logic: Canvas stays fixed, padding pushes image inward.
       const imageRatio = imageDimensions.w / imageDimensions.h;
       const decorationW = glassBorder ? 2 * glassBorderWidth + 2 : 0;
       const decorationH = (glassBorder ? 2 * glassBorderWidth + 2 : 0) + (showMacOsBar ? (showBrowserBar ? 52 : 40) : 0);
@@ -2010,15 +2010,15 @@ export default function StudioPage() {
         finalH = innerH + decorationH + 2 * padding;
       }
     } else {
-      // Fixed Aspect Ratio logic
+      // Fixed Aspect Ratio logic: Canvas size stays constant, padding only shrinks the image inward.
       const [wStr, hStr] = aspectStyle.split('/');
       const ratio = Number(wStr) / Number(hStr);
 
       if (ratio >= 1) {
-        finalW = defaultSize + (padding * 2);
+        finalW = defaultSize;
         finalH = finalW / ratio;
       } else {
-        finalH = defaultSize + (padding * 2);
+        finalH = defaultSize;
         finalW = finalH * ratio;
       }
     }
@@ -2038,8 +2038,10 @@ export default function StudioPage() {
     const canvasW = parseFloat(canvasDims.width as string);
     const canvasH = parseFloat(canvasDims.height as string);
     
-    const availableW = Math.max(1, canvasW - 2 * padding) * (scale / 100);
-    const availableH = Math.max(1, canvasH - 2 * padding) * (scale / 100);
+    const baseW = canvasW - 2 * padding;
+    const baseH = canvasH - 2 * padding;
+    const availableW = Math.max(1, baseW * (scale / 100));
+    const availableH = Math.max(1, baseH * (scale / 100));
     
     const decorationW = glassBorder ? 2 * glassBorderWidth + 2 : 0;
     const decorationH = (glassBorder ? 2 * glassBorderWidth + 2 : 0) + (showMacOsBar ? (showBrowserBar ? 52 : 40) : 0);
@@ -3446,7 +3448,7 @@ export default function StudioPage() {
               {/* Image Frame inside content container */}
               <div 
                 ref={imageFrameRef}
-                className={`relative group z-10 pointer-events-auto ${isRotating || isDragging || isResizing ? 'transition-none' : 'transition duration-200 ease-out'} flex flex-col justify-center items-center max-w-full max-h-full ${!image ? 'w-full h-full' : ''} ${isDragging ? 'cursor-grabbing' : (image ? (isLocked ? 'cursor-default' : 'cursor-move') : 'cursor-default')}`}
+                className={`relative group z-10 pointer-events-auto ${isRotating || isDragging || isResizing ? 'transition-none' : 'transition duration-200 ease-out'} flex flex-col justify-center items-center ${scale <= 100 ? 'max-w-full max-h-full' : ''} ${!image ? 'w-full h-full' : ''} ${isDragging ? 'cursor-grabbing' : (image ? (isLocked ? 'cursor-default' : 'cursor-move') : 'cursor-default')}`}
                 style={{
                   transform: `translate(${pos.x}px, ${pos.y}px) ${activePerspectiveTransform} ${rotation !== 0 ? `rotate(${rotation}deg)` : ''}`,
                   transformStyle: 'preserve-3d',
@@ -3456,7 +3458,7 @@ export default function StudioPage() {
 
                 {/* Screenshot Card Container */}
                 <div 
-                  className={`relative flex flex-col items-center max-w-full max-h-full ${!image ? 'w-full h-full' : ''} ${image && isDragging ? 'opacity-90 transition-none cursor-grabbing' : image ? 'cursor-grab' : ''}`}
+                  className={`relative flex flex-col items-center ${scale <= 100 ? 'max-w-full max-h-full' : ''} ${!image ? 'w-full h-full' : ''} ${image && isDragging ? 'opacity-90 transition-none cursor-grabbing' : image ? 'cursor-grab' : ''}`}
                   style={image ? {
                     ...getScreenshotCardDimensions(),
                     borderRadius: `${radius}px`,
