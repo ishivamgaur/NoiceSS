@@ -11,8 +11,8 @@
   [![Try it Live](https://img.shields.io/badge/Try_it_Live_→-000000?style=for-the-badge)](https://noicess.fun)
 
   <div style="margin-top: 16px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
-    <a href="https://github.com/ishivgaur/noiceSS/blob/main/LICENSE">
-      <img src="https://img.shields.io/github/license/ishivgaur/noiceSS?style=flat-square&color=blue" alt="License" />
+    <a href="https://github.com/ishivamgaur/noiceSS/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/ishivamgaur/noiceSS?style=flat-square&color=blue" alt="License" />
     </a>
     <img src="https://img.shields.io/badge/Next.js_15-black?style=flat-square&logo=next.js" alt="Next.js" />
     <img src="https://img.shields.io/badge/React_19-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React" />
@@ -44,7 +44,7 @@
 
 Raw screenshots don't sell products. But hiring a designer or wrestling with Figma every time you need a polished mockup is overkill.
 
-**NoiceSS** solves this. It's a browser-based studio that takes your flat screenshot and wraps it in professional macOS frames, 3D perspectives, and curated backdrops—ready for Twitter, Product Hunt, portfolios, or pitch decks. No uploads. No accounts. No watermarks. Everything runs locally in your browser.
+**NoiceSS** solves this. It's a browser-based studio that takes your flat screenshot and wraps it in professional macOS frames, 3D perspectives, and curated backdrops - ready for Twitter, Product Hunt, portfolios, or pitch decks. No uploads. No accounts. No watermarks. Everything runs locally in your browser.
 
 > [!TIP]
 > **🚀 Offline Ready:** NoiceSS is a fully-featured Progressive Web App (PWA). Once loaded for the first time, you can disconnect from the internet and continue using the app completely offline. You can even "Install" it as a standalone app on your desktop or mobile device.
@@ -89,7 +89,7 @@ NoiceSS is built for people who care about pixel-perfect output.
 
 ```bash
 # Clone the repository
-git clone https://github.com/ishivgaur/noiceSS.git
+git clone https://github.com/ishivamgaur/noiceSS.git
 cd noiceSS
 
 # Install dependencies
@@ -128,7 +128,7 @@ See [`.env.example`](.env.example) for reference.
 
 ## Contributing
 
-We welcome contributions from everyone—whether it's a bug fix, a new backdrop preset, performance optimization, or documentation improvement.
+We welcome contributions from everyone - whether it's a bug fix, a new backdrop preset, performance optimization, or documentation improvement.
 
 Please read the **[Contributing Guide](CONTRIBUTING.md)** before opening a pull request. It covers the development setup, coding conventions, and PR process.
 
@@ -152,5 +152,5 @@ This project is open-source and distributed under the **MIT License**. See the [
 ---
 
 <div align="center">
-  <sub>Built and maintained by <a href="https://github.com/ishivgaur">@ishivgaur</a></sub>
+  <sub>Built and maintained by <a href="https://github.com/ishivamgaur">@ishivamgaur</a></sub>
 </div>

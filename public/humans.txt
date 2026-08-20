@@ -1,0 +1,10 @@
+/* TEAM */
+  Developer: Shivam Gaur
+  Site: https://shivamgaur.space
+  Twitter: @ishivgaur
+  Location: Noida, India
+
+/* SITE */
+  Last update: 2026/08/20
+  Language: English
+  Doctype: HTML5

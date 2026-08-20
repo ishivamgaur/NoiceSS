@@ -34,15 +34,22 @@ export const metadata: Metadata = {
     "screenshot mockup generator", "3d screenshot", "app presentation maker", 
     "screenshot editor", "macOS frame generator", "aesthetic screenshot mockup",
     "stunning screenshot", "glassmorphism screenshot", "beautiful screenshot maker",
-    "best screenshot editor", "beautiful UI presentation", "clean screenshot editor"
+    "best screenshot editor", "beautiful UI presentation", "clean screenshot editor",
+    "free screenshot tool", "twitter screenshot generator", "product hunt screenshot maker", 
+    "browser mockup", "window mockup", "image beautifier", "screenshot backgrounds",
+    "Shivam Gaur", "ishivamgaur", "Shivam Gaur developer", "Shivam Gaur portfolio",
+    "noiceSS Shivam Gaur", "full-stack developer Noida", "shivamgaur.space"
   ],
-  authors: [{ name: "NoiceSS Team" }],
-  creator: "NoiceSS",
+  authors: [{ name: "Shivam Gaur", url: "https://shivamgaur.space" }],
+  creator: "Shivam Gaur",
   ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && {
     verification: {
       google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
     },
   }),
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_APP_URL || "https://noicess.fun",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -64,6 +71,7 @@ export const metadata: Metadata = {
     title: "NoiceSS - Beautiful Screenshot Mockup Studio",
     description: "Create stunning, beautiful screenshot mockups with NoiceSS. Add 3D perspectives, macOS frames, and radiant backdrops.",
     images: ["/noice-og.webp"],
+    creator: "@ishivgaur",
   },
   robots: {
     index: true,
@@ -98,12 +106,39 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       "operatingSystem": "Any",
       "description": "Create stunning, beautiful screenshot mockups with NoiceSS. Add 3D perspectives, macOS frames, radiant backdrops, and export in high-resolution. 100% free and open-source.",
       "url": process.env.NEXT_PUBLIC_APP_URL || "https://noicess.fun",
-      "sameAs": ["https://github.com/ishivgaur/noiceSS"],
+      "sameAs": [
+        "https://github.com/ishivamgaur/noiceSS",
+        "https://twitter.com/ishivgaur",
+        "https://linkedin.com/in/ishivamgaur",
+        "https://instagram.com/ishivamgaur"
+      ],
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "@id": `${process.env.NEXT_PUBLIC_APP_URL || "https://noicess.fun"}/#person`,
+      "name": "Shivam Gaur",
+      "alternateName": "@ishivamgaur",
+      "url": "https://shivamgaur.space",
+      "jobTitle": "Full Stack Developer",
+      "description": "Shivam Gaur is a full-stack developer in Noida, India, building web products with React, Next.js, Node.js, TypeScript, and MongoDB.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Noida",
+        "addressRegion": "Uttar Pradesh",
+        "addressCountry": "IN"
+      },
+      "sameAs": [
+        "https://github.com/ishivamgaur",
+        "https://linkedin.com/in/ishivamgaur",
+        "https://twitter.com/ishivgaur",
+        "https://instagram.com/ishivamgaur"
+      ]
     },
     {
       "@context": "https://schema.org",
@@ -140,8 +175,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
         />
+        <link rel="alternate" type="application/rss+xml" href="/feed.xml" title="NoiceSS RSS Feed" />
+        <link rel="author" type="text/plain" href="/humans.txt" />
+        <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-friendly site summary" />
+        <link rel="alternate" type="text/plain" href="/ai.txt" title="AI usage preferences" />
       </head>
       <body suppressHydrationWarning>
         {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (

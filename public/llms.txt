@@ -1,0 +1,15 @@
+# NoiceSS
+> Beautiful Screenshot Mockup Studio
+
+NoiceSS is an open-source web application that allows users to create stunning 3D screenshot mockups.
+Users can upload an image, apply a macOS window frame, add 3D perspective transforms, and place the image over beautiful radiant glassmorphism backdrops.
+
+Features:
+- Free and open-source
+- 100% client-side rendering (privacy friendly)
+- High resolution export (up to 4x/8x scale)
+- Developed by Shivam Gaur
+
+Link: https://noicess.fun
+Author: https://shivamgaur.space
+GitHub: https://github.com/ishivamgaur/noiceSS

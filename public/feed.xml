@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>NoiceSS - Beautiful Screenshot Mockup Studio</title>
+    <link>https://noicess.fun</link>
+    <description>Create stunning, beautiful screenshot mockups with NoiceSS. Add 3D perspectives, macOS frames, radiant backdrops, and export in high-resolution.</description>
+    <language>en-US</language>
+    <managingEditor>ishivamgaur@gmail.com (Shivam Gaur)</managingEditor>
+    <webMaster>ishivamgaur@gmail.com (Shivam Gaur)</webMaster>
+    <lastBuildDate>Thu, 20 Aug 2026 12:00:00 +0000</lastBuildDate>
+    <atom:link href="https://noicess.fun/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>NoiceSS v1.0 Launched</title>
+      <link>https://noicess.fun</link>
+      <description>We just launched NoiceSS! A completely free, open-source tool for making 3D screenshot mockups. Try it out now!</description>
+      <pubDate>Thu, 20 Aug 2026 12:00:00 +0000</pubDate>
+      <guid>https://noicess.fun/#v1-launch</guid>
+    </item>
+  </channel>
+</rss>

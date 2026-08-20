@@ -16,7 +16,7 @@ First off, thank you for considering contributing to NoiceSS! Every contribution
 
 ## Code of Conduct
 
-By participating in this project, you agree to maintain a welcoming, inclusive, and harassment-free environment for everyone. Be respectful in all interactions—whether in issues, pull requests, or discussions.
+By participating in this project, you agree to maintain a welcoming, inclusive, and harassment-free environment for everyone. Be respectful in all interactions - whether in issues, pull requests, or discussions.
 
 ## How Can I Contribute?
 
