@@ -2976,7 +2976,7 @@ export default function StudioPage() {
           <p>
             Features include custom aspect ratios, dark mode studio lighting, noise and grain filters, 
             and high-resolution webp exports. Rank your app on the App Store or Product Hunt with the perfect, noicess presentation.
-            NoiceSS is 100% free and open-source. Contribute or star the project on GitHub: <a href="https://github.com/ishivgaur/noiceSS">https://github.com/ishivgaur/noiceSS</a>.
+            NoiceSS is 100% free and open-source. Contribute or star the project on GitHub: <a href="https://github.com/ishivamgaur/noiceSS" target="_blank" rel="noopener noreferrer" className="text-white underline underline-offset-2">https://github.com/ishivamgaur/noiceSS</a>.
           </p>
           <h3>Core Features & Keywords</h3>
           <ul>

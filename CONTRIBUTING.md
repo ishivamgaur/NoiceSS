@@ -22,7 +22,7 @@ By participating in this project, you agree to maintain a welcoming, inclusive, 
 
 ### 🐛 Reporting Bugs
 
-Before creating a bug report, please check the [existing issues](https://github.com/ishivgaur/noiceSS/issues) to avoid duplicates. When filing a new bug, include:
+Before creating a bug report, please check the [existing issues](https://github.com/ishivamgaur/noiceSS/issues) to avoid duplicates. When filing a new bug, include:
 
 - **A clear, descriptive title.**
 - **Steps to reproduce** the behavior.
@@ -177,4 +177,4 @@ chore(deps): bump next.js to v15.1
 
 ---
 
-Thank you for helping make NoiceSS better! If you have any questions, feel free to open a [Discussion](https://github.com/ishivgaur/noiceSS/discussions) or reach out via an issue.
+Thank you for helping make NoiceSS better! If you have any questions, feel free to open a [Discussion](https://github.com/ishivamgaur/noiceSS/discussions) or reach out via an issue.
