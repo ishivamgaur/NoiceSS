@@ -55,6 +55,26 @@ export const MACOS_BACKGROUNDS = [
   { name: 'Apple Retina', url: '/wallpapers/apple-retina.webp' }
 ];
 
+export const RAYCAST_BACKGROUNDS = [
+  { name: 'Blob Red', url: '/wallpapers/raycast-blob-red.webp' },
+  { name: 'Blob', url: '/wallpapers/raycast-blob.webp' },
+  { name: 'Blue Distortion 1', url: '/wallpapers/raycast-blue-distortion-1.webp' },
+  { name: 'Blue Distortion 2', url: '/wallpapers/raycast-blue-distortion-2.webp' },
+  { name: 'Chromatic Dark 1', url: '/wallpapers/raycast-chromatic-dark-1.webp' },
+  { name: 'Chromatic Dark 2', url: '/wallpapers/raycast-chromatic-dark-2.webp' },
+  { name: 'Cube Prod', url: '/wallpapers/raycast-cube-prod.webp' },
+  { name: 'Glaze 1', url: '/wallpapers/raycast-glaze-1.webp' },
+  { name: 'Glaze 2', url: '/wallpapers/raycast-glaze-2.webp' },
+  { name: 'Loupe Mono Dark', url: '/wallpapers/raycast-loupe-mono-dark.webp' },
+  { name: 'Loupe', url: '/wallpapers/raycast-loupe.webp' },
+  { name: 'Mono Dark Distortion 1', url: '/wallpapers/raycast-mono-dark-distortion-1.webp' },
+  { name: 'Mono Dark Distortion 2', url: '/wallpapers/raycast-mono-dark-distortion-2.webp' },
+  { name: 'Red Distortion 1', url: '/wallpapers/raycast-red-distortion-1.webp' },
+  { name: 'Red Distortion 2', url: '/wallpapers/raycast-red-distortion-2.webp' },
+  { name: 'Red Distortion 3', url: '/wallpapers/raycast-red-distortion-3.webp' },
+  { name: 'Red Distortion 4', url: '/wallpapers/raycast-red-distortion-4.webp' },
+];
+
 export const GRADIENTS = [
   'radial-gradient(ellipse at 50% 20%, #27272a 0%, #09090b 100%)',
   'linear-gradient(135deg, #18181b 0%, #09090b 100%)',

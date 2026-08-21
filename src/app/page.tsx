@@ -69,6 +69,26 @@ const MACOS_BACKGROUNDS = [
   { name: 'Apple Retina', url: '/wallpapers/apple-retina.webp' }
 ];
 
+const RAYCAST_BACKGROUNDS = [
+  { name: 'Blob Red', url: '/wallpapers/raycast-blob-red.webp' },
+  { name: 'Blob', url: '/wallpapers/raycast-blob.webp' },
+  { name: 'Blue Distortion 1', url: '/wallpapers/raycast-blue-distortion-1.webp' },
+  { name: 'Blue Distortion 2', url: '/wallpapers/raycast-blue-distortion-2.webp' },
+  { name: 'Chromatic Dark 1', url: '/wallpapers/raycast-chromatic-dark-1.webp' },
+  { name: 'Chromatic Dark 2', url: '/wallpapers/raycast-chromatic-dark-2.webp' },
+  { name: 'Cube Prod', url: '/wallpapers/raycast-cube-prod.webp' },
+  { name: 'Glaze 1', url: '/wallpapers/raycast-glaze-1.webp' },
+  { name: 'Glaze 2', url: '/wallpapers/raycast-glaze-2.webp' },
+  { name: 'Loupe Mono Dark', url: '/wallpapers/raycast-loupe-mono-dark.webp' },
+  { name: 'Loupe', url: '/wallpapers/raycast-loupe.webp' },
+  { name: 'Mono Dark Distortion 1', url: '/wallpapers/raycast-mono-dark-distortion-1.webp' },
+  { name: 'Mono Dark Distortion 2', url: '/wallpapers/raycast-mono-dark-distortion-2.webp' },
+  { name: 'Red Distortion 1', url: '/wallpapers/raycast-red-distortion-1.webp' },
+  { name: 'Red Distortion 2', url: '/wallpapers/raycast-red-distortion-2.webp' },
+  { name: 'Red Distortion 3', url: '/wallpapers/raycast-red-distortion-3.webp' },
+  { name: 'Red Distortion 4', url: '/wallpapers/raycast-red-distortion-4.webp' },
+];
+
 const GRADIENTS = [
   // Row 1: Studio Titanium, Cosmic Void & Linear Indigo
   'radial-gradient(ellipse at 50% 20%, #27272a 0%, #09090b 100%)',
@@ -452,6 +472,46 @@ const FILTERS = [
   { id: 'cyberpunk', name: 'Cyber Neon', desc: 'Ultra Vivid Glow', filterStyle: 'saturate(180%) hue-rotate(280deg) contrast(140%)', icon: Flame },
 ];
 
+const ASCII_PATTERNS = [
+  { id: 'dots', name: 'Dots', char: '·' },
+  { id: 'bullet', name: 'Bullet', char: '•' },
+  { id: 'ring-dot', name: 'Ring Dot', char: '◌' },
+  { id: 'light-shade', name: 'Light', char: '░' },
+  { id: 'medium-shade', name: 'Medium', char: '▒' },
+  { id: 'dark-shade', name: 'Dark', char: '▓' },
+  { id: 'full-block', name: 'Block', char: '█' },
+  { id: 'half-block', name: 'Half Block', char: '▀' },
+  { id: 'quarter', name: 'Quarter', char: '▔' },
+  { id: 'plus', name: 'Plus', char: '+' },
+  { id: 'heavy-plus', name: 'Heavy Plus', char: '✚' },
+  { id: 'hash', name: 'Hash', char: '#' },
+  { id: 'asterisk', name: 'Star', char: '*' },
+  { id: 'cross', name: 'Cross', char: '×' },
+  { id: 'heavy-x', name: 'Heavy X', char: '✕' },
+  { id: 'slash', name: 'Slash', char: '/' },
+  { id: 'backslash', name: 'Back', char: '\\' },
+  { id: 'pipe', name: 'Pipe', char: '|' },
+  { id: 'double-pipe', name: 'Double Pipe', char: '║' },
+  { id: 'equals', name: 'Equals', char: '=' },
+  { id: 'colon', name: 'Colon', char: ':' },
+  { id: 'percent', name: 'Percent', char: '%' },
+  { id: 'at', name: 'At', char: '@' },
+  { id: 'ampersand', name: 'And', char: '&' },
+  { id: 'tilde', name: 'Tilde', char: '~' },
+  { id: 'underscore', name: 'Under', char: '_' },
+  { id: 'caret', name: 'Caret', char: '^' },
+  { id: 'circle', name: 'Circle', char: '○' },
+  { id: 'filled-circle', name: 'Filled Circle', char: '●' },
+  { id: 'square', name: 'Square', char: '□' },
+  { id: 'filled-square', name: 'Filled Square', char: '■' },
+  { id: 'triangle', name: 'Triangle', char: '▲' },
+  { id: 'down-triangle', name: 'Down Triangle', char: '▼' },
+  { id: 'diamond', name: 'Diamond', char: '◆' },
+  { id: 'star', name: 'Star', char: '★' },
+  { id: 'left-arrow', name: 'Left Arrow', char: '←' },
+  { id: 'right-arrow', name: 'Right Arrow', char: '→' },
+];
+
 const renderPlatformIcon = (platform: string, size = 12) => {
   switch (platform) {
     case 'x':
@@ -535,6 +595,10 @@ export default function StudioPage() {
   const [padding, setPadding] = useState(64);
   const [radius, setRadius] = useState(16);
   const [shadow, setShadow] = useState(25);
+  const [shadowBlur, setShadowBlur] = useState(45);
+  const [shadowOpacity, setShadowOpacity] = useState(35);
+  const [shadowOffsetX, setShadowOffsetX] = useState(0);
+  const [shadowOffsetY, setShadowOffsetY] = useState(0);
   const [scale, setScale] = useState(100);
   const [aspectRatio, setAspectRatio] = useState('auto');
   const [customRatioW, setCustomRatioW] = useState<number | string>(16);
@@ -598,6 +662,14 @@ export default function StudioPage() {
   const [noiseTarget, setNoiseTarget] = useState('both');
   const [imageBlur, setImageBlur] = useState(0);
   const [bgBlur, setBgBlur] = useState(0);
+
+  // ASCII Art Overlay state
+  const [asciiEnabled, setAsciiEnabled] = useState(false);
+  const [asciiPattern, setAsciiPattern] = useState('medium-shade');
+  const [asciiSize, setAsciiSize] = useState(16);
+  const [asciiOpacity, setAsciiOpacity] = useState(30);
+  const [asciiTarget, setAsciiTarget] = useState('canvas');
+  const [asciiColor, setAsciiColor] = useState('#ffffff');
   
   // Manual lighting & grading state
   const [brightness, setBrightness] = useState(100);
@@ -752,10 +824,12 @@ export default function StudioPage() {
     // Left Sidebar: Backdrop
     bgBlur: true,
     wallpapers: true,
+    raycast: true,
     gradients: true,
     solidColors: true,
     // Left Sidebar: Effects
     textureNoise: true,
+    asciiArt: true,
     focusBlur: true,
     colorFilters: true,
     // Right Sidebar
@@ -854,6 +928,9 @@ export default function StudioPage() {
         if (s.padding !== undefined) setPadding(s.padding);
         if (s.radius !== undefined) setRadius(s.radius);
         if (s.shadow !== undefined) setShadow(s.shadow);
+        if (s.shadowBlur !== undefined) setShadowBlur(s.shadowBlur);
+        if (s.shadowOpacity !== undefined) setShadowOpacity(s.shadowOpacity);
+        if (s.shadowOffsetX !== undefined) setShadowOffsetX(s.shadowOffsetX);
         if (s.scale !== undefined) setScale(s.scale);
         if (s.rotation !== undefined) setRotation(s.rotation);
         if (s.isLocked !== undefined) setIsLocked(s.isLocked);
@@ -883,6 +960,12 @@ export default function StudioPage() {
         if (s.noiseIntensity !== undefined) setNoiseIntensity(s.noiseIntensity);
         if (s.grainIntensity !== undefined) setGrainIntensity(s.grainIntensity);
         if (s.noiseTarget !== undefined) setNoiseTarget(s.noiseTarget);
+        if (s.asciiEnabled !== undefined) setAsciiEnabled(s.asciiEnabled);
+        if (s.asciiPattern !== undefined) setAsciiPattern(s.asciiPattern);
+        if (s.asciiSize !== undefined) setAsciiSize(s.asciiSize);
+        if (s.asciiOpacity !== undefined) setAsciiOpacity(s.asciiOpacity);
+        if (s.asciiTarget !== undefined) setAsciiTarget(s.asciiTarget);
+        if (s.asciiColor !== undefined) setAsciiColor(s.asciiColor);
         if (s.bgBlur !== undefined) setBgBlur(s.bgBlur);
         if (s.imageBlur !== undefined) setImageBlur(s.imageBlur);
         if (s.watermark !== undefined) setWatermark(s.watermark);
@@ -954,6 +1037,12 @@ export default function StudioPage() {
           noiseIntensity,
           grainIntensity,
           noiseTarget,
+          asciiEnabled,
+          asciiPattern,
+          asciiSize,
+          asciiOpacity,
+          asciiTarget,
+          asciiColor,
           bgBlur,
           imageBlur,
           watermark,
@@ -1014,6 +1103,12 @@ export default function StudioPage() {
     noiseIntensity,
     grainIntensity,
     noiseTarget,
+    asciiEnabled,
+    asciiPattern,
+    asciiSize,
+    asciiOpacity,
+    asciiTarget,
+    asciiColor,
     bgBlur,
     imageBlur,
     watermark,
@@ -1087,6 +1182,12 @@ export default function StudioPage() {
         noiseIntensity,
         grainIntensity,
         noiseTarget,
+        asciiEnabled,
+        asciiPattern,
+        asciiSize,
+        asciiOpacity,
+        asciiTarget,
+        asciiColor,
         watermark,
         watermarkPlatform,
         watermarkPosition,
@@ -1152,6 +1253,12 @@ export default function StudioPage() {
     setNoiseIntensity(config.noiseIntensity ?? 0);
     setGrainIntensity(config.grainIntensity ?? 0);
     if (config.noiseTarget) setNoiseTarget(config.noiseTarget);
+    setAsciiEnabled(config.asciiEnabled ?? false);
+    if (config.asciiPattern) setAsciiPattern(config.asciiPattern);
+    setAsciiSize(config.asciiSize ?? 16);
+    setAsciiOpacity(config.asciiOpacity ?? 25);
+    if (config.asciiTarget) setAsciiTarget(config.asciiTarget);
+    if (config.asciiColor) setAsciiColor(config.asciiColor);
     if (config.watermark !== undefined) setWatermark(config.watermark);
     if (config.watermarkPlatform) setWatermarkPlatform(config.watermarkPlatform);
     if (config.watermarkPosition) setWatermarkPosition(config.watermarkPosition);
@@ -1224,7 +1331,21 @@ export default function StudioPage() {
     ctx.putImageData(imageData, 0, 0);
     setNoiseTexture(c.toDataURL('image/png'));
   }, []);
-  
+
+  // ASCII Art generator — builds a single tiled SVG of the chosen character, repeated via CSS
+  const asciiTexture = reactUseMemo(() => {
+    if (typeof document === 'undefined' || !asciiEnabled) return '';
+    const pattern = ASCII_PATTERNS.find(p => p.id === asciiPattern) || ASCII_PATTERNS[0];
+    const char = pattern.char;
+    const tile = asciiSize;
+    const escapeXml = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${tile}" height="${tile}" viewBox="0 0 ${tile} ${tile}">` +
+      `<text x="${tile / 2}" y="${tile / 2}" font-family="monospace" font-size="${Math.max(4, tile - 2)}" fill="${asciiColor}" text-anchor="middle" dominant-baseline="central">${escapeXml(char)}</text>` +
+      `</svg>`;
+    return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+  }, [asciiEnabled, asciiPattern, asciiSize, asciiColor]);
+
   const canvasRef = useRef<HTMLDivElement>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
 
@@ -2365,12 +2486,61 @@ export default function StudioPage() {
                   </div>
 
                   {/* Drop Shadow */}
-                  <div>
-                    <div className="flex items-center justify-between text-xs mb-2">
+                  <div className="flex flex-col gap-3 p-3 rounded-xl bg-white/[0.015] border border-white/[0.04]">
+                    <div className="flex items-center justify-between text-xs">
                       <label className="text-zinc-300 font-medium">Drop Shadow</label>
-                      <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{shadow}px</span>
+                      <button
+                        onClick={() => { setShadow(0); setShadowBlur(0); setShadowOpacity(0); setShadowOffsetX(0); setShadowOffsetY(0); }}
+                        className="text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors uppercase tracking-wider"
+                      >
+                        Reset
+                      </button>
                     </div>
-                    <Slider min={0} max={60} step={1} value={[shadow]} onValueChange={(v) => setShadow(Array.isArray(v) ? v[0] : v as number)} />
+
+                    {/* Distance */}
+                    <div>
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <span className="text-zinc-400">Distance</span>
+                        <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{shadow}px</span>
+                      </div>
+                      <Slider min={0} max={80} step={1} value={[shadow]} onValueChange={(v) => setShadow(Array.isArray(v) ? v[0] : v as number)} />
+                    </div>
+
+                    {/* Blur */}
+                    <div>
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <span className="text-zinc-400">Blur</span>
+                        <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{shadowBlur}px</span>
+                      </div>
+                      <Slider min={0} max={150} step={1} value={[shadowBlur]} onValueChange={(v) => setShadowBlur(Array.isArray(v) ? v[0] : v as number)} />
+                    </div>
+
+                    {/* Opacity */}
+                    <div>
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <span className="text-zinc-400">Opacity</span>
+                        <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{shadowOpacity}%</span>
+                      </div>
+                      <Slider min={0} max={100} step={1} value={[shadowOpacity]} onValueChange={(v) => setShadowOpacity(Array.isArray(v) ? v[0] : v as number)} />
+                    </div>
+
+                    {/* Offset X */}
+                    <div>
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <span className="text-zinc-400">Offset X</span>
+                        <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{shadowOffsetX}px</span>
+                      </div>
+                      <Slider min={-80} max={80} step={1} value={[shadowOffsetX]} onValueChange={(v) => setShadowOffsetX(Array.isArray(v) ? v[0] : v as number)} />
+                    </div>
+
+                    {/* Offset Y */}
+                    <div>
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <span className="text-zinc-400">Offset Y</span>
+                        <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{shadowOffsetY}px</span>
+                      </div>
+                      <Slider min={-80} max={80} step={1} value={[shadowOffsetY]} onValueChange={(v) => setShadowOffsetY(Array.isArray(v) ? v[0] : v as number)} />
+                    </div>
                   </div>
                 </div>
               )}
@@ -2700,19 +2870,29 @@ export default function StudioPage() {
                     {MACOS_BACKGROUNDS.map((bg, idx) => {
                       const bgUrl = `url("${bg.url}")`;
                       const isSelected = background === bgUrl;
+                      // Use the tiny thumbnail for the grid preview; the full-res
+                      // image is only applied to the canvas via setBackground(bgUrl).
+                      const thumbUrl = bg.url.replace('/wallpapers/', '/wallpapers/thumbs/');
                       return (
                         <button 
                           key={idx} 
                           title={bg.name}
                           aria-label={`Select wallpaper ${bg.name}`}
-                          className={`aspect-square rounded-md transition-all duration-150 active:scale-95 border relative overflow-hidden ${
+                          className={`aspect-square rounded-md transition-all duration-150 active:scale-95 border relative overflow-hidden bg-white/[0.02] ${
                             isSelected 
                               ? 'border-white ring-2 ring-white/20 shadow-md scale-105' 
                               : 'border-white/[0.06] hover:border-white/30 hover:scale-105'
                           }`}
-                          style={{ background: bgUrl, backgroundSize: 'cover', backgroundPosition: 'center' }}
                           onClick={() => setBackground(bgUrl)}
-                        />
+                        >
+                          <img
+                            src={thumbUrl}
+                            alt={bg.name}
+                            loading="lazy"
+                            decoding="async"
+                            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                          />
+                        </button>
                       );
                     })}
                   </div>
@@ -2727,6 +2907,53 @@ export default function StudioPage() {
                       }
                     }} />
                   </label>
+                </div>
+              )}
+            </div>
+
+            {/* Section 2.5: Raycast Wallpapers */}
+            <div className="flex flex-col gap-1.5">
+              <button
+                onClick={() => toggleSection('raycast')}
+                className="flex items-center justify-between w-full h-[26px] min-h-[26px] px-0.5 text-[11px] font-semibold text-zinc-400 hover:text-white uppercase tracking-wider transition-colors group cursor-pointer leading-none"
+              >
+                <div className="flex items-center gap-1.5">
+                  <ChevronDown size={13} className={`shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-transform duration-200 ${expandedSections.raycast ? 'rotate-0' : '-rotate-90'}`} />
+                  <span className="leading-none">Raycast Wallpapers</span>
+                </div>
+                <span className="text-[10px] text-zinc-500 font-mono tabular-nums leading-none">{RAYCAST_BACKGROUNDS.length} Presets</span>
+              </button>
+
+              {expandedSections.raycast && (
+                <div className="p-2.5 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-2.5 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <div className="grid grid-cols-6 gap-2">
+                    {RAYCAST_BACKGROUNDS.map((bg, idx) => {
+                      const bgUrl = `url("${bg.url}")`;
+                      const isSelected = background === bgUrl;
+                      const thumbUrl = bg.url.replace('/wallpapers/', '/wallpapers/thumbs/');
+                      return (
+                        <button
+                          key={idx}
+                          title={bg.name}
+                          aria-label={`Select Raycast wallpaper ${bg.name}`}
+                          className={`aspect-square rounded-md transition-all duration-150 active:scale-95 border relative overflow-hidden bg-white/[0.02] ${
+                            isSelected
+                              ? 'border-white ring-2 ring-white/20 shadow-md scale-105'
+                              : 'border-white/[0.06] hover:border-white/30 hover:scale-105'
+                          }`}
+                          onClick={() => setBackground(bgUrl)}
+                        >
+                          <img
+                            src={thumbUrl}
+                            alt={bg.name}
+                            loading="lazy"
+                            decoding="async"
+                            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>
@@ -2883,6 +3110,121 @@ export default function StudioPage() {
                       ))}
                     </div>
                   </div>
+                </div>
+              )}
+            </div>
+
+            {/* Section 1.5: ASCII Art Overlay */}
+            <div className="flex flex-col gap-1.5">
+              <button
+                onClick={() => toggleSection('asciiArt')}
+                className="flex items-center justify-between w-full h-[26px] min-h-[26px] px-0.5 text-[11px] font-semibold text-zinc-400 hover:text-white uppercase tracking-wider transition-colors group cursor-pointer leading-none"
+              >
+                <div className="flex items-center gap-1.5">
+                  <ChevronDown size={13} className={`shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-transform duration-200 ${expandedSections.asciiArt ? 'rotate-0' : '-rotate-90'}`} />
+                  <span className="leading-none">ASCII Art Overlay</span>
+                </div>
+                <span className="text-[10px] text-zinc-500 font-mono tabular-nums leading-none">
+                  {asciiEnabled ? `${asciiOpacity}%` : 'Off'}
+                </span>
+              </button>
+
+              {expandedSections.asciiArt && (
+                <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-3 animate-in fade-in slide-in-from-top-1 duration-150">
+                  {/* Enable Toggle */}
+                  <div className="flex items-center justify-between py-0.5">
+                    <label className="text-zinc-300 font-medium text-xs cursor-pointer">Enable ASCII Pattern</label>
+                    <Checkbox checked={asciiEnabled} onCheckedChange={(c) => setAsciiEnabled(c as boolean)} />
+                  </div>
+
+                  {asciiEnabled && (
+                    <>
+                      {/* Pattern Grid */}
+                      <div>
+                        <label className="text-[11px] text-zinc-400 block mb-2 font-medium">Pattern</label>
+                        <div className="grid grid-cols-5 gap-1.5">
+                          {ASCII_PATTERNS.map((p) => {
+                            const isSelected = asciiPattern === p.id;
+                            return (
+                              <button
+                                key={p.id}
+                                onClick={() => setAsciiPattern(p.id)}
+                                title={p.name}
+                                aria-label={`Select ASCII pattern ${p.name}`}
+                                className={`aspect-square rounded-md border flex items-center justify-center transition-all duration-150 active:scale-95 ${
+                                  isSelected
+                                    ? 'border-white ring-1 ring-white/30 shadow-md bg-white/[0.06]'
+                                    : 'border-white/[0.06] hover:border-white/30 bg-white/[0.02]'
+                                }`}
+                              >
+                                <span className={`font-mono leading-none ${isSelected ? 'text-white' : 'text-zinc-400'}`} style={{ fontSize: '14px' }}>{p.char}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Pattern Size */}
+                      <div>
+                        <div className="flex items-center justify-between text-xs mb-2">
+                          <label className="text-zinc-300 font-medium">Pattern Size</label>
+                          <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{asciiSize}px</span>
+                        </div>
+                        <Slider min={6} max={48} step={1} value={[asciiSize]} onValueChange={(v) => setAsciiSize(Array.isArray(v) ? v[0] : v as number)} />
+                      </div>
+
+                      {/* Opacity */}
+                      <div>
+                        <div className="flex items-center justify-between text-xs mb-2">
+                          <label className="text-zinc-300 font-medium">Opacity</label>
+                          <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{asciiOpacity}%</span>
+                        </div>
+                        <Slider min={0} max={100} step={1} value={[asciiOpacity]} onValueChange={(v) => setAsciiOpacity(Array.isArray(v) ? v[0] : v as number)} />
+                      </div>
+
+                      {/* Application Layer */}
+                      <div>
+                        <label className="text-[11px] text-zinc-400 block mb-2 font-medium">Application Layer</label>
+                        <div className="relative grid grid-cols-3 gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/[0.04] isolate">
+                          {(() => {
+                            const targets = ['canvas', 'image', 'both'];
+                            const idx = targets.indexOf(asciiTarget);
+                            return (
+                              <div
+                                className="absolute top-1 bottom-1 w-[calc((100%-16px)/3)] bg-white/10 border border-white/20 rounded-md shadow-sm ring-1 ring-white/10 transition-transform duration-250 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none -z-10"
+                                style={{
+                                  transform: `translateX(calc(${idx * 100}% + ${idx * 4}px))`,
+                                  left: '4px'
+                                }}
+                              />
+                            );
+                          })()}
+                          {['canvas', 'image', 'both'].map((t) => (
+                            <button
+                              key={t}
+                              onClick={() => setAsciiTarget(t)}
+                              className={`py-1 text-[11px] font-medium capitalize rounded-md transition-colors duration-200 active:scale-95 text-center cursor-pointer ${
+                                asciiTarget === t
+                                  ? 'text-white font-semibold'
+                                  : 'text-zinc-400 hover:text-zinc-200'
+                              }`}
+                            >
+                              {t}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Color */}
+                      <div className="flex items-center justify-between gap-2.5">
+                        <label className="text-xs text-zinc-300 font-medium">Pattern Color</label>
+                        <label className="w-8 h-8 rounded-lg border border-white/10 cursor-pointer relative overflow-hidden flex items-center justify-center hover:border-white/30 transition-colors" title="Pick ASCII color">
+                          <span className="w-full h-full block" style={{ background: asciiColor }} />
+                          <input type="color" aria-label="Pick ASCII pattern color" className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" value={asciiColor} onChange={(e) => setAsciiColor(e.target.value)} />
+                        </label>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -3431,7 +3773,7 @@ export default function StudioPage() {
             <div className="absolute inset-0 flex items-center justify-center pointer-events-auto" data-workspace-bg="true">
               <div 
                 ref={canvasRef}
-                className={`relative flex items-center justify-center shadow-2xl shrink-0 overflow-hidden ${isPanningWorkspace ? 'cursor-grabbing' : 'cursor-grab'}`}
+                className={`relative flex items-center justify-center shrink-0 ${isPanningWorkspace ? 'cursor-grabbing' : 'cursor-grab'}`}
                 onClick={(e) => {
                   const isInsideScreenshotFrame = pointerDownTargetRef.current && imageFrameRef.current?.contains(pointerDownTargetRef.current);
                   if (!isInsideScreenshotFrame) {
@@ -3441,7 +3783,7 @@ export default function StudioPage() {
                 }}
             style={{
               aspectRatio: aspectStyle,
-              ...canvasDimensions
+              ...canvasDimensions,
             }}
           >
             {/* Background Layer (Strictly Clipped, 0 padding) */}
@@ -3479,6 +3821,16 @@ export default function StudioPage() {
                   )}
                 </div>
               )}
+
+              {/* ASCII Art Overlay Layer (Canvas) */}
+              {asciiEnabled && (asciiTarget === 'canvas' || asciiTarget === 'both') && asciiTexture && (
+                <div className="absolute inset-0 pointer-events-none z-10" style={{
+                  backgroundImage: asciiTexture,
+                  backgroundRepeat: 'repeat',
+                  opacity: asciiOpacity / 100,
+                  mixBlendMode: 'overlay',
+                }} />
+              )}
             </div>
 
             {/* 1. Clipped Image Content Container (Applies padding exclusively to content) */}
@@ -3500,15 +3852,15 @@ export default function StudioPage() {
                   style={image ? {
                     ...screenshotCardDimensions,
                     borderRadius: `${radius}px`,
-                    boxShadow: activePerspectiveTransform 
-                      ? `20px 20px ${shadow * 3}px rgba(0,0,0,0.45)` 
-                      : `0 ${shadow}px ${shadow * 2}px rgba(0,0,0,0.35)`,
+                    boxShadow: shadow > 0
+                      ? (activePerspectiveTransform
+                          ? `${shadowOffsetX + shadow * 0.6}px ${shadowOffsetY + shadow * 0.8}px ${shadowBlur}px ${shadow * 0.4}px rgba(0,0,0,${shadowOpacity / 100})`
+                          : `${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px ${shadow * 0.4}px rgba(0,0,0,${shadowOpacity / 100})`)
+                      : 'none',
                     border: glassBorder ? `1px solid rgba(${glassRgb}, ${glassBorderOpacity / 100})` : 'none',
                     background: glassBorder ? `rgba(${glassRgb}, ${(glassBorderOpacity / 100) * 0.25})` : 'transparent',
                     backdropFilter: glassBorder && glassBorderBlur > 0 ? `blur(${glassBorderBlur}px)` : 'none',
                     WebkitBackdropFilter: glassBorder && glassBorderBlur > 0 ? `blur(${glassBorderBlur}px)` : 'none',
-                    clipPath: glassBorder ? `inset(0 round ${radius}px)` : undefined,
-                    WebkitClipPath: glassBorder ? `inset(0 round ${radius}px)` : undefined,
                     padding: glassBorder ? `${glassBorderWidth}px` : '0',
                     isolation: 'isolate',
                   } : {}}
@@ -3537,6 +3889,16 @@ export default function StudioPage() {
                           }} />
                         )}
                       </div>
+                    )}
+
+                    {/* ASCII Art Overlay Layer (Image) */}
+                    {image && asciiEnabled && (asciiTarget === 'image' || asciiTarget === 'both') && asciiTexture && (
+                      <div className="absolute inset-0 pointer-events-none z-20" style={{
+                        backgroundImage: asciiTexture,
+                        backgroundRepeat: 'repeat',
+                        opacity: asciiOpacity / 100,
+                        mixBlendMode: 'overlay',
+                      }} />
                     )}
 
                     {image && showMacOsBar && (
