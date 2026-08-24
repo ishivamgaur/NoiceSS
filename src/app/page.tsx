@@ -1914,28 +1914,44 @@ export default function StudioPage() {
             });
           }
           // Fix html-to-image backdrop-filter bleed bug by forcing overflow clipping during export
-          // We wrap the card in a new div to hold the box-shadow, so overflow: hidden doesn't cut the shadow off.
           const card = clonedDoc.querySelector<HTMLElement>('[data-screenshot-card]');
           if (card) {
             const currentShadow = card.style.boxShadow;
             if (currentShadow && currentShadow !== 'none') {
-              const wrapper = clonedDoc.createElement('div');
-              wrapper.style.boxShadow = currentShadow;
-              wrapper.style.borderRadius = card.style.borderRadius;
-              wrapper.style.display = 'flex';
-              wrapper.style.width = card.style.width || (card.classList.contains('w-full') ? '100%' : 'auto');
-              wrapper.style.height = card.style.height || (card.classList.contains('h-full') ? '100%' : 'auto');
+              const shadowWrapper = clonedDoc.createElement('div');
+              shadowWrapper.style.boxShadow = currentShadow;
+              shadowWrapper.style.borderRadius = card.style.borderRadius;
+              shadowWrapper.style.display = 'flex';
+              shadowWrapper.style.width = card.style.width || (card.classList.contains('w-full') ? '100%' : 'auto');
+              shadowWrapper.style.height = card.style.height || (card.classList.contains('h-full') ? '100%' : 'auto');
+              shadowWrapper.style.transform = card.style.transform;
+
+              const clipWrapper = clonedDoc.createElement('div');
+              clipWrapper.style.overflow = 'hidden';
+              clipWrapper.style.borderRadius = card.style.borderRadius;
+              clipWrapper.style.width = '100%';
+              clipWrapper.style.height = '100%';
+              clipWrapper.style.display = 'flex';
+
               if (card.parentNode) {
-                card.parentNode.insertBefore(wrapper, card);
-                wrapper.appendChild(card);
+                card.parentNode.insertBefore(shadowWrapper, card);
+                clipWrapper.appendChild(card);
+                shadowWrapper.appendChild(clipWrapper);
               }
               card.style.boxShadow = 'none';
+              card.style.transform = 'none';
+            } else {
+               const clipWrapper = clonedDoc.createElement('div');
+               clipWrapper.style.overflow = 'hidden';
+               clipWrapper.style.borderRadius = card.style.borderRadius;
+               clipWrapper.style.width = card.style.width || (card.classList.contains('w-full') ? '100%' : 'auto');
+               clipWrapper.style.height = card.style.height || (card.classList.contains('h-full') ? '100%' : 'auto');
+               clipWrapper.style.display = 'flex';
+               if (card.parentNode) {
+                 card.parentNode.insertBefore(clipWrapper, card);
+                 clipWrapper.appendChild(card);
+               }
             }
-            card.style.overflow = 'hidden';
-            // Force a hard SVG clip path during export to guarantee the blur cannot escape the border radius
-            const radius = card.style.borderRadius || '0px';
-            card.style.clipPath = `inset(0px round ${radius})`;
-            card.style.WebkitClipPath = `inset(0px round ${radius})`;
           }
         },
       };
@@ -2029,22 +2045,40 @@ export default function StudioPage() {
           if (card) {
             const currentShadow = card.style.boxShadow;
             if (currentShadow && currentShadow !== 'none') {
-              const wrapper = clonedDoc.createElement('div');
-              wrapper.style.boxShadow = currentShadow;
-              wrapper.style.borderRadius = card.style.borderRadius;
-              wrapper.style.display = 'flex';
-              wrapper.style.width = card.style.width || (card.classList.contains('w-full') ? '100%' : 'auto');
-              wrapper.style.height = card.style.height || (card.classList.contains('h-full') ? '100%' : 'auto');
+              const shadowWrapper = clonedDoc.createElement('div');
+              shadowWrapper.style.boxShadow = currentShadow;
+              shadowWrapper.style.borderRadius = card.style.borderRadius;
+              shadowWrapper.style.display = 'flex';
+              shadowWrapper.style.width = card.style.width || (card.classList.contains('w-full') ? '100%' : 'auto');
+              shadowWrapper.style.height = card.style.height || (card.classList.contains('h-full') ? '100%' : 'auto');
+              shadowWrapper.style.transform = card.style.transform;
+
+              const clipWrapper = clonedDoc.createElement('div');
+              clipWrapper.style.overflow = 'hidden';
+              clipWrapper.style.borderRadius = card.style.borderRadius;
+              clipWrapper.style.width = '100%';
+              clipWrapper.style.height = '100%';
+              clipWrapper.style.display = 'flex';
+
               if (card.parentNode) {
-                card.parentNode.insertBefore(wrapper, card);
-                wrapper.appendChild(card);
+                card.parentNode.insertBefore(shadowWrapper, card);
+                clipWrapper.appendChild(card);
+                shadowWrapper.appendChild(clipWrapper);
               }
               card.style.boxShadow = 'none';
+              card.style.transform = 'none';
+            } else {
+               const clipWrapper = clonedDoc.createElement('div');
+               clipWrapper.style.overflow = 'hidden';
+               clipWrapper.style.borderRadius = card.style.borderRadius;
+               clipWrapper.style.width = card.style.width || (card.classList.contains('w-full') ? '100%' : 'auto');
+               clipWrapper.style.height = card.style.height || (card.classList.contains('h-full') ? '100%' : 'auto');
+               clipWrapper.style.display = 'flex';
+               if (card.parentNode) {
+                 card.parentNode.insertBefore(clipWrapper, card);
+                 clipWrapper.appendChild(card);
+               }
             }
-            card.style.overflow = 'hidden';
-            const radius = card.style.borderRadius || '0px';
-            card.style.clipPath = `inset(0px round ${radius})`;
-            card.style.WebkitClipPath = `inset(0px round ${radius})`;
           }
         },
       });
@@ -3943,8 +3977,8 @@ export default function StudioPage() {
                   onPointerUp={image ? handlePointerUp : undefined}
                   data-screenshot-card="true"
                 >
-                  {/* Clipped screenshot content */}
-                  <div className={`relative flex flex-col items-center overflow-hidden max-w-full max-h-full ${!image ? 'w-full h-full' : ''} ${image ? 'w-full h-full' : ''}`} style={{ borderRadius: `${Math.max(0, radius - (glassBorder ? glassBorderWidth + 1 : 0))}px` }}>
+                    {/* Clipped screenshot content */}
+                    <div className={`relative flex flex-col items-center overflow-hidden max-w-full max-h-full ${!image ? 'w-full h-full' : ''} ${image ? 'w-full h-full' : ''}`} style={{ borderRadius: `${Math.max(0, radius - (glassBorder ? glassBorderWidth + 1 : 0))}px` }}>
                     {/* Image Noise & Grain Layer */}
                     {image && (noiseIntensity > 0 || grainIntensity > 0) && (noiseTarget === 'image' || noiseTarget === 'both') && (
                       <div className="absolute inset-0 pointer-events-none mix-blend-overlay z-20">
