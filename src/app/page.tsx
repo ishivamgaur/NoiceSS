@@ -592,14 +592,14 @@ export default function StudioPage() {
   const [imageSelected, setImageSelected] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [rotation, setRotation] = useState(0);
-  const [padding, setPadding] = useState(64);
+  const padding = 0;
   const [radius, setRadius] = useState(16);
   const [shadow, setShadow] = useState(25);
   const [shadowBlur, setShadowBlur] = useState(45);
   const [shadowOpacity, setShadowOpacity] = useState(35);
   const [shadowOffsetX, setShadowOffsetX] = useState(0);
   const [shadowOffsetY, setShadowOffsetY] = useState(0);
-  const [scale, setScale] = useState(100);
+  const [scale, setScale] = useState(80);
   const [aspectRatio, setAspectRatio] = useState('auto');
   const [customRatioW, setCustomRatioW] = useState<number | string>(16);
   const [customRatioH, setCustomRatioH] = useState<number | string>(9);
@@ -731,14 +731,14 @@ export default function StudioPage() {
   const historyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentConfigSnapshot = React.useMemo(() => ({
-    background, padding, radius, shadow, bgBlur, aspectRatio, customRatioW, customRatioH,
+    background, radius, shadow, bgBlur, aspectRatio, customRatioW, customRatioH,
     showMacOsBar, showBrowserBar, browserUrl, view, glassBorder, glassBorderWidth, glassBorderOpacity, glassBorderBlur, glassBorderColor,
     perspective, rotateX, rotateY, rotateZ, perspectiveDepth, brightness, contrast, saturation, hueRotate, filter,
     noiseIntensity, grainIntensity, noiseTarget, watermark, watermarkPlatform, watermarkPosition, watermarkTarget,
     watermarkOpacity, watermarkBlur, watermarkGlass, watermarkBorderWidth, watermarkBorderOpacity, watermarkOffsetX,
     watermarkOffsetY, watermarkScale, pos, rotation, scale, imageBlur, image, imageDimensions
   }), [
-    background, padding, radius, shadow, bgBlur, aspectRatio, customRatioW, customRatioH,
+    background, radius, shadow, bgBlur, aspectRatio, customRatioW, customRatioH,
     showMacOsBar, showBrowserBar, browserUrl, view, glassBorder, glassBorderWidth, glassBorderOpacity, glassBorderBlur, glassBorderColor,
     perspective, rotateX, rotateY, rotateZ, perspectiveDepth, brightness, contrast, saturation, hueRotate, filter,
     noiseIntensity, grainIntensity, noiseTarget, watermark, watermarkPlatform, watermarkPosition, watermarkTarget,
@@ -925,7 +925,6 @@ export default function StudioPage() {
           }
           setBackground(bg);
         }
-        if (s.padding !== undefined) setPadding(s.padding);
         if (s.radius !== undefined) setRadius(s.radius);
         if (s.shadow !== undefined) setShadow(s.shadow);
         if (s.shadowBlur !== undefined) setShadowBlur(s.shadowBlur);
@@ -1219,7 +1218,6 @@ export default function StudioPage() {
   const handleApplyPreset = (config: any) => {
     if (!config) return;
     if (config.background) setBackground(config.background);
-    setPadding(config.padding ?? 64);
     setRadius(config.radius ?? 16);
     setShadow(config.shadow ?? 30);
     setBgBlur(config.bgBlur ?? 0);
@@ -1831,7 +1829,7 @@ export default function StudioPage() {
     img.onload = () => {
       setImageDimensions({ w: img.width, h: img.height });
       setImage(url);
-      setScale(100);
+      setScale(80);
       setPos({ x: 0, y: 0 });
       setAspectRatio('auto');
     };
@@ -1890,70 +1888,17 @@ export default function StudioPage() {
       const { toPng, toJpeg, toBlob } = await import('html-to-image');
       let dataUrl = '';
       
-      // Calculate the optimal multiplier to preserve original image quality without loss
       let optimalMultiplier = multiplier;
       if (image && imageDimensions && imageDimensions.w) {
-        // The image is rendered at a base width of 800px on the canvas.
-        // We find the scale factor needed to make it match the original native resolution.
         const neededRatio = imageDimensions.w / 800;
-        // Cap at 6x to prevent memory crashes on ridiculously large images
         optimalMultiplier = Math.min(Math.max(multiplier, neededRatio), 6);
       }
 
       const options = {
         cacheBust: true,
         pixelRatio: optimalMultiplier,
-        quality: 1.0, // Maximum quality
+        quality: 1.0,
         filter: filterExportNodes,
-        // Re-apply ASCII data-URL backgrounds to the cloned DOM so html-to-image captures them
-        onclone: (clonedDoc: Document) => {
-          if (asciiTextureRaw && asciiEnabled) {
-            const asciiDivs = clonedDoc.querySelectorAll<HTMLElement>('[data-ascii-layer]');
-            asciiDivs.forEach((div) => {
-              div.style.backgroundImage = `url("${asciiTextureRaw}")`;
-            });
-          }
-          // Fix html-to-image backdrop-filter bleed bug by forcing overflow clipping during export
-          const card = clonedDoc.querySelector<HTMLElement>('[data-screenshot-card]');
-          if (card) {
-            const currentShadow = card.style.boxShadow;
-            if (currentShadow && currentShadow !== 'none') {
-              const shadowWrapper = clonedDoc.createElement('div');
-              shadowWrapper.style.boxShadow = currentShadow;
-              shadowWrapper.style.borderRadius = card.style.borderRadius;
-              shadowWrapper.style.display = 'flex';
-              shadowWrapper.style.width = card.style.width || (card.classList.contains('w-full') ? '100%' : 'auto');
-              shadowWrapper.style.height = card.style.height || (card.classList.contains('h-full') ? '100%' : 'auto');
-              shadowWrapper.style.transform = card.style.transform;
-
-              const clipWrapper = clonedDoc.createElement('div');
-              clipWrapper.style.overflow = 'hidden';
-              clipWrapper.style.borderRadius = card.style.borderRadius;
-              clipWrapper.style.width = '100%';
-              clipWrapper.style.height = '100%';
-              clipWrapper.style.display = 'flex';
-
-              if (card.parentNode) {
-                card.parentNode.insertBefore(shadowWrapper, card);
-                clipWrapper.appendChild(card);
-                shadowWrapper.appendChild(clipWrapper);
-              }
-              card.style.boxShadow = 'none';
-              card.style.transform = 'none';
-            } else {
-               const clipWrapper = clonedDoc.createElement('div');
-               clipWrapper.style.overflow = 'hidden';
-               clipWrapper.style.borderRadius = card.style.borderRadius;
-               clipWrapper.style.width = card.style.width || (card.classList.contains('w-full') ? '100%' : 'auto');
-               clipWrapper.style.height = card.style.height || (card.classList.contains('h-full') ? '100%' : 'auto');
-               clipWrapper.style.display = 'flex';
-               if (card.parentNode) {
-                 card.parentNode.insertBefore(clipWrapper, card);
-                 clipWrapper.appendChild(card);
-               }
-            }
-          }
-        },
       };
       if (format === 'jpeg') {
         dataUrl = await toJpeg(canvasRef.current, options);
@@ -2023,64 +1968,16 @@ export default function StudioPage() {
     try {
       const { toBlob } = await import('html-to-image');
       
-      let optimalMultiplier = 3; // Enforce minimum 3x resolution for crisp clipboard copies
+      let optimalMultiplier = 3; 
       if (image && imageDimensions && imageDimensions.w) {
         const neededRatio = imageDimensions.w / 800;
         optimalMultiplier = Math.min(Math.max(3, neededRatio), 6);
       }
 
       const blob = await toBlob(canvasRef.current, { 
-        pixelRatio: optimalMultiplier, 
+        pixelRatio: optimalMultiplier,
         cacheBust: true,
         filter: filterExportNodes,
-        onclone: (clonedDoc: Document) => {
-          if (asciiTextureRaw && asciiEnabled) {
-            const asciiDivs = clonedDoc.querySelectorAll<HTMLElement>('[data-ascii-layer]');
-            asciiDivs.forEach((div) => {
-              div.style.backgroundImage = `url("${asciiTextureRaw}")`;
-            });
-          }
-          // Fix html-to-image backdrop-filter bleed bug by forcing overflow clipping during export
-          const card = clonedDoc.querySelector<HTMLElement>('[data-screenshot-card]');
-          if (card) {
-            const currentShadow = card.style.boxShadow;
-            if (currentShadow && currentShadow !== 'none') {
-              const shadowWrapper = clonedDoc.createElement('div');
-              shadowWrapper.style.boxShadow = currentShadow;
-              shadowWrapper.style.borderRadius = card.style.borderRadius;
-              shadowWrapper.style.display = 'flex';
-              shadowWrapper.style.width = card.style.width || (card.classList.contains('w-full') ? '100%' : 'auto');
-              shadowWrapper.style.height = card.style.height || (card.classList.contains('h-full') ? '100%' : 'auto');
-              shadowWrapper.style.transform = card.style.transform;
-
-              const clipWrapper = clonedDoc.createElement('div');
-              clipWrapper.style.overflow = 'hidden';
-              clipWrapper.style.borderRadius = card.style.borderRadius;
-              clipWrapper.style.width = '100%';
-              clipWrapper.style.height = '100%';
-              clipWrapper.style.display = 'flex';
-
-              if (card.parentNode) {
-                card.parentNode.insertBefore(shadowWrapper, card);
-                clipWrapper.appendChild(card);
-                shadowWrapper.appendChild(clipWrapper);
-              }
-              card.style.boxShadow = 'none';
-              card.style.transform = 'none';
-            } else {
-               const clipWrapper = clonedDoc.createElement('div');
-               clipWrapper.style.overflow = 'hidden';
-               clipWrapper.style.borderRadius = card.style.borderRadius;
-               clipWrapper.style.width = card.style.width || (card.classList.contains('w-full') ? '100%' : 'auto');
-               clipWrapper.style.height = card.style.height || (card.classList.contains('h-full') ? '100%' : 'auto');
-               clipWrapper.style.display = 'flex';
-               if (card.parentNode) {
-                 card.parentNode.insertBefore(clipWrapper, card);
-                 clipWrapper.appendChild(card);
-               }
-            }
-          }
-        },
       });
       if (blob && navigator.clipboard && window.ClipboardItem) {
         await navigator.clipboard.write([
@@ -2434,15 +2331,6 @@ export default function StudioPage() {
               
               {expandedSections.canvasSetup && (
                 <div className="p-3 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-3 animate-in fade-in slide-in-from-top-1 duration-150">
-                  {/* Padding */}
-                  <div>
-                    <div className="flex items-center justify-between text-xs mb-2">
-                      <label className="text-zinc-300 font-medium">Padding</label>
-                      <span className="text-zinc-400 font-mono tabular-nums text-[11px] bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/[0.03]">{padding}px</span>
-                    </div>
-                    <Slider min={0} max={120} step={1} value={[padding]} onValueChange={(v) => setPadding(Array.isArray(v) ? v[0] : v as number)} />
-                  </div>
-                  
                   {/* Image Scale */}
                   <div>
                     <div className="flex items-center justify-between text-xs mb-2">
@@ -3566,7 +3454,7 @@ export default function StudioPage() {
                             onClick={() => {
                               setAspectRatio('custom');
                               setShowRatioMenu(false);
-                              setScale(100);
+                              setScale(80);
                               setPos({ x: 0, y: 0 });
                             }}
                             className="px-3 h-7 rounded-md bg-white hover:bg-zinc-200 text-black text-xs font-semibold shadow-sm transition-colors shrink-0 active:scale-95"
@@ -3593,7 +3481,7 @@ export default function StudioPage() {
                                       onClick={() => { 
                                         setAspectRatio(r.id); 
                                         setShowRatioMenu(false); 
-                                        setScale(100);
+                                        setScale(80);
                                         setPos({ x: 0, y: 0 });
                                       }}
                                       className={`flex flex-col items-center justify-center p-2 rounded-lg text-center transition-all duration-150 active:scale-95 border min-h-[58px] ${
@@ -3959,15 +3847,15 @@ export default function StudioPage() {
                   style={image ? {
                     ...screenshotCardDimensions,
                     borderRadius: `${radius}px`,
-                    boxShadow: shadow > 0
-                      ? (activePerspectiveTransform
-                          ? `${shadowOffsetX + shadow * 0.6}px ${shadowOffsetY + shadow * 0.8}px ${shadowBlur}px ${shadow * 0.4}px rgba(0,0,0,${shadowOpacity / 100})`
-                          : `${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px ${shadow * 0.4}px rgba(0,0,0,${shadowOpacity / 100})`)
-                      : 'none',
+                    boxShadow: activePerspectiveTransform 
+                      ? `20px 20px ${shadow * 3}px rgba(0,0,0,0.45)` 
+                      : `0 ${shadow}px ${shadow * 2}px rgba(0,0,0,0.35)`,
                     border: glassBorder ? `1px solid rgba(${glassRgb}, ${glassBorderOpacity / 100})` : 'none',
                     background: glassBorder ? `rgba(${glassRgb}, ${(glassBorderOpacity / 100) * 0.25})` : 'transparent',
                     backdropFilter: glassBorder && glassBorderBlur > 0 ? `blur(${glassBorderBlur}px)` : 'none',
                     WebkitBackdropFilter: glassBorder && glassBorderBlur > 0 ? `blur(${glassBorderBlur}px)` : 'none',
+                    clipPath: glassBorder ? `inset(0px round ${radius}px)` : undefined,
+                    WebkitClipPath: glassBorder ? `inset(0px round ${radius}px)` : undefined,
                     padding: glassBorder ? `${glassBorderWidth}px` : '0',
                     isolation: 'isolate',
                   } : {}}
@@ -4310,8 +4198,8 @@ export default function StudioPage() {
             </button>
             <button
               className="text-[10px] sm:text-xs font-mono tabular-nums font-semibold text-white/90 px-1.5 sm:px-2 py-1 mx-0.5 rounded-md bg-white/5 hover:text-white hover:bg-white/10 transition-colors"
-              title="Click to reset size (100%)"
-              onClick={() => setScale(100)}
+              title="Click to reset size (80%)"
+              onClick={() => setScale(80)}
             >
               {Math.round(scale)}%
             </button>
@@ -4380,7 +4268,7 @@ export default function StudioPage() {
             </button>
             <button
               className="text-[10px] sm:text-xs font-mono tabular-nums font-semibold text-white/90 px-1.5 sm:px-2 py-1 mx-0.5 rounded-md bg-white/5 hover:text-white hover:bg-white/10 transition-colors"
-              title="Click to reset size (100%)"
+              title="Click to reset size (80%)"
               onClick={() => setWatermarkScale(100)}
             >
               {Math.round(watermarkScale)}%
