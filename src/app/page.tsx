@@ -1332,19 +1332,28 @@ export default function StudioPage() {
     setNoiseTexture(c.toDataURL('image/png'));
   }, []);
 
-  // ASCII Art generator — builds a single tiled SVG of the chosen character, repeated via CSS
-  const asciiTexture = reactUseMemo(() => {
+  // ASCII Art generator — rasterizes the chosen character into a tiled PNG.
+  // Canvas-raster (not SVG-text) so the texture survives html-to-image export in all browsers.
+  // Returns the raw data URL (no CSS wrapper) so it can be used as an <img> src for export reliability
+  const asciiTextureRaw = reactUseMemo(() => {
     if (typeof document === 'undefined' || !asciiEnabled) return '';
     const pattern = ASCII_PATTERNS.find(p => p.id === asciiPattern) || ASCII_PATTERNS[0];
-    const char = pattern.char;
-    const tile = asciiSize;
-    const escapeXml = (s: string) =>
-      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${tile}" height="${tile}" viewBox="0 0 ${tile} ${tile}">` +
-      `<text x="${tile / 2}" y="${tile / 2}" font-family="monospace" font-size="${Math.max(4, tile - 2)}" fill="${asciiColor}" text-anchor="middle" dominant-baseline="central">${escapeXml(char)}</text>` +
-      `</svg>`;
-    return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+    const ss = 4;
+    const tile = Math.max(6, asciiSize);
+    const c = document.createElement('canvas');
+    c.width = tile * ss;
+    c.height = tile * ss;
+    const ctx = c.getContext('2d');
+    if (!ctx) return '';
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.fillStyle = asciiColor;
+    ctx.font = `${Math.max(4, tile - 2) * ss}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(pattern.char, c.width / 2, c.height / 2);
+    return c.toDataURL('image/png');
   }, [asciiEnabled, asciiPattern, asciiSize, asciiColor]);
+  const asciiTexture = asciiTextureRaw ? `url("${asciiTextureRaw}")` : '';
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
@@ -1896,6 +1905,39 @@ export default function StudioPage() {
         pixelRatio: optimalMultiplier,
         quality: 1.0, // Maximum quality
         filter: filterExportNodes,
+        // Re-apply ASCII data-URL backgrounds to the cloned DOM so html-to-image captures them
+        onclone: (clonedDoc: Document) => {
+          if (asciiTextureRaw && asciiEnabled) {
+            const asciiDivs = clonedDoc.querySelectorAll<HTMLElement>('[data-ascii-layer]');
+            asciiDivs.forEach((div) => {
+              div.style.backgroundImage = `url("${asciiTextureRaw}")`;
+            });
+          }
+          // Fix html-to-image backdrop-filter bleed bug by forcing overflow clipping during export
+          // We wrap the card in a new div to hold the box-shadow, so overflow: hidden doesn't cut the shadow off.
+          const card = clonedDoc.querySelector<HTMLElement>('[data-screenshot-card]');
+          if (card) {
+            const currentShadow = card.style.boxShadow;
+            if (currentShadow && currentShadow !== 'none') {
+              const wrapper = clonedDoc.createElement('div');
+              wrapper.style.boxShadow = currentShadow;
+              wrapper.style.borderRadius = card.style.borderRadius;
+              wrapper.style.display = 'flex';
+              wrapper.style.width = card.style.width || (card.classList.contains('w-full') ? '100%' : 'auto');
+              wrapper.style.height = card.style.height || (card.classList.contains('h-full') ? '100%' : 'auto');
+              if (card.parentNode) {
+                card.parentNode.insertBefore(wrapper, card);
+                wrapper.appendChild(card);
+              }
+              card.style.boxShadow = 'none';
+            }
+            card.style.overflow = 'hidden';
+            // Force a hard SVG clip path during export to guarantee the blur cannot escape the border radius
+            const radius = card.style.borderRadius || '0px';
+            card.style.clipPath = `inset(0px round ${radius})`;
+            card.style.WebkitClipPath = `inset(0px round ${radius})`;
+          }
+        },
       };
       if (format === 'jpeg') {
         dataUrl = await toJpeg(canvasRef.current, options);
@@ -1955,7 +1997,7 @@ export default function StudioPage() {
     } finally {
       setIsExporting(false);
     }
-  }, [canvasRef, exportFormat, exportScale]);
+  }, [canvasRef, exportFormat, exportScale, asciiTextureRaw, asciiEnabled]);
 
   const handleCopyClipboard = async () => {
     if (!canvasRef.current || !image) return;
@@ -1975,6 +2017,36 @@ export default function StudioPage() {
         pixelRatio: optimalMultiplier, 
         cacheBust: true,
         filter: filterExportNodes,
+        onclone: (clonedDoc: Document) => {
+          if (asciiTextureRaw && asciiEnabled) {
+            const asciiDivs = clonedDoc.querySelectorAll<HTMLElement>('[data-ascii-layer]');
+            asciiDivs.forEach((div) => {
+              div.style.backgroundImage = `url("${asciiTextureRaw}")`;
+            });
+          }
+          // Fix html-to-image backdrop-filter bleed bug by forcing overflow clipping during export
+          const card = clonedDoc.querySelector<HTMLElement>('[data-screenshot-card]');
+          if (card) {
+            const currentShadow = card.style.boxShadow;
+            if (currentShadow && currentShadow !== 'none') {
+              const wrapper = clonedDoc.createElement('div');
+              wrapper.style.boxShadow = currentShadow;
+              wrapper.style.borderRadius = card.style.borderRadius;
+              wrapper.style.display = 'flex';
+              wrapper.style.width = card.style.width || (card.classList.contains('w-full') ? '100%' : 'auto');
+              wrapper.style.height = card.style.height || (card.classList.contains('h-full') ? '100%' : 'auto');
+              if (card.parentNode) {
+                card.parentNode.insertBefore(wrapper, card);
+                wrapper.appendChild(card);
+              }
+              card.style.boxShadow = 'none';
+            }
+            card.style.overflow = 'hidden';
+            const radius = card.style.borderRadius || '0px';
+            card.style.clipPath = `inset(0px round ${radius})`;
+            card.style.WebkitClipPath = `inset(0px round ${radius})`;
+          }
+        },
       });
       if (blob && navigator.clipboard && window.ClipboardItem) {
         await navigator.clipboard.write([
@@ -3824,9 +3896,10 @@ export default function StudioPage() {
 
               {/* ASCII Art Overlay Layer (Canvas) */}
               {asciiEnabled && (asciiTarget === 'canvas' || asciiTarget === 'both') && asciiTexture && (
-                <div className="absolute inset-0 pointer-events-none z-10" style={{
+                <div data-ascii-layer="true" className="absolute inset-0 pointer-events-none z-10" style={{
                   backgroundImage: asciiTexture,
                   backgroundRepeat: 'repeat',
+                  backgroundSize: `${asciiSize}px ${asciiSize}px`,
                   opacity: asciiOpacity / 100,
                   mixBlendMode: 'overlay',
                 }} />
@@ -3868,6 +3941,7 @@ export default function StudioPage() {
                   onPointerDown={image ? handlePointerDown : undefined}
                   onPointerMove={image ? handlePointerMove : undefined}
                   onPointerUp={image ? handlePointerUp : undefined}
+                  data-screenshot-card="true"
                 >
                   {/* Clipped screenshot content */}
                   <div className={`relative flex flex-col items-center overflow-hidden max-w-full max-h-full ${!image ? 'w-full h-full' : ''} ${image ? 'w-full h-full' : ''}`} style={{ borderRadius: `${Math.max(0, radius - (glassBorder ? glassBorderWidth + 1 : 0))}px` }}>
@@ -3893,9 +3967,10 @@ export default function StudioPage() {
 
                     {/* ASCII Art Overlay Layer (Image) */}
                     {image && asciiEnabled && (asciiTarget === 'image' || asciiTarget === 'both') && asciiTexture && (
-                      <div className="absolute inset-0 pointer-events-none z-20" style={{
+                      <div data-ascii-layer="true" className="absolute inset-0 pointer-events-none z-20" style={{
                         backgroundImage: asciiTexture,
                         backgroundRepeat: 'repeat',
+                        backgroundSize: `${asciiSize}px ${asciiSize}px`,
                         opacity: asciiOpacity / 100,
                         mixBlendMode: 'overlay',
                       }} />
