@@ -3788,7 +3788,7 @@ export default function StudioPage() {
                   ...(background === 'CURRENT_IMAGE'
                     ? { backgroundImage: image ? `url("${image}")` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }
                     : background.startsWith('url(') 
-                    ? { backgroundImage: background, backgroundSize: 'cover', backgroundPosition: 'center' }
+                    ? { backgroundImage: `${background}, ${background.replace('/wallpapers/', '/wallpapers/thumbs/')}`, backgroundSize: 'cover, cover', backgroundPosition: 'center, center' }
                     : { background: background }
                   ),
                   filter: `${getLightingFilterStyle('canvas')} ${bgBlur > 0 ? `blur(${bgBlur}px)` : ''}`.trim() || 'none',
@@ -4643,7 +4643,7 @@ export default function StudioPage() {
                                   ...(background === 'CURRENT_IMAGE'
                                     ? { backgroundImage: image ? `url("${image}")` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }
                                     : background.startsWith('url(') 
-                                    ? { backgroundImage: background, backgroundSize: 'cover', backgroundPosition: 'center' }
+                                    ? { backgroundImage: `${background}, ${background.replace('/wallpapers/', '/wallpapers/thumbs/')}`, backgroundSize: 'cover, cover', backgroundPosition: 'center, center' }
                                     : { background: background }),
                                   filter: bgBlur > 0 ? `blur(${bgBlur / 4}px)` : 'none',
                                   transform: bgBlur > 0 ? `scale(${1 + (bgBlur / 100)})` : 'none',
@@ -4704,7 +4704,7 @@ export default function StudioPage() {
                                   ...(background === 'CURRENT_IMAGE'
                                     ? { backgroundImage: image ? `url("${image}")` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }
                                     : background.startsWith('url(') 
-                                    ? { backgroundImage: background, backgroundSize: 'cover', backgroundPosition: 'center' }
+                                    ? { backgroundImage: `${background}, ${background.replace('/wallpapers/', '/wallpapers/thumbs/')}`, backgroundSize: 'cover, cover', backgroundPosition: 'center, center' }
                                     : { background: background }),
                                   filter: bgBlur > 0 ? `blur(${bgBlur / 4}px)` : 'none',
                                   transform: bgBlur > 0 ? `scale(${1 + (bgBlur / 100)})` : 'none',
