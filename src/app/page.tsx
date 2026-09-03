@@ -898,14 +898,17 @@ export default function StudioPage() {
       }
 
       // Load Saved Studio Image (if any)
-      const savedImage = localStorage.getItem('noicess_studio_image');
-      if (savedImage) {
-        setImage(savedImage);
-        const img = new Image();
-        img.src = savedImage;
-        img.onload = () => {
-          setImageDimensions({ w: img.naturalWidth, h: img.naturalHeight });
-        };
+      const savedImageBase64 = localStorage.getItem('noicess_studio_image_base64');
+      if (savedImageBase64) {
+        fetch(savedImageBase64).then(res => res.blob()).then(blob => {
+          const url = URL.createObjectURL(blob);
+          setImage(url);
+          const img = new Image();
+          img.src = url;
+          img.onload = () => {
+            setImageDimensions({ w: img.naturalWidth, h: img.naturalHeight });
+          };
+        }).catch(() => {});
       }
 
       // Load Saved Studio State
@@ -914,32 +917,43 @@ export default function StudioPage() {
         const s = JSON.parse(savedState);
         if (s.background !== undefined) {
           let bg = s.background;
-          const bgMap: Record<string, string> = {
-            'abstract-waves.webp': 'abstract-waves.webp',
-            'blue-abstract.webp': 'blue-abstract.webp',
-            'iridescent-spheres.webp': 'iridescent-spheres.webp',
-            'macos-golden.webp': 'macos-golden.webp',
-            'macos-big-sur-dark.webp': 'macos-big-sur-dark.webp',
-            'macos-big-sur-light.webp': 'macos-big-sur-light.webp',
-            'macos-monterey-dark.webp': 'macos-monterey-dark.webp',
-            'macos-monterey-wwdc.webp': 'macos-monterey-wwdc.webp',
-            'macos-sequoia.webp': 'macos-sequoia.webp',
-            'macos-tahoe-light.webp': 'macos-tahoe-light.webp',
-            'macos-tahoe-dark.webp': 'macos-tahoe-dark.webp',
-            'surface-abstract.webp': 'surface-abstract.webp',
-            'macbook-abstract.webp': 'macbook-abstract.webp',
-            'dark-green-8k.webp': 'dark-green-8k.webp',
-            'emerald-dark.webp': 'emerald-dark.webp',
-            'macos-dark-4k.webp': 'macos-dark-4k.webp',
-            'apple-retina.webp': 'apple-retina.webp'
-          };
-          
-          for (const [oldName, newName] of Object.entries(bgMap)) {
-            if (bg.includes(oldName)) {
-              bg = bg.replace(oldName, newName);
+          if (bg === 'custom-blob') {
+            const customBgBase64 = localStorage.getItem('noicess_custom_bg_base64');
+            if (customBgBase64) {
+              fetch(customBgBase64).then(res => res.blob()).then(blob => {
+                setBackground(`url("${URL.createObjectURL(blob)}")`);
+              }).catch(() => {});
+            } else {
+              setBackground('url("/wallpapers/macos-sequoia.webp")');
             }
+          } else {
+            const bgMap: Record<string, string> = {
+              'abstract-waves.webp': 'abstract-waves.webp',
+              'blue-abstract.webp': 'blue-abstract.webp',
+              'iridescent-spheres.webp': 'iridescent-spheres.webp',
+              'macos-golden.webp': 'macos-golden.webp',
+              'macos-big-sur-dark.webp': 'macos-big-sur-dark.webp',
+              'macos-big-sur-light.webp': 'macos-big-sur-light.webp',
+              'macos-monterey-dark.webp': 'macos-monterey-dark.webp',
+              'macos-monterey-wwdc.webp': 'macos-monterey-wwdc.webp',
+              'macos-sequoia.webp': 'macos-sequoia.webp',
+              'macos-tahoe-light.webp': 'macos-tahoe-light.webp',
+              'macos-tahoe-dark.webp': 'macos-tahoe-dark.webp',
+              'surface-abstract.webp': 'surface-abstract.webp',
+              'macbook-abstract.webp': 'macbook-abstract.webp',
+              'dark-green-8k.webp': 'dark-green-8k.webp',
+              'emerald-dark.webp': 'emerald-dark.webp',
+              'macos-dark-4k.webp': 'macos-dark-4k.webp',
+              'apple-retina.webp': 'apple-retina.webp'
+            };
+            
+            for (const [oldName, newName] of Object.entries(bgMap)) {
+              if (bg.includes(oldName)) {
+                bg = bg.replace(oldName, newName);
+              }
+            }
+            setBackground(bg);
           }
-          setBackground(bg);
         }
         if (s.radius !== undefined) setRadius(s.radius);
         if (s.shadow !== undefined) setShadow(s.shadow);
@@ -1019,7 +1033,7 @@ export default function StudioPage() {
     const saveTimeout = setTimeout(() => {
       try {
         const stateToSave = {
-          background,
+          background: background.includes('blob:') ? 'custom-blob' : background,
           padding,
           radius,
           shadow,
@@ -1143,24 +1157,6 @@ export default function StudioPage() {
     image,
   ]);
 
-  // 3. Auto-save or remove uploaded screenshot
-  useEffect(() => {
-    if (!isStorageInitialized) return;
-    try {
-      if (image) {
-        // Only store if it's a data URL (not a blob) and smaller than 4MB
-        if (image.startsWith('data:') && image.length < 4 * 1024 * 1024) {
-          localStorage.setItem('noicess_studio_image', image);
-        } else if (image.startsWith('blob:')) {
-          localStorage.removeItem('noicess_studio_image');
-        }
-      } else {
-        localStorage.removeItem('noicess_studio_image');
-      }
-    } catch (e) {
-      console.warn('Unable to persist image to localStorage', e);
-    }
-  }, [isStorageInitialized, image]);
 
   // Save current studio configuration as preset
   const handleSavePreset = (e?: React.FormEvent) => {
@@ -1863,6 +1859,14 @@ export default function StudioPage() {
             if (blob) {
               const url = URL.createObjectURL(blob);
               loadImage(url);
+              
+              const reader = new FileReader();
+              reader.onload = (ev) => {
+                if (ev.target?.result) {
+                  try { localStorage.setItem('noicess_studio_image_base64', ev.target.result as string); } catch(err){}
+                }
+              };
+              reader.readAsDataURL(blob);
             }
           }
         }
@@ -1874,8 +1878,17 @@ export default function StudioPage() {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const url = URL.createObjectURL(e.target.files[0]);
+      const file = e.target.files[0];
+      const url = URL.createObjectURL(file);
       loadImage(url);
+      
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (ev.target?.result) {
+          try { localStorage.setItem('noicess_studio_image_base64', ev.target.result as string); } catch(err){}
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -2954,8 +2967,17 @@ export default function StudioPage() {
                     <span>Upload Custom Wallpaper</span>
                     <input type="file" aria-label="Upload custom background image" accept="image/*" className="hidden" onChange={(e) => {
                       if (e.target.files && e.target.files[0]) {
-                        const url = URL.createObjectURL(e.target.files[0]);
+                        const file = e.target.files[0];
+                        const url = URL.createObjectURL(file);
                         setBackground(`url("${url}")`);
+                        
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          if (ev.target?.result) {
+                            try { localStorage.setItem('noicess_custom_bg_base64', ev.target.result as string); } catch(err){}
+                          }
+                        };
+                        reader.readAsDataURL(file);
                       }
                     }} />
                   </label>
@@ -3760,7 +3782,8 @@ export default function StudioPage() {
             <button 
               className="group flex items-center gap-0 sm:gap-1.5 md:gap-1.5 px-2.5 sm:px-3 md:px-3.5 py-2 rounded-lg text-xs font-medium border border-white/5 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-zinc-400 disabled:hover:border-white/5 disabled:cursor-not-allowed active:scale-[0.96]" 
               onClick={() => { 
-                setImage(null); 
+                setImage(null);
+                localStorage.removeItem('noicess_studio_image_base64');
                 setImageSelected(false); 
                 setRotation(0); 
                 setPos({ x: 0, y: 0 }); 
@@ -4288,7 +4311,8 @@ export default function StudioPage() {
               className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg hover:bg-red-500/20 text-zinc-400 hover:text-red-400 transition-colors"
               title="Remove image"
               onClick={() => { 
-                setImage(null); 
+                setImage(null);
+                localStorage.removeItem('noicess_studio_image_base64');
                 setImageSelected(false); 
                 setRotation(0); 
                 setPos({ x: 0, y: 0 }); 
