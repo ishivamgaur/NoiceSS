@@ -1907,7 +1907,7 @@ export default function StudioPage() {
       }
 
       const options = {
-        cacheBust: true,
+        cacheBust: false, // Must be false so it doesn't append query params to blob: URLs and break them
         pixelRatio: optimalMultiplier,
         quality: 1.0,
         filter: filterExportNodes,
@@ -1988,7 +1988,7 @@ export default function StudioPage() {
 
       const blob = await toBlob(canvasRef.current, { 
         pixelRatio: optimalMultiplier,
-        cacheBust: true,
+        cacheBust: false, // Must be false so it doesn't append query params to blob: URLs
         filter: filterExportNodes,
       });
       if (blob && navigator.clipboard && window.ClipboardItem) {
