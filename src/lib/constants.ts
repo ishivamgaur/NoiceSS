@@ -75,6 +75,21 @@ export const RAYCAST_BACKGROUNDS = [
   { name: 'Red Distortion 4', url: '/wallpapers/raycast-red-distortion-4.webp' },
 ];
 
+export const NATURE_BACKGROUNDS = [
+  { name: 'Chosen Nature 1', url: '/wallpapers/chosen-nature-1.webp' },
+  { name: 'Chosen Nature 2', url: '/wallpapers/chosen-nature-2.webp' },
+  { name: 'Chosen Nature 3', url: '/wallpapers/chosen-nature-3.webp' },
+  { name: 'Chosen Nature 4', url: '/wallpapers/chosen-nature-4.webp' },
+  { name: 'Chosen Nature 5', url: '/wallpapers/chosen-nature-5.webp' },
+  { name: 'Chosen Nature 6', url: '/wallpapers/chosen-nature-6.webp' },
+  { name: 'Chosen Nature 7', url: '/wallpapers/chosen-nature-7.webp' },
+  { name: 'Chosen Nature 8', url: '/wallpapers/chosen-nature-8.webp' },
+  { name: 'Chosen Nature 9', url: '/wallpapers/chosen-nature-9.webp' },
+  { name: 'Chosen Nature 10', url: '/wallpapers/chosen-nature-10.webp' },
+  { name: 'Chosen Nature 11', url: '/wallpapers/chosen-nature-11.webp' },
+  { name: 'Chosen Nature 12', url: '/wallpapers/chosen-nature-12.webp' },
+];
+
 export const GRADIENTS = [
   'radial-gradient(ellipse at 50% 20%, #27272a 0%, #09090b 100%)',
   'linear-gradient(135deg, #18181b 0%, #09090b 100%)',

@@ -89,6 +89,21 @@ const RAYCAST_BACKGROUNDS = [
   { name: 'Red Distortion 4', url: '/wallpapers/raycast-red-distortion-4.webp' },
 ];
 
+const NATURE_BACKGROUNDS = [
+  { name: 'Chosen Nature 1', url: '/wallpapers/chosen-nature-1.webp' },
+  { name: 'Chosen Nature 2', url: '/wallpapers/chosen-nature-2.webp' },
+  { name: 'Chosen Nature 3', url: '/wallpapers/chosen-nature-3.webp' },
+  { name: 'Chosen Nature 4', url: '/wallpapers/chosen-nature-4.webp' },
+  { name: 'Chosen Nature 5', url: '/wallpapers/chosen-nature-5.webp' },
+  { name: 'Chosen Nature 6', url: '/wallpapers/chosen-nature-6.webp' },
+  { name: 'Chosen Nature 7', url: '/wallpapers/chosen-nature-7.webp' },
+  { name: 'Chosen Nature 8', url: '/wallpapers/chosen-nature-8.webp' },
+  { name: 'Chosen Nature 9', url: '/wallpapers/chosen-nature-9.webp' },
+  { name: 'Chosen Nature 10', url: '/wallpapers/chosen-nature-10.webp' },
+  { name: 'Chosen Nature 11', url: '/wallpapers/chosen-nature-11.webp' },
+  { name: 'Chosen Nature 12', url: '/wallpapers/chosen-nature-12.webp' },
+];
+
 const GRADIENTS = [
   // Row 1: Studio Titanium, Cosmic Void & Linear Indigo
   'radial-gradient(ellipse at 50% 20%, #27272a 0%, #09090b 100%)',
@@ -593,13 +608,13 @@ export default function StudioPage() {
   const [isLocked, setIsLocked] = useState(false);
   const [rotation, setRotation] = useState(0);
   const padding = 0;
-  const [radius, setRadius] = useState(16);
+  const [radius, setRadius] = useState(12);
   const [shadow, setShadow] = useState(25);
   const [shadowBlur, setShadowBlur] = useState(45);
   const [shadowOpacity, setShadowOpacity] = useState(35);
   const [shadowOffsetX, setShadowOffsetX] = useState(0);
   const [shadowOffsetY, setShadowOffsetY] = useState(0);
-  const [scale, setScale] = useState(80);
+  const [scale, setScale] = useState(85);
   const [aspectRatio, setAspectRatio] = useState('auto');
   const [customRatioW, setCustomRatioW] = useState<number | string>(16);
   const [customRatioH, setCustomRatioH] = useState<number | string>(9);
@@ -825,6 +840,7 @@ export default function StudioPage() {
     bgBlur: true,
     wallpapers: true,
     raycast: true,
+    nature: true,
     gradients: true,
     solidColors: true,
     // Left Sidebar: Effects
@@ -1132,9 +1148,11 @@ export default function StudioPage() {
     if (!isStorageInitialized) return;
     try {
       if (image) {
-        // Only store if smaller than 4MB to prevent localStorage QuotaExceededError
-        if (image.length < 4 * 1024 * 1024) {
+        // Only store if it's a data URL (not a blob) and smaller than 4MB
+        if (image.startsWith('data:') && image.length < 4 * 1024 * 1024) {
           localStorage.setItem('noicess_studio_image', image);
+        } else if (image.startsWith('blob:')) {
+          localStorage.removeItem('noicess_studio_image');
         }
       } else {
         localStorage.removeItem('noicess_studio_image');
@@ -1218,7 +1236,7 @@ export default function StudioPage() {
   const handleApplyPreset = (config: any) => {
     if (!config) return;
     if (config.background) setBackground(config.background);
-    setRadius(config.radius ?? 16);
+    setRadius(config.radius ?? 12);
     setShadow(config.shadow ?? 30);
     setBgBlur(config.bgBlur ?? 0);
     if (config.aspectRatio) setAspectRatio(config.aspectRatio);
@@ -1829,7 +1847,7 @@ export default function StudioPage() {
     img.onload = () => {
       setImageDimensions({ w: img.width, h: img.height });
       setImage(url);
-      setScale(80);
+      setScale(85);
       setPos({ x: 0, y: 0 });
       setAspectRatio('auto');
     };
@@ -1843,11 +1861,8 @@ export default function StudioPage() {
           if (e.clipboardData.items[i].type.indexOf('image') !== -1) {
             const blob = e.clipboardData.items[i].getAsFile();
             if (blob) {
-              const reader = new FileReader();
-              reader.onload = (e) => {
-                if (e.target?.result) loadImage(e.target.result as string);
-              };
-              reader.readAsDataURL(blob);
+              const url = URL.createObjectURL(blob);
+              loadImage(url);
             }
           }
         }
@@ -1859,11 +1874,8 @@ export default function StudioPage() {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) loadImage(e.target.result as string);
-      };
-      reader.readAsDataURL(e.target.files[0]);
+      const url = URL.createObjectURL(e.target.files[0]);
+      loadImage(url);
     }
   };
 
@@ -2845,6 +2857,53 @@ export default function StudioPage() {
               )}
             </div>
 
+            {/* Section 2.6: Nature Wallpapers */}
+            <div className="flex flex-col gap-1.5">
+              <button
+                onClick={() => toggleSection('nature')}
+                className="flex items-center justify-between w-full h-[26px] min-h-[26px] px-0.5 text-[11px] font-semibold text-zinc-400 hover:text-white uppercase tracking-wider transition-colors group cursor-pointer leading-none"
+              >
+                <div className="flex items-center gap-1.5">
+                  <ChevronDown size={13} className={`shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-transform duration-200 ${expandedSections.nature ? 'rotate-0' : '-rotate-90'}`} />
+                  <span className="leading-none">Nature Walls</span>
+                </div>
+                <span className="text-[10px] text-zinc-500 font-mono tabular-nums leading-none">{NATURE_BACKGROUNDS.length} Presets</span>
+              </button>
+
+              {expandedSections.nature && (
+                <div className="p-2.5 rounded-xl bg-white/[0.015] border border-white/[0.04] flex flex-col gap-2.5 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <div className="grid grid-cols-6 gap-2">
+                    {NATURE_BACKGROUNDS.map((bg, idx) => {
+                      const bgUrl = `url("${bg.url}")`;
+                      const isSelected = background === bgUrl;
+                      const thumbUrl = bg.url.replace('/wallpapers/', '/wallpapers/thumbs/');
+                      return (
+                        <button
+                          key={idx}
+                          title={bg.name}
+                          aria-label={`Select Nature wallpaper ${bg.name}`}
+                          className={`aspect-square rounded-md transition-all duration-150 active:scale-95 border relative overflow-hidden bg-white/[0.02] ${
+                            isSelected
+                              ? 'border-white ring-2 ring-white/20 shadow-md scale-105'
+                              : 'border-white/[0.06] hover:border-white/30 hover:scale-105'
+                          }`}
+                          onClick={() => setBackground(bgUrl)}
+                        >
+                          <img
+                            src={thumbUrl}
+                            alt={bg.name}
+                            loading="lazy"
+                            decoding="async"
+                            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Section 2: Curated Wallpapers */}
             <div className="flex flex-col gap-1.5">
               <button
@@ -2853,7 +2912,7 @@ export default function StudioPage() {
               >
                 <div className="flex items-center gap-1.5">
                   <ChevronDown size={13} className={`shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-transform duration-200 ${expandedSections.wallpapers ? 'rotate-0' : '-rotate-90'}`} />
-                  <span className="leading-none">Studio Wallpapers</span>
+                  <span className="leading-none">Studio Walls</span>
                 </div>
                 <span className="text-[10px] text-zinc-500 font-mono tabular-nums leading-none">{MACOS_BACKGROUNDS.length} Presets</span>
               </button>
@@ -2895,9 +2954,8 @@ export default function StudioPage() {
                     <span>Upload Custom Wallpaper</span>
                     <input type="file" aria-label="Upload custom background image" accept="image/*" className="hidden" onChange={(e) => {
                       if (e.target.files && e.target.files[0]) {
-                        const reader = new FileReader();
-                        reader.onload = (ev) => { if (ev.target?.result) setBackground(`url("${ev.target.result}")`); };
-                        reader.readAsDataURL(e.target.files[0]);
+                        const url = URL.createObjectURL(e.target.files[0]);
+                        setBackground(`url("${url}")`);
                       }
                     }} />
                   </label>
@@ -2913,7 +2971,7 @@ export default function StudioPage() {
               >
                 <div className="flex items-center gap-1.5">
                   <ChevronDown size={13} className={`shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-transform duration-200 ${expandedSections.raycast ? 'rotate-0' : '-rotate-90'}`} />
-                  <span className="leading-none">Raycast Wallpapers</span>
+                  <span className="leading-none">Raycast Walls</span>
                 </div>
                 <span className="text-[10px] text-zinc-500 font-mono tabular-nums leading-none">{RAYCAST_BACKGROUNDS.length} Presets</span>
               </button>
@@ -3454,7 +3512,7 @@ export default function StudioPage() {
                             onClick={() => {
                               setAspectRatio('custom');
                               setShowRatioMenu(false);
-                              setScale(80);
+                              setScale(85);
                               setPos({ x: 0, y: 0 });
                             }}
                             className="px-3 h-7 rounded-md bg-white hover:bg-zinc-200 text-black text-xs font-semibold shadow-sm transition-colors shrink-0 active:scale-95"
@@ -3481,7 +3539,7 @@ export default function StudioPage() {
                                       onClick={() => { 
                                         setAspectRatio(r.id); 
                                         setShowRatioMenu(false); 
-                                        setScale(80);
+                                        setScale(85);
                                         setPos({ x: 0, y: 0 });
                                       }}
                                       className={`flex flex-col items-center justify-center p-2 rounded-lg text-center transition-all duration-150 active:scale-95 border min-h-[58px] ${
@@ -4198,8 +4256,8 @@ export default function StudioPage() {
             </button>
             <button
               className="text-[10px] sm:text-xs font-mono tabular-nums font-semibold text-white/90 px-1.5 sm:px-2 py-1 mx-0.5 rounded-md bg-white/5 hover:text-white hover:bg-white/10 transition-colors"
-              title="Click to reset size (80%)"
-              onClick={() => setScale(80)}
+              title="Click to reset size (85%)"
+              onClick={() => setScale(85)}
             >
               {Math.round(scale)}%
             </button>
