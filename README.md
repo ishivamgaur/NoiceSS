@@ -1,89 +1,203 @@
 <div align="center">
   <a href="https://noicess.fun" target="_blank">
-    <img src="https://noicess.fun/noice-og.webp" alt="NoiceSS - Beautiful Screenshot Mockup Studio" width="800" style="border-radius: 12px; margin-bottom: 24px;" />
+    <img src="https://noicess.fun/noice-og.webp" alt="NoiceSS - Screenshot Mockup Studio & MCP Server" width="800" style="border-radius: 12px; margin-bottom: 24px;" />
   </a>
 
-  # ✨ NoiceSS
+  # NoiceSS
 
-  **An open-source screenshot mockup studio.**<br/>
-  *Turn flat, boring screenshots into stunning 3D presentations.*
+  **Turn raw screenshots into beautiful mockups — in your browser or directly from your AI agent.**
 
-  [![Try it Live](https://img.shields.io/badge/Try_it_Live_→-000000?style=for-the-badge)](https://noicess.fun)
+  [![Try it Live](https://img.shields.io/badge/Live_Studio-noicess.fun-000000?style=for-the-badge)](https://noicess.fun)
 
-  <div style="margin-top: 16px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+  <div style="margin-top: 14px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
     <a href="https://github.com/ishivamgaur/noiceSS/blob/main/LICENSE">
       <img src="https://img.shields.io/github/license/ishivamgaur/noiceSS?style=flat-square&color=blue" alt="License" />
     </a>
+    <img src="https://img.shields.io/badge/MCP_Server-Ready-8A2BE2?style=flat-square" alt="MCP Server Ready" />
+    <img src="https://img.shields.io/badge/Zero_Cost-100%25_Local-brightgreen?style=flat-square" alt="100% Local" />
     <img src="https://img.shields.io/badge/Next.js_15-black?style=flat-square&logo=next.js" alt="Next.js" />
     <img src="https://img.shields.io/badge/React_19-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React" />
     <img src="https://img.shields.io/badge/Tailwind_v4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white" alt="Tailwind" />
-    <img src="https://img.shields.io/badge/Zustand-443E38?style=flat-square&logo=react&logoColor=white" alt="Zustand" />
-    <img src="https://img.shields.io/badge/Serwist_PWA-5A0FC8?style=flat-square&logo=pwa&logoColor=white" alt="Serwist PWA" />
-    <img src="https://img.shields.io/badge/Radix_UI-161618?style=flat-square&logo=radix-ui&logoColor=white" alt="Radix UI" />
+    <img src="https://img.shields.io/badge/PWA-Offline_Ready-5A0FC8?style=flat-square" alt="Offline Ready" />
     <a href="#contributing">
-      <img src="https://img.shields.io/badge/PRs_Welcome-brightgreen?style=flat-square" alt="PRs Welcome" />
+      <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen?style=flat-square" alt="PRs Welcome" />
     </a>
   </div>
 </div>
 
 ---
 
-## Table of Contents
+## What is NoiceSS?
 
-- [Why NoiceSS](#why-noicess)
-- [Key Features](#key-features)
-- [Export Quality](#export-quality)
-- [Getting Started](#getting-started)
-- [Technology Stack](#technology-stack)
-- [Contributing](#contributing)
-- [License](#license)
+Raw screenshots look boring in documentation, pitch decks, and social posts. Making them look great in Figma or Photoshop takes too long.
+
+**NoiceSS gives you two simple ways to fix this:**
+
+1. **The Web Studio ([noicess.fun](https://noicess.fun))**: Drop an image into your browser, click presets for 3D tilt, macOS window frames, wallpapers, or frosted borders, and download 4K Retina images instantly. Works completely offline as a PWA.
+2. **The MCP Server for AI Agents**: Hook NoiceSS into **Cursor, Claude, Windsurf, Cline, Antigravity, or Zed**. Just ask your AI agent in plain English to transform any image in your codebase into a polished mockup or responsive 3D website component.
+
+```
+"Make this screenshot 16:9 with a blurred background, macOS frame, and a small watermark"
+                                   │
+                                   ▼
+          [Plain Screenshot]  ──▶  [NoiceSS MCP]  ──▶  [Polished Hero Mockup]
+```
 
 ---
 
-## Why NoiceSS
+## Quick Comparison
 
-Raw screenshots don't sell products. But hiring a designer or wrestling with Figma every time you need a polished mockup is overkill.
+| What you need | Web Studio (`noicess.fun`) | AI Agent MCP Server |
+| :--- | :--- | :--- |
+| **Best for** | Quick manual edits & visual tweaking | Automated mockups right inside your coding workflow |
+| **Interface** | Visual sliders & instant browser preview | Plain English prompts to your coding assistant |
+| **Outputs** | WebP, PNG, JPEG (1x, 2x, 4x Retina) | Saved image files + copy-paste React & Tailwind code |
+| **Cost** | 100% Free | $0 (Runs locally on your machine, zero API fees) |
+| **Privacy** | Never leaves your browser | Never leaves your computer |
 
-**NoiceSS** solves this. It's a browser-based studio that takes your flat screenshot and wraps it in professional macOS frames, 3D perspectives, and curated backdrops - ready for Twitter, Product Hunt, portfolios, or pitch decks. No uploads. No accounts. No watermarks. Everything runs locally in your browser.
+---
+
+## Model Context Protocol (MCP) Quickstart
+
+Let your AI agent make your screenshots look great without you ever leaving your editor.
+
+### Why use the MCP server?
+
+- **Zero Cloud Fees**: Runs locally using Node and Sharp. No OpenAI API keys, no subscriptions, no credit cards.
+- **Total Privacy**: Your proprietary product screenshots and code never get uploaded anywhere.
+- **Pixel-Perfect Matches**: Uses the exact same look as the web studio — real frosted glass blur, macOS traffic lights, smooth shadows, and badges.
+- **Generates Code Too**: Ask for Tailwind CSS or React components with 3D tilt ready to drop straight into your landing page.
+
+### 1. Test it in 10 seconds
+
+Inside this project folder:
+
+```bash
+# Start the MCP server over stdio
+npm run mcp
+```
+
+### 2. Connect Your AI Agent
+
+Add NoiceSS to your agent's config. Replace `<PATH_TO_NOICESS>` with the path to this folder (e.g., `C:/Users/1by20/Desktop/noiceSS` on Windows or `/Users/you/noiceSS` on Mac/Linux):
+
+#### Cursor (`.cursor/mcp.json`)
+```json
+{
+  "mcpServers": {
+    "noicess": {
+      "command": "node",
+      "args": ["<PATH_TO_NOICESS>/bin/noicess-mcp.mjs"]
+    }
+  }
+}
+```
+
+#### Claude Desktop (`claude_desktop_config.json`)
+```json
+{
+  "mcpServers": {
+    "noicess": {
+      "command": "node",
+      "args": ["<PATH_TO_NOICESS>/bin/noicess-mcp.mjs"]
+    }
+  }
+}
+```
+
+#### Windsurf (`~/.codeium/windsurf/mcp_config.json`)
+```json
+{
+  "mcpServers": {
+    "noicess": {
+      "command": "node",
+      "args": ["<PATH_TO_NOICESS>/bin/noicess-mcp.mjs"]
+    }
+  }
+}
+```
+
+#### VS Code (Cline / Roo Code)
+```json
+{
+  "mcpServers": {
+    "noicess": {
+      "command": "node",
+      "args": ["<PATH_TO_NOICESS>/bin/noicess-mcp.mjs"]
+    }
+  }
+}
+```
+
+#### Google Antigravity / Gemini CLI
+```bash
+agy mcp add noicess node <PATH_TO_NOICESS>/bin/noicess-mcp.mjs
+```
+
+#### Zed (`~/.config/zed/settings.json`)
+```json
+{
+  "context_servers": {
+    "noicess": {
+      "command": {
+        "path": "node",
+        "args": ["<PATH_TO_NOICESS>/bin/noicess-mcp.mjs"]
+      }
+    }
+  }
+}
+```
+
+---
+
+## What Can You Ask Your Agent To Do?
+
+Once connected, just talk to your agent naturally:
+
+#### 1. Blurred Background + Frosted Glass Border
+> *"Take `public/preview.png`, use the screenshot itself as a blurred background with 15px blur, 16:9 ratio, 4px frosted glass border, and add a small 'made with mcp' watermark on the top right. Save it to `public/hero.webp`."*
+
+#### 2. macOS Window Frame on Curated Wallpaper
+> *"Take `screenshots/app.png`, put it on the macOS Sequoia wallpaper with 10px blur, show the macOS close/minimize buttons with window title 'App Preview', and export as a 2x retina WebP."*
+
+#### 3. Ready-To-Paste Landing Page Code
+> *"Generate responsive 3D Tailwind CSS code for `public/hero.png` using the isometric-left perspective and Safari URL bar so I can paste it into my hero section."*
+
+#### 4. Fine-Tune in the Browser
+> *"Generate a NoiceSS Studio link for this screenshot with my current settings so I can play with the 3D tilt in the browser."*
 
 > [!TIP]
-> **🚀 Offline Ready:** NoiceSS is a fully-featured Progressive Web App (PWA). Once loaded for the first time, you can disconnect from the internet and continue using the app completely offline. You can even "Install" it as a standalone app on your desktop or mobile device.
+> Read **[`MCP.md`](MCP.md)** for the complete list of all 9 MCP tools, background IDs, gradients, and custom options.
 
-It's also 100% open-source under the MIT License, so you can self-host it, fork it, or contribute to it.
+---
 
-## Key Features
+## Features
 
-| Feature | Description |
-| :--- | :--- |
-| **macOS Window Frames** | Wrap screenshots in a realistic Safari/macOS application frame with customizable traffic lights. |
-| **3D Isometric Tilting** | Full X, Y, Z-axis rotation with adjustable perspective depth for dynamic, eye-catching presentations. |
-| **Decoupled Studio Lighting** | Independent brightness, contrast, saturation, and hue controls for the screenshot and the background canvas separately. |
-| **8K Radiant Backdrops** | Curated wallpaper library, gradient fills, solid colors, transparency, or custom image uploads. |
-| **Background Blur** | Apply gaussian blur to the backdrop with automatic edge scaling to eliminate bleed artifacts. |
-| **Offline PWA Support** | Fully functional without an internet connection after the first load. Install it on your device and use it anywhere. Powered by Serwist. |
-| **Aspect Ratio Presets** | One-click sizing for Twitter (16:9), Instagram (1:1), Dribbble (4:3), LinkedIn, and custom ratios. |
-| **Watermark Editor** | Add draggable, resizable text/image watermarks with opacity and blend mode controls. |
-| **Undo / Redo** | Full history stack so you never lose your work. |
-| **Privacy-First** | All rendering is performed client-side with HTML2Canvas. Your images never leave your browser. |
+- **macOS & Safari Frames**: Realistic title bars with red, yellow, green traffic light buttons and customizable URL bars.
+- **3D Tilting**: Rotate on X, Y, and Z axes with perspective depth to give your screenshot a sleek presentation angle.
+- **Frosted Glass Borders**: Translucent glass framing that samples and blurs whatever is behind it.
+- **Blurred Screenshot Backdrops**: Use your own screenshot as an ambient background, smoothly blurred with zero edge leakage.
+- **51 Wallpaper Presets**: Includes macOS system wallpapers, Raycast backgrounds, nature landscapes, and clean gradient fills.
+- **Watermark Badge**: Add a floating frosted glass badge (`@username` or custom text) in any corner, with small, medium, or large sizes.
+- **Offline PWA**: Installable on desktop or mobile. Works without internet once opened.
+- **100% Private**: Zero analytics on your images. All browser processing happens on client canvas, and all MCP processing happens locally in Node.
 
-## Export Quality
+---
 
-NoiceSS is built for people who care about pixel-perfect output.
+## Export Options
 
-| Property | Details |
-| :--- | :--- |
-| **Format** | WebP (lossy or lossless). Superior compression and color accuracy over JPEG/PNG. |
-| **Resolution** | Export at **1×** (standard), **2×** (Retina), or **4×** (Ultra HD / 4K). A 1200×630 canvas at 4× exports as 4800×2520. |
-| **Color Space** | sRGB with full alpha channel support for transparent backgrounds. |
-| **Anti-Aliasing** | Sub-pixel smoothing on all 3D-transformed edges to prevent jagged artifacts. |
-| **File Size** | Optimized WebP encoding keeps file sizes small without sacrificing visual quality. |
+- **Formats**: WebP (recommended for small size & high quality), PNG (lossless), and JPEG.
+- **Scales**: 1x (standard), 2x (Retina displays), or 4x (Ultra HD / print).
+- **Transparency**: Clean transparent background support for PNG and WebP exports.
 
-## Getting Started
+---
+
+## Getting Started (Local Development)
 
 ### Prerequisites
 
-- **Node.js** 18.x or later
-- **npm**, yarn, or pnpm
+- **Node.js** 18 or newer
+- **npm**, pnpm, or yarn
 
 ### Installation
 
@@ -95,62 +209,45 @@ cd noiceSS
 # Install dependencies
 npm install
 
-# (Optional) Configure environment variables for analytics
-cp .env.example .env
-
-# Start the dev server
+# Start the web app
 npm run dev
+
+# Or run the MCP server
+npm run mcp
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and start creating.
+Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Environment Variables
+---
 
-NoiceSS works perfectly without any environment variables. These are entirely optional:
+## Tech Stack
 
-| Variable | Purpose |
-| :--- | :--- |
-| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Google Search Console verification tag |
-| `NEXT_PUBLIC_UMAMI_WEBSITE_ID` | Umami analytics tracking ID |
+- **Framework**: Next.js 15 (App Router)
+- **UI & Components**: React 19, Tailwind CSS v4, Radix UI, Lucide Icons
+- **AI / MCP**: `@modelcontextprotocol/sdk`
+- **Image Compositor**: Sharp
+- **State Management**: Zustand
+- **Offline Engine**: Serwist PWA
 
-See [`.env.example`](.env.example) for reference.
-
-## Technology Stack
-
-| Layer | Technology |
-| :--- | :--- |
-| Framework | [Next.js 15](https://nextjs.org/) (App Router) |
-| Styling | [Tailwind CSS v4](https://tailwindcss.com/) |
-| UI Primitives | [Radix UI](https://www.radix-ui.com/) |
-| State | [Zustand](https://zustand-demo.pmnd.rs/) |
-| PWA & Offline | [Serwist](https://serwist.pages.dev/) |
-| Canvas Export | HTML2Canvas |
+---
 
 ## Contributing
 
-We welcome contributions from everyone - whether it's a bug fix, a new backdrop preset, performance optimization, or documentation improvement.
+Contributions are welcome! Whether it's adding new wallpaper presets, improving the compositor, or reporting bugs:
 
-Please read the **[Contributing Guide](CONTRIBUTING.md)** before opening a pull request. It covers the development setup, coding conventions, and PR process.
+1. Check out the [Contributing Guide](CONTRIBUTING.md).
+2. Create a branch: `git checkout -b feat/my-improvement`.
+3. Commit your changes: `git commit -m "feat: add new gradient preset"`.
+4. Open a Pull Request.
 
-Quick start for contributors:
-
-```bash
-# Fork → Clone → Branch
-git checkout -b feature/your-feature
-
-# Make changes, then commit using conventional commits
-git commit -m "feat: add gradient backdrop preset"
-
-# Push and open a PR
-git push origin feature/your-feature
-```
+---
 
 ## License
 
-This project is open-source and distributed under the **MIT License**. See the [`LICENSE`](LICENSE) file for details.
+Open-source under the **MIT License**. See [`LICENSE`](LICENSE) for details.
 
 ---
 
 <div align="center">
-  <sub>Built and maintained by <a href="https://github.com/ishivamgaur">@ishivamgaur</a></sub>
+  <sub>Built and maintained by <a href="https://github.com/ishivamgaur">@ishivgaur</a></sub>
 </div>

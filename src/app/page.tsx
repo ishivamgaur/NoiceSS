@@ -1291,6 +1291,103 @@ export default function StudioPage() {
     if (config.imageDimensions !== undefined) setImageDimensions(config.imageDimensions);
   };
 
+  // ─── Hydrate Studio State from URL Hash or Query Params (MCP & Share Deep Links) ───
+  useEffect(() => {
+    const hydrateFromUrl = () => {
+      try {
+        if (typeof window === 'undefined') return;
+        const hash = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : '';
+        const search = window.location.search.startsWith('?') ? window.location.search.slice(1) : '';
+        const queryStr = hash || search;
+        if (!queryStr) return;
+
+        const p = new URLSearchParams(queryStr);
+
+        // 1. Preset
+        const presetId = p.get('preset');
+        if (presetId) {
+          const foundPreset = PRESETS.find(pr => pr.id === presetId);
+          if (foundPreset?.config) {
+            handleApplyPreset(foundPreset.config);
+          }
+        }
+
+        // 2. Image pre-load
+        const imgParam = p.get('img');
+        if (imgParam) {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.src = imgParam;
+          img.onload = () => {
+            setImage(imgParam);
+            setImageDimensions({ w: img.naturalWidth, h: img.naturalHeight });
+          };
+        }
+
+        // 3. Background & Blur
+        const bgParam = p.get('bg');
+        if (bgParam) {
+          if (bgParam.startsWith('linear-gradient') || bgParam.startsWith('radial-gradient') || bgParam.startsWith('#') || bgParam === 'transparent') {
+            setBackground(bgParam);
+          } else {
+            const cleanBg = bgParam.replace(/^url\(["']?|["']?\)$/g, '').replace(/^\/wallpapers\//, '');
+            const filename = cleanBg.endsWith('.webp') ? cleanBg : `${cleanBg}.webp`;
+            setBackground(`url("/wallpapers/${filename}")`);
+          }
+        }
+        if (p.has('bgBlur')) setBgBlur(Number(p.get('bgBlur')));
+
+        // 4. Chrome
+        if (p.has('chrome')) setShowMacOsBar(p.get('chrome') === '1' || p.get('chrome') === 'true');
+        if (p.has('browser')) setShowBrowserBar(p.get('browser') === '1' || p.get('browser') === 'true');
+        if (p.has('browserUrl')) setBrowserUrl(p.get('browserUrl')!);
+
+        // 5. Geometry & Sizing
+        if (p.has('radius')) setRadius(Number(p.get('radius')));
+        if (p.has('scale')) setScale(Number(p.get('scale')));
+        if (p.has('rotation')) setRotation(Number(p.get('rotation')));
+        if (p.has('aspect')) setAspectRatio(p.get('aspect')!);
+
+        // 6. Shadow
+        if (p.has('shadow')) setShadow(Number(p.get('shadow')));
+        if (p.has('shadowBlur')) setShadowBlur(Number(p.get('shadowBlur')));
+        if (p.has('shadowOpacity')) setShadowOpacity(Number(p.get('shadowOpacity')));
+        if (p.has('shadowOffsetX')) setShadowOffsetX(Number(p.get('shadowOffsetX')));
+        if (p.has('shadowOffsetY')) setShadowOffsetY(Number(p.get('shadowOffsetY')));
+
+        // 7. Glass Border
+        if (p.has('glassBorder')) setGlassBorder(p.get('glassBorder') === '1' || p.get('glassBorder') === 'true');
+        if (p.has('gbWidth')) setGlassBorderWidth(Number(p.get('gbWidth')));
+        if (p.has('gbOpacity')) setGlassBorderOpacity(Number(p.get('gbOpacity')));
+        if (p.has('gbBlur')) setGlassBorderBlur(Number(p.get('gbBlur')));
+
+        // 8. 3D Perspective
+        if (p.has('perspective')) setPerspective(p.get('perspective')!);
+        if (p.has('rx')) setRotateX(Number(p.get('rx')));
+        if (p.has('ry')) setRotateY(Number(p.get('ry')));
+        if (p.has('rz')) setRotateZ(Number(p.get('rz')));
+        if (p.has('depth')) setPerspectiveDepth(Number(p.get('depth')));
+
+        // 9. Lighting
+        if (p.has('brightness')) setBrightness(Number(p.get('brightness')));
+        if (p.has('contrast')) setContrast(Number(p.get('contrast')));
+        if (p.has('saturation')) setSaturation(Number(p.get('saturation')));
+        if (p.has('hueRotate')) setHueRotate(Number(p.get('hueRotate')));
+        if (p.has('filter')) setFilter(p.get('filter')!);
+
+        // 10. Watermark
+        const wm = p.get('watermark');
+        if (wm) setWatermark(wm);
+      } catch (err) {
+        console.error('Failed to parse URL parameters for studio state', err);
+      }
+    };
+
+    hydrateFromUrl();
+    window.addEventListener('hashchange', hydrateFromUrl);
+    return () => window.removeEventListener('hashchange', hydrateFromUrl);
+  }, []);
+
   // Delete saved preset
   const handleDeletePreset = (id: string) => {
     const updated = customPresets.filter(p => p.id !== id);
