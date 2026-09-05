@@ -56,7 +56,7 @@ export function createNoiceServer() {
         {
           name: 'generate_mockup',
           description:
-            'Generates a pixel-perfect screenshot mockup with FULL control over every parameter: backgrounds, shadows, blur, brightness/contrast, filters, noise/grain, watermarks, ASCII overlays, glass borders, window chrome, and more. Zero cloud costs — runs 100% locally with Sharp.',
+            'Generates a pixel-perfect screenshot mockup with FULL control over every parameter: backgrounds, shadows, blur, brightness/contrast, filters, noise/grain, watermarks, ASCII overlays, glass borders, window chrome, and more. Zero cloud costs: runs 100% locally with Sharp.',
           inputSchema: {
             type: 'object',
             properties: {
@@ -587,7 +587,7 @@ export function createNoiceServer() {
         let output = `### NoiceSS Wallpapers (${filtered.length} total)\n\n`;
         for (const [cat, items] of Object.entries(grouped)) {
           output += `**${cat.charAt(0).toUpperCase() + cat.slice(1)}** (${items.length}):\n`;
-          output += items.map((w) => `• \`${w.filename}\` — ${w.name}`).join('\n');
+          output += items.map((w) => `• \`${w.filename}\`: ${w.name}`).join('\n');
           output += '\n\n';
         }
         output += `**Usage:** Set as the \`background\` parameter, e.g. \`"dark-green-8k.webp"\``;

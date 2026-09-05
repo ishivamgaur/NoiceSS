@@ -1,6 +1,6 @@
 # NoiceSS MCP Server
 
-Use NoiceSS directly inside your AI coding assistant — **Cursor, Claude Desktop, Windsurf, VS Code (Cline / Roo Code), Google Antigravity, or Zed**.
+Use NoiceSS directly inside your AI coding assistant: **Cursor, Claude Desktop, Windsurf, VS Code (Cline / Roo Code), Google Antigravity, or Zed**.
 
 Instead of switching tabs to open Figma or drag images into a browser, you can tell your AI agent to make your screenshots look great, add macOS window frames, apply blurred backgrounds, and generate responsive landing page code.
 
@@ -121,7 +121,7 @@ The main rendering tool. Takes an image and wraps it with backgrounds, window fr
 | **Frosted Glass** | `glassBorder` | `boolean` | Add frosted glass frame around screenshot (default: `false`) |
 | | `glassBorderWidth` | `number` | Glass border width in pixels (e.g. `4` or `8`) |
 | | `glassBorderBlur` | `number` | Blur strength behind the glass border (default: `20`) |
-| | `glassBorderOpacity`| `number` | White glass sheen opacity percentage (default: `20`–`25`) |
+| | `glassBorderOpacity`| `number` | White glass sheen opacity percentage (default: `20`-`25`) |
 | **Shadow** | `shadow` | `number` | Shadow spread (`0` to `80`, default: `25`) |
 | | `shadowBlur` | `number` | Shadow blur radius in pixels (default: `45`) |
 | | `shadowOpacity` | `number` | Shadow dark intensity percentage (default: `35`) |

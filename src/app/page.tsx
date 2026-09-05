@@ -1441,7 +1441,7 @@ export default function StudioPage() {
     setNoiseTexture(c.toDataURL('image/png'));
   }, []);
 
-  // ASCII Art generator — rasterizes the chosen character into a tiled PNG.
+  // ASCII Art generator: rasterizes the chosen character into a tiled PNG.
   // Canvas-raster (not SVG-text) so the texture survives html-to-image export in all browsers.
   // Returns the raw data URL (no CSS wrapper) so it can be used as an <img> src for export reliability
   const asciiTextureRaw = reactUseMemo(() => {

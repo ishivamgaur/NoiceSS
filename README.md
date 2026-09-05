@@ -5,7 +5,7 @@
 
   # NoiceSS
 
-  **Turn raw screenshots into beautiful mockups — in your browser or directly from your AI agent.**
+  **Turn raw screenshots into beautiful mockups in your browser or directly from your AI agent.**
 
   [![Try it Live](https://img.shields.io/badge/Live_Studio-noicess.fun-000000?style=for-the-badge)](https://noicess.fun)
 
@@ -65,7 +65,7 @@ Let your AI agent make your screenshots look great without you ever leaving your
 
 - **Zero Cloud Fees**: Runs locally using Node and Sharp. No OpenAI API keys, no subscriptions, no credit cards.
 - **Total Privacy**: Your proprietary product screenshots and code never get uploaded anywhere.
-- **Pixel-Perfect Matches**: Uses the exact same look as the web studio — real frosted glass blur, macOS traffic lights, smooth shadows, and badges.
+- **Pixel-Perfect Matches**: Uses the exact same look as the web studio with real frosted glass blur, macOS traffic lights, smooth shadows, and badges.
 - **Generates Code Too**: Ask for Tailwind CSS or React components with 3D tilt ready to drop straight into your landing page.
 
 ### 1. Test it in 10 seconds
