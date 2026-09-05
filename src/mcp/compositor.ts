@@ -72,12 +72,19 @@ function escapeXml(str: string): string {
 
 /**
  * Generates the unified macOS / Safari window chrome header
- * Matches NoiceSS Studio browser implementation (page.tsx L3982-4001) exactly:
- * - Height: 40px (or 52px when showBrowserBar is true)
+/**
+ * Creates macOS window chrome header SVG (matching NoiceSS Studio page.tsx L4080-4120 exactly):
+ * - Height: 40px (default macOS) or 52px (Safari browser bar), scaled by dpiScale
  * - Background: #1C1C1E
- * - Traffic lights: 12px dots, 8px gap, #ff5f56, #ffbd2e, #27c93f
- * - Integrated URL pill with lock icon if browserUrl is set
- * - Centered title if windowTitle is set
+ * - Traffic lights: 12px dots, 8px gap, #ff5f56, #ffbd2e, #27c93f, with 1px inset shine & 0.5px dark border
+ * - Safari address bar (when showBrowserBar is true):
+ *   - Height: 28px * scale
+ *   - Background: #2C2C2E with subtle inset shadow and 1px border rgba(255,255,255,0.06)
+ *   - Border radius: 6px * scale
+ *   - Centered lock icon (size 12 * scale, stroke 2, opacity 50%) + URL text (13px * scale, rgba(255,255,255,0.7))
+ * - Window title (when showBrowserBar is false & title is present):
+ *   - Centered 13px * scale, medium weight (500), rgba(255,255,255,0.7)
+ * - Bottom border (when showBrowserBar is true): rgba(0,0,0,0.4) 1px
  */
 function createWindowChromeSvg(
   width: number,
@@ -86,48 +93,93 @@ function createWindowChromeSvg(
   browserUrl?: string,
   title?: string
 ): Buffer {
-  const dotR = 6;
+  const baseH = showBrowserBar ? 52 : 40;
+  const scale = height / baseH;
+
+  // Dot dimensions matching page.tsx L4084-4088 exactly
+  const dotR = Math.max(2, Math.round(6 * scale));
   const dotY = Math.round(height / 2);
-  const startX = 20;
-  const dotGap = 20;
+  const padLeft = Math.round(20 * scale);
+  const dotGap = Math.round(8 * scale);
+  const dotPitch = dotR * 2 + dotGap; // center-to-center distance
+
+  const redCx = padLeft + dotR;
+  const yellowCx = redCx + dotPitch;
+  const greenCx = yellowCx + dotPitch;
+
+  const strokeWidth = Math.max(0.5, Number((0.6 * scale).toFixed(1)));
+  const highlightRx = Math.max(1, Number((dotR * 0.65).toFixed(1)));
+  const highlightRy = Math.max(0.5, Number((dotR * 0.32).toFixed(1)));
+  const highlightCy = dotY - Math.round(dotR * 0.3);
 
   let centerContent = '';
   if (showBrowserBar) {
-    const pillW = Math.min(420, Math.max(180, Math.round(width * 0.45)));
-    const pillH = 28;
-    const pillX = Math.round((width - pillW) / 2);
+    const pillH = Math.round(28 * scale);
     const pillY = Math.round((height - pillH) / 2);
+    const pillRadius = Math.max(2, Math.round(6 * scale));
+    const maxPillW = Math.round(400 * scale);
+    const trafficZone = Math.round((20 + 52 + 16) * scale);
+    const pillW = Math.min(maxPillW, Math.max(Math.round(160 * scale), width - trafficZone * 2));
+    const pillX = Math.round((width - pillW) / 2);
+
+    const lockSize = Math.max(8, Math.round(12 * scale));
+    const lockGap = Math.max(3, Math.round(6 * scale));
+    const fontSize = Math.max(9, Math.round(13 * scale));
     const displayUrl = browserUrl || 'example.com';
 
+    // Perfectly center lock icon + URL text inside pill (matching flex items-center justify-center)
+    const approxCharW = fontSize * 0.54;
+    const maxTextW = pillW - (lockSize + lockGap + Math.round(20 * scale));
+    const estTextW = Math.min(maxTextW, Math.round(displayUrl.length * approxCharW));
+    const totalInnerW = lockSize + lockGap + estTextW;
+    const innerStartX = Math.round(pillX + (pillW - totalInnerW) / 2);
+
+    const lockX = innerStartX;
+    const lockY = Math.round(height / 2 - lockSize / 2);
+    const lockScale = Number((lockSize / 24).toFixed(3));
+
+    const textX = innerStartX + lockSize + lockGap;
+    const textY = Math.round(height / 2 + fontSize * 0.34);
+
     centerContent = `
-      <!-- Integrated Safari URL Pill -->
-      <rect x="${pillX}" y="${pillY}" width="${pillW}" height="${pillH}" rx="6" ry="6" fill="#2C2C2E" stroke="rgba(255,255,255,0.06)" stroke-width="1" />
-      <!-- Lock Icon -->
-      <g transform="translate(${pillX + 12}, ${pillY + 8}) scale(0.65)">
-        <path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" />
+      <!-- URL Pill Container matching bg-[#2C2C2E] border-white/[0.06] shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] -->
+      <rect x="${pillX}" y="${pillY}" width="${pillW}" height="${pillH}" rx="${pillRadius}" ry="${pillRadius}" fill="#2C2C2E" stroke="rgba(255,255,255,0.06)" stroke-width="${strokeWidth}" />
+      <!-- Subtle Pill Inner Top Shadow -->
+      <line x1="${pillX + pillRadius}" y1="${pillY + 1}" x2="${pillX + pillW - pillRadius}" y2="${pillY + 1}" stroke="rgba(0,0,0,0.25)" stroke-width="${strokeWidth}" />
+      <!-- Lock Icon (Lucide 12px) -->
+      <g transform="translate(${lockX}, ${lockY}) scale(${lockScale})" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
       </g>
-      <!-- URL Text -->
-      <text x="${pillX + 30}" y="${pillY + 18}" fill="rgba(255,255,255,0.7)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="400">${escapeXml(displayUrl)}</text>
+      <!-- URL Text matching text-[13px] text-white/70 font-sans tracking-wide -->
+      <text x="${textX}" y="${textY}" fill="rgba(255,255,255,0.7)" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif" font-size="${fontSize}" font-weight="400" letter-spacing="0.02em">${escapeXml(displayUrl)}</text>
     `;
   } else if (title) {
-    centerContent = `<text x="50%" y="${dotY + 4}" text-anchor="middle" fill="#9ca3af" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500">${escapeXml(title)}</text>`;
+    const fontSize = Math.max(9, Math.round(13 * scale));
+    const textY = Math.round(height / 2 + fontSize * 0.34);
+    centerContent = `
+      <!-- Centered Window Title matching text-[13px] font-medium text-white/70 -->
+      <text x="50%" y="${textY}" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif" font-size="${fontSize}" font-weight="500" letter-spacing="0.01em">${escapeXml(title)}</text>
+    `;
   }
 
   const bottomBorder = showBrowserBar
-    ? `<line x1="0" y1="${height - 1}" x2="${width}" y2="${height - 1}" stroke="rgba(0,0,0,0.4)" stroke-width="1" />`
+    ? `<line x1="0" y1="${height - 1}" x2="${width}" y2="${height - 1}" stroke="rgba(0,0,0,0.4)" stroke-width="${Math.max(1, Math.round(1 * scale))}" />`
     : '';
 
   const svg = `
     <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
       <rect width="${width}" height="${height}" fill="#1C1C1E" />
       ${bottomBorder}
-      <!-- Close (Red) -->
-      <circle cx="${startX}" cy="${dotY}" r="${dotR}" fill="#ff5f56" stroke="rgba(0,0,0,0.1)" stroke-width="0.5" />
-      <!-- Minimize (Yellow) -->
-      <circle cx="${startX + dotGap}" cy="${dotY}" r="${dotR}" fill="#ffbd2e" stroke="rgba(0,0,0,0.1)" stroke-width="0.5" />
-      <!-- Maximize (Green) -->
-      <circle cx="${startX + dotGap * 2}" cy="${dotY}" r="${dotR}" fill="#27c93f" stroke="rgba(0,0,0,0.1)" stroke-width="0.5" />
+      <!-- Close (Red #ff5f56) -->
+      <circle cx="${redCx}" cy="${dotY}" r="${dotR}" fill="#ff5f56" stroke="rgba(0,0,0,0.12)" stroke-width="${strokeWidth}" />
+      <ellipse cx="${redCx}" cy="${highlightCy}" rx="${highlightRx}" ry="${highlightRy}" fill="rgba(255,255,255,0.22)" />
+      <!-- Minimize (Yellow #ffbd2e) -->
+      <circle cx="${yellowCx}" cy="${dotY}" r="${dotR}" fill="#ffbd2e" stroke="rgba(0,0,0,0.12)" stroke-width="${strokeWidth}" />
+      <ellipse cx="${yellowCx}" cy="${highlightCy}" rx="${highlightRx}" ry="${highlightRy}" fill="rgba(255,255,255,0.22)" />
+      <!-- Maximize (Green #27c93f) -->
+      <circle cx="${greenCx}" cy="${dotY}" r="${dotR}" fill="#27c93f" stroke="rgba(0,0,0,0.12)" stroke-width="${strokeWidth}" />
+      <ellipse cx="${greenCx}" cy="${highlightCy}" rx="${highlightRx}" ry="${highlightRy}" fill="rgba(255,255,255,0.22)" />
       ${centerContent}
     </svg>
   `.trim();
@@ -663,6 +715,7 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
   const showMacOsBar = mergedConfig.showMacOsBar ?? (view === 'minimal' ? false : view === 'browser' || view === 'default' ? true : false);
   const showBrowserBar = mergedConfig.showBrowserBar ?? (view === 'browser');
   const browserUrl = mergedConfig.browserUrl ?? 'example.com';
+  const windowTitle = mergedConfig.windowTitle;
   const padding = mergedConfig.padding ?? 0; // Studio default: 0 (scale controls framing)
   const radius = mergedConfig.radius ?? 12; // Studio default: 12
   const shadow = mergedConfig.shadow ?? 25; // Studio default: 25
@@ -790,7 +843,7 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
       chromeHeight,
       showBrowserBar,
       browserUrl,
-      options.windowTitle
+      windowTitle
     );
     windowComposites.push({
       input: chromeBuffer,

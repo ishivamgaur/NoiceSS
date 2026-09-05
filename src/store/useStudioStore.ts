@@ -35,6 +35,8 @@ export interface StudioState {
   setShowBrowserBar: (v: boolean | ((prev: boolean) => boolean)) => void;
   browserUrl: string;
   setBrowserUrl: (v: string | ((prev: string) => string)) => void;
+  windowTitle: string;
+  setWindowTitle: (v: string | ((prev: string) => string)) => void;
   glassBorder: boolean;
   setGlassBorder: (v: boolean | ((prev: boolean) => boolean)) => void;
   glassBorderWidth: number;
@@ -192,6 +194,8 @@ export const useStudioStore = create<StudioState>((set) => ({
   setShowBrowserBar: (v) => set((state) => ({ showBrowserBar: typeof v === 'function' ? (v as Function)(state.showBrowserBar) : v })),
   browserUrl: 'example.com',
   setBrowserUrl: (v) => set((state) => ({ browserUrl: typeof v === 'function' ? (v as Function)(state.browserUrl) : v })),
+  windowTitle: '',
+  setWindowTitle: (v) => set((state) => ({ windowTitle: typeof v === 'function' ? (v as Function)(state.windowTitle) : v })),
   glassBorder: false,
   setGlassBorder: (v) => set((state) => ({ glassBorder: typeof v === 'function' ? (v as Function)(state.glassBorder) : v })),
   glassBorderWidth: 8,

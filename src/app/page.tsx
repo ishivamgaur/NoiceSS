@@ -623,6 +623,7 @@ export default function StudioPage() {
   const [showMacOsBar, setShowMacOsBar] = useState(false);
   const [showBrowserBar, setShowBrowserBar] = useState(false);
   const [browserUrl, setBrowserUrl] = useState('example.com');
+  const [windowTitle, setWindowTitle] = useState('');
   const [glassBorder, setGlassBorder] = useState(false);
   const [glassBorderWidth, setGlassBorderWidth] = useState(8);
   const [glassBorderBlur, setGlassBorderBlur] = useState(20);
@@ -747,14 +748,14 @@ export default function StudioPage() {
 
   const currentConfigSnapshot = React.useMemo(() => ({
     background, radius, shadow, bgBlur, aspectRatio, customRatioW, customRatioH,
-    showMacOsBar, showBrowserBar, browserUrl, view, glassBorder, glassBorderWidth, glassBorderOpacity, glassBorderBlur, glassBorderColor,
+    showMacOsBar, showBrowserBar, browserUrl, windowTitle, view, glassBorder, glassBorderWidth, glassBorderOpacity, glassBorderBlur, glassBorderColor,
     perspective, rotateX, rotateY, rotateZ, perspectiveDepth, brightness, contrast, saturation, hueRotate, filter,
     noiseIntensity, grainIntensity, noiseTarget, watermark, watermarkPlatform, watermarkPosition, watermarkTarget,
     watermarkOpacity, watermarkBlur, watermarkGlass, watermarkBorderWidth, watermarkBorderOpacity, watermarkOffsetX,
     watermarkOffsetY, watermarkScale, pos, rotation, scale, imageBlur, image, imageDimensions
   }), [
     background, radius, shadow, bgBlur, aspectRatio, customRatioW, customRatioH,
-    showMacOsBar, showBrowserBar, browserUrl, view, glassBorder, glassBorderWidth, glassBorderOpacity, glassBorderBlur, glassBorderColor,
+    showMacOsBar, showBrowserBar, browserUrl, windowTitle, view, glassBorder, glassBorderWidth, glassBorderOpacity, glassBorderBlur, glassBorderColor,
     perspective, rotateX, rotateY, rotateZ, perspectiveDepth, brightness, contrast, saturation, hueRotate, filter,
     noiseIntensity, grainIntensity, noiseTarget, watermark, watermarkPlatform, watermarkPosition, watermarkTarget,
     watermarkOpacity, watermarkBlur, watermarkGlass, watermarkBorderWidth, watermarkBorderOpacity, watermarkOffsetX,
@@ -970,6 +971,7 @@ export default function StudioPage() {
         if (s.showMacOsBar !== undefined) setShowMacOsBar(s.showMacOsBar);
         if (s.showBrowserBar !== undefined) setShowBrowserBar(s.showBrowserBar);
         if (s.browserUrl !== undefined) setBrowserUrl(s.browserUrl);
+        if (s.windowTitle !== undefined) setWindowTitle(s.windowTitle);
         if (s.view !== undefined) setView(s.view);
         if (s.glassBorder !== undefined) setGlassBorder(s.glassBorder);
         if (s.glassBorderWidth !== undefined) setGlassBorderWidth(s.glassBorderWidth);
@@ -1047,6 +1049,7 @@ export default function StudioPage() {
           showMacOsBar,
           showBrowserBar,
           browserUrl,
+          windowTitle,
           view,
           glassBorder,
           glassBorderWidth,
@@ -1113,6 +1116,7 @@ export default function StudioPage() {
     showMacOsBar,
     showBrowserBar,
     browserUrl,
+    windowTitle,
     view,
     glassBorder,
     glassBorderWidth,
@@ -1241,6 +1245,7 @@ export default function StudioPage() {
     setShowMacOsBar(config.showMacOsBar ?? false);
     setShowBrowserBar(config.showBrowserBar ?? false);
     setBrowserUrl(config.browserUrl || 'example.com');
+    setWindowTitle(config.windowTitle || '');
     setView(config.view || 'default');
     setGlassBorder(config.glassBorder ?? false);
     setGlassBorderWidth(config.glassBorderWidth ?? 4);
@@ -1341,6 +1346,8 @@ export default function StudioPage() {
         if (p.has('chrome')) setShowMacOsBar(p.get('chrome') === '1' || p.get('chrome') === 'true');
         if (p.has('browser')) setShowBrowserBar(p.get('browser') === '1' || p.get('browser') === 'true');
         if (p.has('browserUrl')) setBrowserUrl(p.get('browserUrl')!);
+        if (p.has('windowTitle')) setWindowTitle(p.get('windowTitle')!);
+        if (p.has('title')) setWindowTitle(p.get('title')!);
 
         // 5. Geometry & Sizing
         if (p.has('radius')) setRadius(Number(p.get('radius')));
@@ -2546,6 +2553,20 @@ export default function StudioPage() {
                         value={browserUrl}
                         onChange={(e) => setBrowserUrl(e.target.value)}
                         placeholder="example.com"
+                        className="bg-white/[0.03] border border-white/[0.05] rounded-md px-2.5 py-1.5 text-xs text-zinc-300 w-full focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all placeholder:text-zinc-600"
+                      />
+                    </div>
+                  )}
+
+                  {showMacOsBar && !showBrowserBar && (
+                    <div className="flex flex-col gap-1.5 mt-1 mb-2">
+                      <label htmlFor="window-title-input" className="text-[11px] text-zinc-400 font-medium">Window Title</label>
+                      <input 
+                        id="window-title-input"
+                        type="text" 
+                        value={windowTitle}
+                        onChange={(e) => setWindowTitle(e.target.value)}
+                        placeholder="Window Title (optional)"
                         className="bg-white/[0.03] border border-white/[0.05] rounded-md px-2.5 py-1.5 text-xs text-zinc-300 w-full focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all placeholder:text-zinc-600"
                       />
                     </div>
@@ -4086,14 +4107,18 @@ export default function StudioPage() {
                           <div className="w-[12px] h-[12px] rounded-full bg-[#ffbd2e] border border-black/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] shrink-0" />
                           <div className="w-[12px] h-[12px] rounded-full bg-[#27c93f] border border-black/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] shrink-0" />
                         </div>
-                        {showBrowserBar && (
+                        {showBrowserBar ? (
                           <div className="flex-1 flex justify-center min-w-0 px-4">
                             <div className="w-full max-w-[400px] h-[28px] bg-[#2C2C2E] rounded-[6px] flex items-center justify-center text-[13px] text-white/70 border border-white/[0.06] shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] px-3 overflow-hidden pointer-events-none">
                               <Lock size={12} className="mr-1.5 opacity-50 shrink-0" />
                               <span className="truncate font-sans tracking-wide leading-none">{browserUrl}</span>
                             </div>
                           </div>
-                        )}
+                        ) : windowTitle ? (
+                          <div className="flex-1 flex justify-center min-w-0 px-4">
+                            <span className="truncate font-sans text-[13px] font-medium text-white/70 tracking-wide leading-none">{windowTitle}</span>
+                          </div>
+                        ) : null}
                         <div className="shrink-0 w-[52px]"></div>
                       </div>
                     )}
