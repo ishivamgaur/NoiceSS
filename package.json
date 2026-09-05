@@ -1,6 +1,6 @@
 {
-  "name": "tmp_noicess",
-  "version": "0.1.0",
+  "name": "noicess",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,6 +11,8 @@
     "test:mockup": "tsx scripts/test-mockup.ts"
   },
   "bin": {
+    "noicess": "./bin/noicess-mcp.mjs",
+    "noiceSS": "./bin/noicess-mcp.mjs",
     "noicess-mcp": "./bin/noicess-mcp.mjs"
   },
   "dependencies": {

@@ -18,15 +18,15 @@ Instead of switching tabs to open Figma or drag images into a browser, you can t
 
 ## Agent Setup (1 Minute)
 
-Add NoiceSS to your agent configuration file. Replace `<PATH_TO_NOICESS>` with your local repository path (e.g., `C:/Users/1by20/Desktop/noiceSS` on Windows or `/Users/username/noiceSS` on Mac/Linux):
+Connect NoiceSS directly from GitHub without cloning or downloading:
 
 ### Cursor (`.cursor/mcp.json`)
 ```json
 {
   "mcpServers": {
     "noicess": {
-      "command": "node",
-      "args": ["<PATH_TO_NOICESS>/bin/noicess-mcp.mjs"]
+      "command": "npx",
+      "args": ["-y", "github:ishivamgaur/noiceSS"]
     }
   }
 }
@@ -40,8 +40,8 @@ Add NoiceSS to your agent configuration file. Replace `<PATH_TO_NOICESS>` with y
 {
   "mcpServers": {
     "noicess": {
-      "command": "node",
-      "args": ["<PATH_TO_NOICESS>/bin/noicess-mcp.mjs"]
+      "command": "npx",
+      "args": ["-y", "github:ishivamgaur/noiceSS"]
     }
   }
 }
@@ -52,8 +52,8 @@ Add NoiceSS to your agent configuration file. Replace `<PATH_TO_NOICESS>` with y
 {
   "mcpServers": {
     "noicess": {
-      "command": "node",
-      "args": ["<PATH_TO_NOICESS>/bin/noicess-mcp.mjs"]
+      "command": "npx",
+      "args": ["-y", "github:ishivamgaur/noiceSS"]
     }
   }
 }
@@ -66,8 +66,8 @@ Add to your extension's MCP configuration (`cline_mcp_settings.json`):
 {
   "mcpServers": {
     "noicess": {
-      "command": "node",
-      "args": ["<PATH_TO_NOICESS>/bin/noicess-mcp.mjs"]
+      "command": "npx",
+      "args": ["-y", "github:ishivamgaur/noiceSS"]
     }
   }
 }
@@ -75,7 +75,7 @@ Add to your extension's MCP configuration (`cline_mcp_settings.json`):
 
 ### Google Antigravity / Gemini CLI
 ```bash
-agy mcp add noicess node <PATH_TO_NOICESS>/bin/noicess-mcp.mjs
+agy mcp add noicess npx -y github:ishivamgaur/noiceSS
 ```
 
 ### Zed (`~/.config/zed/settings.json`)
@@ -84,13 +84,15 @@ agy mcp add noicess node <PATH_TO_NOICESS>/bin/noicess-mcp.mjs
   "context_servers": {
     "noicess": {
       "command": {
-        "path": "node",
-        "args": ["<PATH_TO_NOICESS>/bin/noicess-mcp.mjs"]
+        "path": "npx",
+        "args": ["-y", "github:ishivamgaur/noiceSS"]
       }
     }
   }
 }
 ```
+
+*(Note: If working locally inside this cloned repository, you can also use `"command": "node", "args": ["bin/noicess-mcp.mjs"]`).*
 
 ---
 
