@@ -1,4 +1,4 @@
-export type ImageFormat = 'png' | 'jpeg' | 'webp';
+export type ImageFormat = 'png' | 'jpeg' | 'jpg' | 'webp';
 
 export type PerspectiveId =
   | 'front'
@@ -31,7 +31,7 @@ export interface MockupConfig {
 
   // --- Background ---
   background?: string;
-  bgBlur?: number;
+  bgBlur?: number | 'off' | 'less' | 'soft' | 'default' | 'medium' | 'more' | 'frosted' | string;
 
   // --- Window Chrome & View ---
   view?: 'default' | 'browser' | 'minimal';
@@ -109,7 +109,7 @@ export interface MockupConfig {
   watermarkPosition?: WatermarkPosition;
   watermarkTarget?: 'screenshot' | 'canvas';
   watermarkOpacity?: number;
-  watermarkBlur?: number;
+  watermarkBlur?: number | 'off' | 'less' | 'soft' | 'default' | 'frosted' | 'more' | 'deep' | string;
   watermarkGlass?: WatermarkGlass;
   watermarkBorderWidth?: number;
   watermarkBorderOpacity?: number;
@@ -123,6 +123,9 @@ export interface MockupConfig {
   format?: ImageFormat;
   quality?: number;
   exportScale?: number;
+  resolution?: '1080p' | '2k' | '4k' | '8k' | string;
+  targetWidth?: number;
+  targetHeight?: number;
 }
 
 export interface GenerateMockupOptions extends MockupConfig {

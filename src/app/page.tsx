@@ -1385,6 +1385,15 @@ export default function StudioPage() {
         // 10. Watermark
         const wm = p.get('watermark');
         if (wm) setWatermark(wm);
+        if (p.has('wmPlatform')) setWatermarkPlatform(p.get('wmPlatform') as any);
+        if (p.has('wmPos')) setWatermarkPosition(p.get('wmPos') as any);
+        if (p.has('wmTarget')) setWatermarkTarget(p.get('wmTarget') as any);
+        if (p.has('wmOpacity')) setWatermarkOpacity(Number(p.get('wmOpacity')));
+        if (p.has('wmBlur')) setWatermarkBlur(Number(p.get('wmBlur')));
+        if (p.has('wmGlass')) setWatermarkGlass(p.get('wmGlass') as any);
+        if (p.has('wmScale')) setWatermarkScale(Number(p.get('wmScale')));
+        if (p.has('wmOffsetX')) setWatermarkOffsetX(Number(p.get('wmOffsetX')));
+        if (p.has('wmOffsetY')) setWatermarkOffsetY(Number(p.get('wmOffsetY')));
       } catch (err) {
         console.error('Failed to parse URL parameters for studio state', err);
       }

@@ -83,8 +83,7 @@ export function createNoiceServer() {
                 description: 'Wallpaper filename (e.g. "dark-green-8k.webp"), "CURRENT_IMAGE" (use screenshot itself as blurred backdrop), gradient CSS string, or hex color.',
               },
               bgBlur: {
-                type: 'number',
-                description: 'Background blur radius in pixels (0 = none). Blurs the entire background wallpaper/gradient before compositing.',
+                description: 'Background blur radius in pixels (0-50), or preset: "off" (0), "less"/"soft" (12), "default"/"medium" (25), "more"/"frosted" (40). Blurs the entire background wallpaper/gradient before compositing.',
               },
 
               // --- Window Chrome & View ---
@@ -318,8 +317,7 @@ export function createNoiceServer() {
                 description: 'Watermark opacity percentage (10-100). Studio default: 65.',
               },
               watermarkBlur: {
-                type: 'number',
-                description: 'Watermark glass blur in pixels (0-32). Studio default: 20.',
+                description: 'Watermark glass blur in pixels (0-40), or preset: "off" (0), "less"/"soft" (10), "default"/"frosted" (20), "more"/"deep" (32). Studio default: 20.',
               },
               watermarkGlass: {
                 type: 'string',
@@ -348,17 +346,29 @@ export function createNoiceServer() {
               // --- Export ---
               format: {
                 type: 'string',
-                description: 'Output format: "webp" (smallest), "png" (lossless), or "jpeg" (compat). Default: "webp".',
+                description: 'Output format: "webp" (smallest), "png" (lossless), "jpeg", or "jpg". Default: "webp".',
                 enum: ['webp', 'png', 'jpeg', 'jpg'],
               },
               quality: {
                 type: 'number',
-                description: 'Output quality 1-100 (for webp/jpeg). Default: 90.',
+                description: 'Output quality 1-100 (for webp/jpeg/jpg). Default: 90 for webp, 95-100 for jpeg.',
               },
               exportScale: {
                 type: 'number',
-                description: 'Export resolution multiplier: 1 (1x 1080p), 2 (2x 2K), 3 (3x 4K), 4 (4x 6K). Studio default: 1.',
-                enum: [1, 2, 3, 4],
+                description: 'Export resolution multiplier: 1 (1x 1080p), 2 (2x 2K), 3 (3x 4K), 4 (4x 6K), or any custom float number. Studio default: 1.',
+              },
+              resolution: {
+                type: 'string',
+                description: 'Target resolution preset: "1080p" (Full HD), "2k" (QHD), "4k" (Ultra HD 3840px), "8k" (7680px). Automatically scales all canvas and vector elements natively.',
+                enum: ['1080p', '2k', '4k', '8k'],
+              },
+              targetWidth: {
+                type: 'number',
+                description: 'Explicit target output width in pixels (e.g. 3840 for 4K).',
+              },
+              targetHeight: {
+                type: 'number',
+                description: 'Explicit target output height in pixels (e.g. 2160 or 2880).',
               },
             },
             required: ['imagePath'],
@@ -516,7 +526,7 @@ export function createNoiceServer() {
           if (options.showBrowserBar) effects.push('Browser chrome: ON');
           if (options.glassBorder) effects.push('Glass border: ON');
           if (options.imageBlur && options.imageBlur > 0) effects.push(`Image blur: ${options.imageBlur}px`);
-          if (options.bgBlur && options.bgBlur > 0) effects.push(`BG blur: ${options.bgBlur}px`);
+          if (options.bgBlur && (typeof options.bgBlur === 'string' ? options.bgBlur !== 'off' : options.bgBlur > 0)) effects.push(`BG blur: ${options.bgBlur}`);
           if (options.filter && options.filter !== 'none') effects.push(`Filter: ${options.filter}`);
           if (options.noiseIntensity && options.noiseIntensity > 0) effects.push(`Noise: ${options.noiseIntensity}%`);
           if (options.watermarkText) effects.push(`Watermark: "${options.watermarkText}"`);

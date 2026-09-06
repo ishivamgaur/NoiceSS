@@ -415,14 +415,16 @@ async function createBackgroundCanvas(
   if (bg === 'CURRENT_IMAGE' && inputImageBuffer) {
     const blurRadius = bgBlur !== undefined ? bgBlur : 25;
     if (blurRadius > 0) {
-      // Zoom in slightly before blur to avoid edge bleed (page.tsx L3973: scale(1 + bgBlur/100))
-      const scaleFactor = 1 + Math.min(0.2, blurRadius / 100);
+      // Scale blur radius proportionally with resolution relative to base canvas (~1560px)
+      const resScale = Math.max(1, targetWidth / 1560);
+      const effectiveBlur = Math.round(blurRadius * resScale);
+      const scaleFactor = 1 + Math.min(0.25, effectiveBlur / 100);
       const scaledW = Math.round(targetWidth * scaleFactor);
       const scaledH = Math.round(targetHeight * scaleFactor);
 
       bgBuffer = await sharp(inputImageBuffer)
         .resize(scaledW, scaledH, { fit: 'cover', position: 'center' })
-        .blur(Math.max(0.3, Math.min(100, blurRadius)))
+        .blur(Math.max(0.3, Math.min(250, effectiveBlur)))
         .extract({
           left: Math.round((scaledW - targetWidth) / 2),
           top: Math.round((scaledH - targetHeight) / 2),
@@ -440,14 +442,16 @@ async function createBackgroundCanvas(
     }
   } else if (wallpaperFile) {
     if (bgBlur && bgBlur > 0) {
-      // Zoom in slightly before blur to avoid edge bleed (page.tsx L3876: scale(1 + bgBlur/100))
-      const scaleFactor = 1 + Math.min(0.2, bgBlur / 100);
+      // Scale blur radius proportionally with resolution relative to base canvas (~1560px)
+      const resScale = Math.max(1, targetWidth / 1560);
+      const effectiveBlur = Math.round(bgBlur * resScale);
+      const scaleFactor = 1 + Math.min(0.25, effectiveBlur / 100);
       const scaledW = Math.round(targetWidth * scaleFactor);
       const scaledH = Math.round(targetHeight * scaleFactor);
 
       bgBuffer = await sharp(wallpaperFile)
         .resize(scaledW, scaledH, { fit: 'cover', position: 'center' })
-        .blur(Math.max(0.3, Math.min(100, bgBlur)))
+        .blur(Math.max(0.3, Math.min(250, effectiveBlur)))
         .extract({
           left: Math.round((scaledW - targetWidth) / 2),
           top: Math.round((scaledH - targetHeight) / 2),
@@ -545,24 +549,81 @@ async function applyColorAdjustments(
   return pipeline.png().toBuffer();
 }
 
+function getPlatformIconInnerSvg(platform: string, color: string): string {
+  switch (platform) {
+    case 'x':
+      return `<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="${color}"/>`;
+    case 'github':
+      return `<path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" fill="${color}"/>`;
+    case 'instagram':
+      return `
+        <rect width="20" height="20" x="2" y="2" rx="5" ry="5" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="17.5" cy="6.5" r="1.5" fill="${color}"/>
+      `;
+    case 'linkedin':
+      return `<path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.45a1.64 1.64 0 1 0 0 3.28 1.64 1.64 0 0 0 0-3.28z" fill="${color}"/>`;
+    case 'globe':
+      return `
+        <circle cx="12" cy="12" r="10" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="2" x2="22" y1="12" y2="12" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      `;
+    default:
+      return '';
+  }
+}
+
+function resolveBgBlur(val?: number | string): number {
+  if (typeof val === 'string') {
+    const s = val.toLowerCase().trim();
+    if (s === 'off' || s === 'none') return 0;
+    if (s === 'less' || s === 'soft') return 12;
+    if (s === 'default' || s === 'medium') return 25;
+    if (s === 'more' || s === 'frosted') return 40;
+    const parsed = parseFloat(s);
+    if (!isNaN(parsed)) return parsed;
+  }
+  if (typeof val === 'number') return val;
+  return 0;
+}
+
+function resolveWatermarkBlur(val?: number | string): number {
+  if (typeof val === 'string') {
+    const s = val.toLowerCase().trim();
+    if (s === 'off' || s === 'none') return 0;
+    if (s === 'less' || s === 'soft') return 10;
+    if (s === 'default' || s === 'frosted') return 20;
+    if (s === 'more' || s === 'deep') return 32;
+    const parsed = parseFloat(s);
+    if (!isNaN(parsed)) return parsed;
+  }
+  if (typeof val === 'number') return val;
+  return 20;
+}
+
 /**
- * Renders a true frosted glass watermark badge matching browser studio (page.tsx L4270-4286):
- * - Backdrop blur of canvas content underneath the badge (backdropFilter: blur(20px))
+ * Renders a true frosted glass watermark badge matching browser studio (page.tsx L4296-4316):
+ * - Backdrop blur of content underneath the badge (backdropFilter: blur(20px))
  * - Pill shape with rounded-full radius (rx=boxH/2)
- * - Translucent white glass wash fill: rgba(255, 255, 255, 0.15)
+ * - Translucent white glass wash fill: rgba(255, 255, 255, 0.15) (or 0.18 on screenshot)
  * - Hairline border stroke: rgba(255, 255, 255, 0.22)
  * - Drop shadow: 0 2px 10px rgba(0, 0, 0, 0.25)
- * - Crisp white typography with letter-spacing 0.025em
+ * - Platform SVG icon (X, GitHub, Instagram, LinkedIn, Globe) alongside typography
+ * - Crisp white typography (text-xs, font-medium, letter-spacing 0.025em)
  */
 async function renderFrostedWatermark(
   canvasBuffer: Buffer,
   canvasW: number,
   canvasH: number,
   text: string,
-  position: string = 'top-right',
+  platform: string = 'x',
+  position: string = 'bottom-right',
+  target: string = 'canvas',
+  cardBounds?: { x: number; y: number; w: number; h: number },
   opacity: number = 85,
   watermarkScale: number | string = 100,
-  watermarkBlur: number = 20,
+  watermarkBlur: number | string = 20,
   watermarkGlass: string = 'frosted',
   watermarkBorderOpacity: number = 22,
   dpiScale: number = 1
@@ -582,29 +643,60 @@ async function renderFrostedWatermark(
     scalePercent = watermarkScale;
   }
 
-  // Exact browser studio styling: text-xs (12px), px-4 (16px), py-2 (8px), top-6 right-6 (24px margin)
+  // Resolve blur preset
+  const resolvedBlur = resolveWatermarkBlur(watermarkBlur);
+
+  // Exact browser studio styling: text-xs (12px), px-4 (16px), py-2 (8px), gap-1.5 (6px)
+  const normPlatform = (platform || 'x').toLowerCase().trim();
+  let displayText = text;
+  if (normPlatform === 'x' && !text.startsWith('@')) {
+    displayText = `@${text}`;
+  }
+  const hasIcon = normPlatform !== 'none';
+
   const scale = Math.max(0.3, Math.min(3.0, (scalePercent / 100) * dpiScale));
   const fontSize = Math.round(12 * scale);
-  const textLen = text.length * fontSize * 0.58;
+  const iconSize = Math.round(12 * scale);
+  const gap = Math.round(6 * scale);
   const padX = Math.round(16 * scale);
   const padY = Math.round(8 * scale);
-  const boxW = Math.round(textLen + padX * 2);
-  const boxH = Math.round(fontSize * 1.33 + padY * 2);
+
+  const textLen = displayText.length * fontSize * 0.58;
+  const contentW = (hasIcon ? iconSize + gap : 0) + textLen;
+  const boxW = Math.round(contentW + padX * 2);
+  const boxH = Math.round(Math.max(fontSize * 1.33, iconSize) + padY * 2);
   const boxR = Math.round(boxH / 2); // rounded-full (9999px)
-  const margin = Math.round(24 * dpiScale); // top-6 right-6 = 24px
 
-  let x = canvasW - boxW - margin;
-  let y = margin;
+  // Coordinate positioning matching browser studio
+  let x = 0;
+  let y = 0;
 
-  if (position.includes('left')) x = margin;
-  else if (position.includes('center')) x = Math.round((canvasW - boxW) / 2);
+  if (target === 'screenshot' && cardBounds) {
+    const margin = Math.round(16 * dpiScale); // Studio default on screenshot: bottom-4 / right-4 (16px)
+    x = cardBounds.x + cardBounds.w - boxW - margin;
+    y = cardBounds.y + cardBounds.h - boxH - margin;
 
-  if (position.startsWith('top')) y = margin;
-  else if (position.includes('bottom')) y = canvasH - boxH - margin;
-  else if (position.includes('center') && !position.includes('bottom')) y = Math.round((canvasH - boxH) / 2);
+    if (position.includes('left')) x = cardBounds.x + margin;
+    else if (position.includes('center')) x = Math.round(cardBounds.x + (cardBounds.w - boxW) / 2);
 
-  // 1. Extract slice of canvas directly under the pill and blur it (backdropFilter: blur(20px))
-  const blurRadius = Math.max(1, Math.min(50, Math.round(watermarkBlur * dpiScale)));
+    if (position.startsWith('top')) y = cardBounds.y + margin;
+    else if (position.includes('bottom')) y = cardBounds.y + cardBounds.h - boxH - margin;
+    else if (position.includes('center') && !position.includes('bottom')) y = Math.round(cardBounds.y + (cardBounds.h - boxH) / 2);
+  } else {
+    const margin = Math.round(24 * dpiScale); // Studio default on canvas: bottom-6 / right-6 (24px)
+    x = canvasW - boxW - margin;
+    y = canvasH - boxH - margin;
+
+    if (position.includes('left')) x = margin;
+    else if (position.includes('center')) x = Math.round((canvasW - boxW) / 2);
+
+    if (position.startsWith('top')) y = margin;
+    else if (position.includes('bottom')) y = canvasH - boxH - margin;
+    else if (position.includes('center') && !position.includes('bottom')) y = Math.round((canvasH - boxH) / 2);
+  }
+
+  // 1. Extract slice of canvas directly under the pill and blur it (backdropFilter: blur)
+  const blurRadius = Math.max(1, Math.min(50, Math.round(resolvedBlur * dpiScale)));
   let frostedSlice: Buffer;
   try {
     const rawSlice = await sharp(canvasBuffer)
@@ -618,15 +710,28 @@ async function renderFrostedWatermark(
       .png()
       .toBuffer();
 
-    // 2. Translucent wash + 1px border stroke + typography
+    // 2. Translucent wash + 1px border stroke + platform icon + typography
     const strokeW = Math.max(1, Math.round(dpiScale * 0.8));
     const glassBg = watermarkGlass === 'dark' 
       ? 'rgba(15, 15, 18, 0.60)' 
       : watermarkGlass === 'clear' 
       ? 'rgba(255, 255, 255, 0.05)' 
-      : 'rgba(255, 255, 255, 0.15)'; // Studio standard
+      : (target === 'screenshot' ? 'rgba(255, 255, 255, 0.18)' : 'rgba(255, 255, 255, 0.15)'); // Studio standard
     const borderAlpha = (watermarkBorderOpacity / 100).toFixed(2);
     const textAlpha = (opacity / 100).toFixed(2);
+    const textColor = `rgba(255, 255, 255, ${textAlpha})`;
+
+    let iconSvgFragment = '';
+    if (hasIcon) {
+      const iconX = padX;
+      const iconY = Math.round((boxH - iconSize) / 2);
+      const innerIcon = getPlatformIconInnerSvg(normPlatform, textColor);
+      iconSvgFragment = `<svg x="${iconX}" y="${iconY}" width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24">${innerIcon}</svg>`;
+    }
+
+    const textX = hasIcon ? padX + iconSize + gap : Math.round(boxW / 2);
+    const textAnchor = hasIcon ? 'start' : 'middle';
+    const textY = Math.round(boxH / 2);
 
     const pillSheenSvg = Buffer.from(`
       <svg width="${boxW}" height="${boxH}" viewBox="0 0 ${boxW} ${boxH}" xmlns="http://www.w3.org/2000/svg">
@@ -634,8 +739,10 @@ async function renderFrostedWatermark(
         <rect x="0" y="0" width="${boxW}" height="${boxH}" rx="${boxR}" ry="${boxR}" fill="${glassBg}" />
         <!-- Hairline border stroke -->
         <rect x="${strokeW / 2}" y="${strokeW / 2}" width="${boxW - strokeW}" height="${boxH - strokeW}" rx="${boxR}" ry="${boxR}" fill="none" stroke="rgba(255,255,255,${borderAlpha})" stroke-width="${strokeW}" />
-        <!-- Crisp white text perfectly centered -->
-        <text x="${boxW / 2}" y="${boxH / 2}" text-anchor="middle" dominant-baseline="central" fill="rgba(255,255,255,${textAlpha})" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="${fontSize}" font-weight="500" letter-spacing="0.025em">${escapeXml(text)}</text>
+        <!-- Platform Icon -->
+        ${iconSvgFragment}
+        <!-- Crisp white text perfectly matching browser studio -->
+        <text x="${textX}" y="${textY}" text-anchor="${textAnchor}" dominant-baseline="central" fill="${textColor}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="${fontSize}" font-weight="500" letter-spacing="0.025em">${escapeXml(displayText)}</text>
       </svg>
     `);
 
@@ -649,11 +756,26 @@ async function renderFrostedWatermark(
       .toBuffer();
   } catch {
     const strokeW = Math.max(1, Math.round(dpiScale * 0.8));
+    const glassBg = watermarkGlass === 'dark' ? 'rgba(15, 15, 18, 0.60)' : 'rgba(255, 255, 255, 0.15)';
+    const textAlpha = (opacity / 100).toFixed(2);
+    const textColor = `rgba(255, 255, 255, ${textAlpha})`;
+    let iconSvgFragment = '';
+    if (hasIcon) {
+      const iconX = padX;
+      const iconY = Math.round((boxH - iconSize) / 2);
+      const innerIcon = getPlatformIconInnerSvg(normPlatform, textColor);
+      iconSvgFragment = `<svg x="${iconX}" y="${iconY}" width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24">${innerIcon}</svg>`;
+    }
+    const textX = hasIcon ? padX + iconSize + gap : Math.round(boxW / 2);
+    const textAnchor = hasIcon ? 'start' : 'middle';
+    const textY = Math.round(boxH / 2);
+
     const pillSvg = Buffer.from(`
       <svg width="${boxW}" height="${boxH}" viewBox="0 0 ${boxW} ${boxH}" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="0" width="${boxW}" height="${boxH}" rx="${boxR}" ry="${boxR}" fill="rgba(255,255,255,0.15)" />
+        <rect x="0" y="0" width="${boxW}" height="${boxH}" rx="${boxR}" ry="${boxR}" fill="${glassBg}" />
         <rect x="${strokeW / 2}" y="${strokeW / 2}" width="${boxW - strokeW}" height="${boxH - strokeW}" rx="${boxR}" ry="${boxR}" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="${strokeW}" />
-        <text x="${boxW / 2}" y="${boxH / 2 + fontSize * 0.35}" text-anchor="middle" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="${fontSize}" font-weight="500" letter-spacing="0.025em">${escapeXml(text)}</text>
+        ${iconSvgFragment}
+        <text x="${textX}" y="${textY}" text-anchor="${textAnchor}" dominant-baseline="central" fill="${textColor}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="${fontSize}" font-weight="500" letter-spacing="0.025em">${escapeXml(displayText)}</text>
       </svg>
     `);
     frostedSlice = await sharp(pillSvg).png().toBuffer();
@@ -724,13 +846,26 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
   const glassBorderOpacity = mergedConfig.glassBorderOpacity ?? 20; // Studio default: 20
   const glassBorderBlur = mergedConfig.glassBorderBlur ?? 20; // Studio default: 20
   const background = mergedConfig.background || 'dark-green-8k.webp'; // Studio default: dark-green-8k
-  const rawFormat = (options.format || 'webp').toLowerCase();
-  const format: ImageFormat = rawFormat === 'jpg' ? 'jpeg' : (rawFormat as ImageFormat);
-  const quality = options.quality ?? 90;
-  const exportScale = mergedConfig.exportScale ?? 1;
+  let rawFormat = (options.format || (mergedConfig as any).format || '').toLowerCase();
+  if (!rawFormat && options.outputPath) {
+    if (options.outputPath.endsWith('.jpg') || options.outputPath.endsWith('.jpeg')) {
+      rawFormat = 'jpeg';
+    } else if (options.outputPath.endsWith('.png')) {
+      rawFormat = 'png';
+    } else if (options.outputPath.endsWith('.webp')) {
+      rawFormat = 'webp';
+    }
+  }
+  if (!rawFormat) rawFormat = 'webp';
+  const format: ImageFormat = (rawFormat === 'jpg' || rawFormat === 'jpeg') ? 'jpeg' : (rawFormat as ImageFormat);
+  const quality = options.quality ?? (mergedConfig as any).quality ?? (format === 'jpeg' ? 95 : 90);
+  const rawExportScale = mergedConfig.exportScale ?? 1;
+  const resolution = ((mergedConfig as any).resolution || (options as any).resolution || '').toLowerCase();
+  const targetWidth = (mergedConfig as any).targetWidth || (options as any).targetWidth;
+  const targetHeight = (mergedConfig as any).targetHeight || (options as any).targetHeight;
   const imgScale = mergedConfig.scale ?? 85; // Studio default: 85%
   const imageBlur = mergedConfig.imageBlur ?? 0;
-  const bgBlur = mergedConfig.bgBlur ?? 0;
+  const bgBlur = resolveBgBlur(mergedConfig.bgBlur);
   const aspectRatio = mergedConfig.aspectRatio || 'auto';
 
   // 2. Studio Shadow Formula (matching page.tsx L3931-3933)
@@ -769,7 +904,9 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
 
   // Watermark
   const watermarkText = mergedConfig.watermark ?? mergedConfig.watermarkText;
+  const watermarkPlatform = mergedConfig.watermarkPlatform ?? 'x';
   const watermarkPosition = mergedConfig.watermarkPosition ?? 'bottom-right';
+  const watermarkTarget = mergedConfig.watermarkTarget ?? 'canvas';
   const watermarkOpacity = mergedConfig.watermarkOpacity ?? 85;
   const watermarkScaleVal = mergedConfig.watermarkScale ?? mergedConfig.watermarkSize ?? 100;
   const watermarkBlurVal = mergedConfig.watermarkBlur ?? 20;
@@ -786,7 +923,7 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
 
   let imgW = imageMetadata.width;
   let imgH = imageMetadata.height;
-  const MAX_WIDTH = 2048;
+  const MAX_WIDTH = 8192; // Safeguard for 4K/8K masters
 
   let processedImageBuffer = rawImageBuffer;
   if (imgW > MAX_WIDTH) {
@@ -798,9 +935,73 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
       .toBuffer();
   }
 
+  // Pre-calculate target aspect ratio
+  let targetRatio: number;
+  if (!aspectRatio || aspectRatio === 'auto') {
+    targetRatio = imgW / imgH;
+  } else {
+    const [wStr, hStr] = aspectRatio.replace(':', '/').split('/');
+    const parsed = parseFloat(wStr) / parseFloat(hStr);
+    targetRatio = !isNaN(parsed) && parsed > 0 ? parsed : imgW / imgH;
+  }
+
+  const hasChrome = showMacOsBar || showBrowserBar;
+  const scaleFraction = Math.max(0.3, Math.min(1.0, (imgScale ?? 85) / 100));
+
+  // Determine base canvas dimensions at 1x
+  const baseDpi = Math.max(1, imgW / 800);
+  const baseGbW = glassBorder ? Math.round((glassBorderWidth ?? 8) * baseDpi) : 0;
+  const baseChromeH = hasChrome ? Math.round((showBrowserBar ? 52 : 40) * baseDpi) : 0;
+  const baseCardW = imgW + baseGbW * 2;
+  const baseCardH = imgH + baseChromeH + baseGbW * 2;
+  const basePad = Math.round(padding * baseDpi);
+
+  let baseCanvasW: number;
+  let baseCanvasH: number;
+  if (baseCardW / baseCardH >= targetRatio) {
+    baseCanvasW = Math.round(baseCardW / scaleFraction) + basePad * 2;
+    baseCanvasH = Math.round(baseCanvasW / targetRatio);
+  } else {
+    baseCanvasH = Math.round(baseCardH / scaleFraction) + basePad * 2;
+    baseCanvasW = Math.round(baseCanvasH * targetRatio);
+  }
+
+  // Native resolution scaling multiplier for pristine 4K/2K/8K rendering
+  let scaleMultiplier = 1;
+  let targetRequestedWidth: number | undefined;
+  if (targetWidth && targetWidth > 0) {
+    targetRequestedWidth = targetWidth;
+    scaleMultiplier = targetWidth / baseCanvasW;
+  } else if (targetHeight && targetHeight > 0) {
+    scaleMultiplier = targetHeight / baseCanvasH;
+  } else if (resolution === '4k' || resolution === 'uhd') {
+    targetRequestedWidth = targetRatio >= 1 ? 3840 : Math.round(2160 * targetRatio);
+    scaleMultiplier = targetRequestedWidth / baseCanvasW;
+  } else if (resolution === '2k' || resolution === 'qhd') {
+    targetRequestedWidth = targetRatio >= 1 ? 2560 : Math.round(1440 * targetRatio);
+    scaleMultiplier = targetRequestedWidth / baseCanvasW;
+  } else if (resolution === '1080p' || resolution === 'fhd') {
+    targetRequestedWidth = targetRatio >= 1 ? 1920 : Math.round(1080 * targetRatio);
+    scaleMultiplier = targetRequestedWidth / baseCanvasW;
+  } else if (resolution === '8k') {
+    targetRequestedWidth = targetRatio >= 1 ? 7680 : Math.round(4320 * targetRatio);
+    scaleMultiplier = targetRequestedWidth / baseCanvasW;
+  } else if (rawExportScale && rawExportScale > 1) {
+    scaleMultiplier = rawExportScale;
+  }
+
+  // If high resolution is requested, scale input image natively with Lanczos3
+  if (scaleMultiplier > 1) {
+    imgW = Math.round(imgW * scaleMultiplier);
+    imgH = Math.round(imgH * scaleMultiplier);
+    processedImageBuffer = await sharp(processedImageBuffer)
+      .resize(imgW, imgH, { fit: 'fill', kernel: 'lanczos3' })
+      .toBuffer();
+  }
+
   if (imageBlur > 0) {
     processedImageBuffer = await sharp(processedImageBuffer)
-      .blur(Math.max(0.3, Math.min(100, imageBlur)))
+      .blur(Math.max(0.3, Math.min(100, imageBlur * scaleMultiplier)))
       .toBuffer();
   }
 
@@ -817,7 +1018,7 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
 
   // Proportional resolution scaling (matching html-to-image optimalMultiplier in page.tsx L1918)
   // The studio UI comp is designed for an 800px base canvas.
-  // When compositing high-res screenshots (e.g. 1920px or 2048px), scale styling parameters
+  // When compositing high-res screenshots (e.g. 1920px, 2048px, or 4K masters), scale styling parameters
   // proportionally so borders, corner radiuses, and shadows maintain exact browser studio proportions.
   const dpiScale = Math.max(1, imgW / 800);
   const gbWidth = glassBorder ? Math.round((glassBorderWidth ?? 8) * dpiScale) : 0;
@@ -828,7 +1029,6 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
   const scaledShadowOffsetX = Math.round(shadowOffsetX * dpiScale);
 
   // 4. Window Chrome (Unified Safari header bar: 40px or 52px, scaled with DPI)
-  const hasChrome = showMacOsBar || showBrowserBar;
   const chromeHeight = hasChrome ? Math.round((showBrowserBar ? 52 : 40) * dpiScale) : 0;
 
   const windowW = imgW;
@@ -886,22 +1086,7 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
     .png()
     .toBuffer();
 
-  // 6. Canvas Dimensions & Aspect Ratio Calculation (matching browser studio page.tsx L2250-2350)
-  // In the browser studio:
-  // - When aspectRatio is 'auto' (or omitted), the canvas aspect ratio strictly matches the image aspect ratio (imgW / imgH).
-  // - When fixed aspectRatio is provided, the canvas matches that ratio.
-  // - The screenshot card occupies exactly scale% (e.g. 90%) of the canvas along its constraining dimension.
-  const scaleFraction = Math.max(0.3, Math.min(1.0, (imgScale ?? 85) / 100));
-
-  let targetRatio: number;
-  if (!aspectRatio || aspectRatio === 'auto') {
-    targetRatio = imgW / imgH;
-  } else {
-    const [wStr, hStr] = aspectRatio.replace(':', '/').split('/');
-    const parsed = parseFloat(wStr) / parseFloat(hStr);
-    targetRatio = !isNaN(parsed) && parsed > 0 ? parsed : imgW / imgH;
-  }
-
+  // 6. Canvas Dimensions (matching browser studio page.tsx L2250-2350)
   // Determine canvas dimensions: card occupies scaleFraction along the bounding dimension
   let canvasW: number;
   let canvasH: number;
@@ -915,6 +1100,12 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
     // Height is the constraining dimension: card occupies exactly scale% of canvas height
     canvasH = Math.round(cardH / scaleFraction) + scaledPadding * 2;
     canvasW = Math.round(canvasH * targetRatio);
+  }
+
+  // Snap to exact standard target resolution if requested within small rounding jitter (e.g. 3839 -> 3840)
+  if (targetRequestedWidth && Math.abs(canvasW - targetRequestedWidth) <= 4) {
+    canvasW = targetRequestedWidth;
+    canvasH = Math.round(canvasW / targetRatio);
   }
 
   // Centering position of the outer card on the canvas
@@ -1047,7 +1238,10 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
       canvasW,
       canvasH,
       watermarkText.trim(),
+      watermarkPlatform,
       watermarkPosition,
+      watermarkTarget,
+      { x: cardX, y: cardY, w: cardW, h: cardH },
       watermarkOpacity,
       watermarkScaleVal,
       watermarkBlurVal,
@@ -1068,10 +1262,10 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
     ));
   }
 
-  // Export scale multiplier (1x, 2x retina, 4x print)
-  if (exportScale > 1) {
-    const scaledW = Math.round(canvasW * exportScale);
-    const scaledH = Math.round(canvasH * exportScale);
+  // Export scale multiplier (fallback if not already rendered natively)
+  if (rawExportScale > 1 && scaleMultiplier === 1) {
+    const scaledW = Math.round(canvasW * rawExportScale);
+    const scaledH = Math.round(canvasH * rawExportScale);
     outputBuffer = await sharp(outputBuffer)
       .resize(scaledW, scaledH, { fit: 'fill', kernel: 'lanczos3' })
       .png()
@@ -1081,9 +1275,13 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
   // Format encoding
   let finalPipeline = sharp(outputBuffer);
   if (format === 'webp') {
-    finalPipeline = finalPipeline.webp({ quality, effort: 4 });
+    finalPipeline = finalPipeline.webp({ quality: Math.min(100, Math.max(1, quality)), effort: 4 });
   } else if (format === 'jpeg') {
-    finalPipeline = finalPipeline.jpeg({ quality });
+    finalPipeline = finalPipeline.jpeg({
+      quality: Math.min(100, Math.max(1, quality)),
+      chromaSubsampling: '4:4:4',
+      mozjpeg: true,
+    });
   } else {
     finalPipeline = finalPipeline.png({ compressionLevel: 8 });
   }
@@ -1105,8 +1303,8 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
   }
 
   const outputMeta = await sharp(finalBuffer).metadata();
-  const outW = outputMeta.width || Math.round(canvasW * Math.max(1, exportScale));
-  const outH = outputMeta.height || Math.round(canvasH * Math.max(1, exportScale));
+  const outW = outputMeta.width || canvasW;
+  const outH = outputMeta.height || canvasH;
 
   return {
     outputPath: resolvedOutputPath,

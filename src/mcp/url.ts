@@ -13,7 +13,7 @@ export function generateStudioUrl(
 
   // Background
   if (options.background) params.set('bg', options.background);
-  if (options.bgBlur !== undefined && options.bgBlur > 0) params.set('bgBlur', String(options.bgBlur));
+  if (options.bgBlur !== undefined && (typeof options.bgBlur === 'string' ? options.bgBlur !== 'off' : options.bgBlur > 0)) params.set('bgBlur', String(options.bgBlur));
 
   // Preset & Perspective
   if (options.preset) params.set('preset', options.preset);
@@ -75,6 +75,15 @@ export function generateStudioUrl(
   // Watermark
   const wm = options.watermark || options.watermarkText;
   if (wm) params.set('watermark', wm);
+  if (options.watermarkPlatform) params.set('wmPlatform', options.watermarkPlatform);
+  if (options.watermarkPosition) params.set('wmPos', options.watermarkPosition);
+  if (options.watermarkTarget) params.set('wmTarget', options.watermarkTarget);
+  if (options.watermarkOpacity !== undefined) params.set('wmOpacity', String(options.watermarkOpacity));
+  if (options.watermarkBlur !== undefined) params.set('wmBlur', String(options.watermarkBlur));
+  if (options.watermarkGlass) params.set('wmGlass', options.watermarkGlass);
+  if (options.watermarkScale !== undefined) params.set('wmScale', String(options.watermarkScale));
+  if (options.watermarkOffsetX !== undefined) params.set('wmOffsetX', String(options.watermarkOffsetX));
+  if (options.watermarkOffsetY !== undefined) params.set('wmOffsetY', String(options.watermarkOffsetY));
 
   // Image source
   if (options.imageSrc) params.set('img', options.imageSrc);
