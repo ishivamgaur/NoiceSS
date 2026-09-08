@@ -134,6 +134,25 @@ export interface GenerateMockupOptions extends MockupConfig {
   preset?: string;
 }
 
+export interface BatchMockupOptions extends MockupConfig {
+  inputPaths?: string[];
+  inputDir?: string;
+  outputDir: string;
+  preset?: string;
+  pattern?: string;
+}
+
+export interface BatchMockupItemResult {
+  inputPath: string;
+  outputPath?: string;
+  width?: number;
+  height?: number;
+  format?: string;
+  sizeBytes?: number;
+  success: boolean;
+  error?: string;
+}
+
 export interface WebsiteEmbedOptions {
   imageSrc: string;
   altText?: string;

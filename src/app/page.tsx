@@ -10,7 +10,7 @@ import {
   Loader2, Aperture, SlidersHorizontal, Droplets, Droplet, Tv, Radio, Film, 
   Focus, Pipette, Paintbrush, Flame, Zap, SunMedium, Type, Scan, Scaling, 
   AppWindow, Gauge, EyeOff, SlidersVertical, X, Lock, Unlock, Bookmark, Save, Plus, Star, Camera, Undo2, Redo2,
-  ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Menu
+  ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Menu, Terminal
 } from 'lucide-react';
 
 import { Slider } from "@/components/ui/slider";
@@ -1420,6 +1420,7 @@ export default function StudioPage() {
   const [exportScale, setExportScale] = useState<number>(2);
   const [isExporting, setIsExporting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [mcpCopied, setMcpCopied] = useState(false);
   const [starCount, setStarCount] = useState<number | null>(null);
 
   useEffect(() => {
@@ -2138,6 +2139,105 @@ export default function StudioPage() {
       toast.error('Copy Failed', { description: 'Could not copy image to clipboard.' });
     } finally {
       setIsExporting(false);
+    }
+  };
+
+  const handleCopyMcpCall = () => {
+    try {
+      const cleanBg = background.startsWith('url(')
+        ? background.replace(/^url\(["']?|["']?\)$/g, '').replace(/^\/wallpapers\//, '')
+        : background;
+
+      const mcpParams: Record<string, any> = {
+        imagePath: 'screenshot.png',
+        outputPath: `mockup.${exportFormat === 'jpeg' ? 'jpg' : exportFormat}`,
+        background: cleanBg,
+        aspectRatio,
+        scale,
+        radius,
+        shadow,
+        shadowBlur,
+        shadowOpacity,
+        glassBorder,
+      };
+
+      if (glassBorder) {
+        mcpParams.glassBorderWidth = glassBorderWidth;
+        mcpParams.glassBorderOpacity = glassBorderOpacity;
+        mcpParams.glassBorderBlur = glassBorderBlur;
+        mcpParams.glassBorderColor = glassBorderColor;
+      }
+
+      if (showMacOsBar) {
+        mcpParams.showMacOsBar = true;
+        if (showBrowserBar) {
+          mcpParams.showBrowserBar = true;
+          mcpParams.browserUrl = browserUrl;
+        } else if (windowTitle) {
+          mcpParams.windowTitle = windowTitle;
+        }
+      }
+
+      if (perspective && perspective !== 'front') {
+        mcpParams.perspective = perspective;
+        mcpParams.rotateX = rotateX;
+        mcpParams.rotateY = rotateY;
+        mcpParams.rotateZ = rotateZ;
+      }
+
+      if (bgBlur > 0) mcpParams.bgBlur = bgBlur;
+      if (imageBlur > 0) mcpParams.imageBlur = imageBlur;
+
+      if (watermark) {
+        mcpParams.watermarkText = watermark;
+        mcpParams.watermarkPlatform = watermarkPlatform;
+        mcpParams.watermarkPosition = watermarkPosition;
+        mcpParams.watermarkTarget = watermarkTarget;
+        mcpParams.watermarkOpacity = watermarkOpacity;
+        mcpParams.watermarkBlur = watermarkBlur;
+        mcpParams.watermarkScale = watermarkScale;
+      }
+
+      if (noiseIntensity > 0) mcpParams.noiseIntensity = noiseIntensity;
+      if (grainIntensity > 0) mcpParams.grainIntensity = grainIntensity;
+      if (asciiEnabled) {
+        mcpParams.asciiEnabled = true;
+        mcpParams.asciiPattern = asciiPattern;
+        mcpParams.asciiSize = asciiSize;
+        mcpParams.asciiOpacity = asciiOpacity;
+        mcpParams.asciiColor = asciiColor;
+      }
+
+      if (brightness !== 100) mcpParams.brightness = brightness;
+      if (contrast !== 100) mcpParams.contrast = contrast;
+      if (saturation !== 100) mcpParams.saturation = saturation;
+      if (hueRotate !== 0) mcpParams.hueRotate = hueRotate;
+      if (filter !== 'none') mcpParams.filter = filter;
+
+      mcpParams.format = exportFormat;
+      mcpParams.exportScale = exportScale;
+
+      const payload = {
+        name: 'generate_mockup',
+        arguments: mcpParams,
+      };
+
+      navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+      setMcpCopied(true);
+      setTimeout(() => setMcpCopied(false), 2000);
+      toast('Copied MCP Call', {
+        description: 'Ready to paste into Claude, Cursor, or your MCP client.',
+        icon: '⚡',
+        style: {
+          background: 'rgba(20, 20, 20, 0.8)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          color: '#fff',
+        }
+      });
+    } catch (err) {
+      console.error('Failed to copy MCP call', err);
+      toast.error('Copy Failed', { description: 'Could not copy MCP tool call.' });
     }
   };
 
@@ -5225,9 +5325,9 @@ export default function StudioPage() {
                 })()}
                 {[
                   { val: 1, label: '1x', desc: '1080p' },
-                  { val: 2, label: '2x', desc: '2K' },
-                  { val: 3, label: '3x', desc: '4K' },
-                  { val: 4, label: '4x', desc: '6K' }
+                  { val: 2, label: '2x', desc: '2K QHD' },
+                  { val: 3, label: '3x', desc: '4K UHD' },
+                  { val: 4, label: '4x', desc: '6K Master' }
                 ].map((res) => {
                   const isSelected = exportScale === res.val;
                   return (
@@ -5298,6 +5398,15 @@ export default function StudioPage() {
                 noicess-XXXXXX.{exportFormat === 'jpeg' ? 'jpg' : exportFormat}
               </span>
             </div>
+
+            {/* 1-Click Copy MCP Tool Call */}
+            <button
+              onClick={handleCopyMcpCall}
+              className="w-full h-8 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-xs font-semibold flex items-center justify-center gap-1.5 text-zinc-300 hover:text-white transition-all active:scale-[0.98] cursor-pointer"
+            >
+              {mcpCopied ? <Check size={13} className="text-white" /> : <Terminal size={13} className="text-zinc-400" />}
+              <span>{mcpCopied ? 'MCP Tool Call Copied!' : 'Copy MCP Tool Call'}</span>
+            </button>
 
             {/* Footer Action Buttons */}
             <div className="flex items-center gap-2 pt-0.5">

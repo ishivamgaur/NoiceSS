@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp, { type OverlayOptions } from 'sharp';
 import { MCP_PRESETS, ALL_FILTERS, ASCII_PATTERNS } from './presets.js';
-import type { GenerateMockupOptions, ImageFormat } from './types.js';
+import type { GenerateMockupOptions, ImageFormat, BatchMockupOptions, BatchMockupItemResult } from './types.js';
 
 export interface CompositorResult {
   outputPath?: string;
@@ -652,7 +652,6 @@ async function renderFrostedWatermark(
   if (normPlatform === 'x' && !text.startsWith('@')) {
     displayText = `@${text}`;
   }
-  const hasIcon = normPlatform !== 'none';
 
   const scale = Math.max(0.3, Math.min(3.0, (scalePercent / 100) * dpiScale));
   const fontSize = Math.round(12 * scale);
@@ -660,6 +659,8 @@ async function renderFrostedWatermark(
   const gap = Math.round(6 * scale);
   const padX = Math.round(16 * scale);
   const padY = Math.round(8 * scale);
+
+  const hasIcon = normPlatform !== 'none';
 
   const textLen = displayText.length * fontSize * 0.58;
   const contentW = (hasIcon ? iconSize + gap : 0) + textLen;
@@ -698,8 +699,9 @@ async function renderFrostedWatermark(
   // 1. Extract slice of canvas directly under the pill and blur it (backdropFilter: blur)
   const blurRadius = Math.max(1, Math.min(50, Math.round(resolvedBlur * dpiScale)));
   let frostedSlice: Buffer;
+  let rawSlice: Buffer | null = null;
   try {
-    const rawSlice = await sharp(canvasBuffer)
+    rawSlice = await sharp(canvasBuffer)
       .extract({
         left: Math.max(0, x),
         top: Math.max(0, y),
@@ -710,7 +712,7 @@ async function renderFrostedWatermark(
       .png()
       .toBuffer();
 
-    // 2. Translucent wash + 1px border stroke + platform icon + typography
+    // 2. Translucent wash + 1px border stroke + platform icon / avatar + typography
     const strokeW = Math.max(1, Math.round(dpiScale * 0.8));
     const glassBg = watermarkGlass === 'dark' 
       ? 'rgba(15, 15, 18, 0.60)' 
@@ -722,9 +724,10 @@ async function renderFrostedWatermark(
     const textColor = `rgba(255, 255, 255, ${textAlpha})`;
 
     let iconSvgFragment = '';
+    const iconX = padX;
+    const iconY = Math.round((boxH - iconSize) / 2);
+
     if (hasIcon) {
-      const iconX = padX;
-      const iconY = Math.round((boxH - iconSize) / 2);
       const innerIcon = getPlatformIconInnerSvg(normPlatform, textColor);
       iconSvgFragment = `<svg x="${iconX}" y="${iconY}" width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24">${innerIcon}</svg>`;
     }
@@ -747,11 +750,13 @@ async function renderFrostedWatermark(
     `);
 
     const pillMask = createRoundedMask(boxW, boxH, boxR);
+    const pillLayers: OverlayOptions[] = [
+      { input: pillMask, blend: 'dest-in' },
+      { input: pillSheenSvg, blend: 'over' },
+    ];
+
     frostedSlice = await sharp(rawSlice)
-      .composite([
-        { input: pillMask, blend: 'dest-in' },
-        { input: pillSheenSvg, blend: 'over' },
-      ])
+      .composite(pillLayers)
       .png()
       .toBuffer();
   } catch {
@@ -759,10 +764,11 @@ async function renderFrostedWatermark(
     const glassBg = watermarkGlass === 'dark' ? 'rgba(15, 15, 18, 0.60)' : 'rgba(255, 255, 255, 0.15)';
     const textAlpha = (opacity / 100).toFixed(2);
     const textColor = `rgba(255, 255, 255, ${textAlpha})`;
+    const iconX = padX;
+    const iconY = Math.round((boxH - iconSize) / 2);
+
     let iconSvgFragment = '';
     if (hasIcon) {
-      const iconX = padX;
-      const iconY = Math.round((boxH - iconSize) / 2);
       const innerIcon = getPlatformIconInnerSvg(normPlatform, textColor);
       iconSvgFragment = `<svg x="${iconX}" y="${iconY}" width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24">${innerIcon}</svg>`;
     }
@@ -778,7 +784,22 @@ async function renderFrostedWatermark(
         <text x="${textX}" y="${textY}" text-anchor="${textAnchor}" dominant-baseline="central" fill="${textColor}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="${fontSize}" font-weight="500" letter-spacing="0.025em">${escapeXml(displayText)}</text>
       </svg>
     `);
-    frostedSlice = await sharp(pillSvg).png().toBuffer();
+
+    const fallbackLayers: OverlayOptions[] = [{ input: pillSvg, blend: 'over' }];
+
+    const baseBuffer = rawSlice || await sharp({
+      create: {
+        width: boxW,
+        height: boxH,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      },
+    }).png().toBuffer();
+
+    frostedSlice = await sharp(baseBuffer)
+      .composite(fallbackLayers)
+      .png()
+      .toBuffer();
   }
 
   // 3. Drop Shadow: 0 2px 10px rgba(0,0,0,0.25)
@@ -868,10 +889,32 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
   const bgBlur = resolveBgBlur(mergedConfig.bgBlur);
   const aspectRatio = mergedConfig.aspectRatio || 'auto';
 
-  // 2. Studio Shadow Formula (matching page.tsx L3931-3933)
-  // In browser: 0 ${shadow}px ${shadow * 2}px rgba(0,0,0,0.35)
-  // Perspective: 20px 20px ${shadow * 3}px rgba(0,0,0,0.45)
-  const is3D = mergedConfig.perspective && mergedConfig.perspective !== 'front';
+  // 2. 3D Perspective & Shadow Formula (matching page.tsx L3931-3933)
+  const is3D = Boolean((mergedConfig.perspective && mergedConfig.perspective !== 'front') ||
+    (mergedConfig.rotateX !== undefined && mergedConfig.rotateX !== 0) ||
+    (mergedConfig.rotateY !== undefined && mergedConfig.rotateY !== 0) ||
+    (mergedConfig.rotateZ !== undefined && mergedConfig.rotateZ !== 0));
+
+  let rotateX = mergedConfig.rotateX ?? 0;
+  let rotateY = mergedConfig.rotateY ?? 0;
+  let rotateZ = mergedConfig.rotateZ ?? 0;
+
+  if (mergedConfig.perspective && mergedConfig.perspective !== 'front' && rotateX === 0 && rotateY === 0 && rotateZ === 0) {
+    if (mergedConfig.perspective === 'isometric-left') {
+      rotateX = 15; rotateY = -20; rotateZ = 2;
+    } else if (mergedConfig.perspective === 'isometric-right') {
+      rotateX = 15; rotateY = 20; rotateZ = -2;
+    } else if (mergedConfig.perspective === 'elevated') {
+      rotateX = 24; rotateY = 0; rotateZ = 0;
+    } else if (mergedConfig.perspective === 'skew-left') {
+      rotateX = 8; rotateY = -32; rotateZ = 4;
+    } else if (mergedConfig.perspective === 'subtle') {
+      rotateX = 8; rotateY = -10; rotateZ = 1;
+    } else if (mergedConfig.perspective === 'flat-lay') {
+      rotateX = 40; rotateY = 0; rotateZ = 0;
+    }
+  }
+
   const shadowBlur = mergedConfig.shadowBlur ?? (is3D ? Math.round(shadow * 3) : Math.round(shadow * 2));
   const shadowOpacity = mergedConfig.shadowOpacity ?? (is3D ? 45 : 35);
   const shadowOffsetX = mergedConfig.shadowOffsetX ?? (is3D ? 20 : 0);
@@ -1131,20 +1174,12 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
   const bgBuffer = await createBackgroundCanvas(canvasW, canvasH, background, bgBlur, processedImageBuffer);
 
   // 9. Assemble Layers in precise visual hierarchy
-  const finalLayers: OverlayOptions[] = [
-    // Layer 1: Ambient Drop Shadow
-    {
-      input: shadowBuffer,
-      top: 0,
-      left: 0,
-    },
-  ];
+  const finalLayers: OverlayOptions[] = [];
 
-  // Layer 2: True Frosted Glass Card Frame (if enabled)
+  // True Frosted Glass Card Frame (if enabled)
+  let frostedCardSlice: Buffer | undefined;
   if (glassBorder && gbWidth > 0) {
     const gbBlurRadius = Math.round(glassBorderBlur * dpiScale);
-    // Extract slice of canvas background under the card, blur it, and mask to rounded rect
-    let frostedCardSlice: Buffer;
     try {
       const bgSlice = await sharp(bgBuffer)
         .extract({
@@ -1180,20 +1215,105 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
     } catch {
       frostedCardSlice = createGlassBorderSvg(cardW, cardH, scaledRadius, glassBorderOpacity, Math.max(1, Math.round(1.2 * dpiScale)));
     }
-
-    finalLayers.push({
-      input: frostedCardSlice,
-      top: cardY,
-      left: cardX,
-    });
   }
 
-  // Layer 3: Inset Screenshot Window
-  finalLayers.push({
-    input: roundedWindowBuffer,
-    top: cardY + gbWidth,
-    left: cardX + gbWidth,
-  });
+  const is3DActive = is3D && (rotateX !== 0 || rotateY !== 0 || rotateZ !== 0);
+  let activeCardX = cardX;
+  let activeCardY = cardY;
+  let activeCardW = cardW;
+  let activeCardH = cardH;
+
+  if (is3DActive) {
+    const cardComposites: OverlayOptions[] = [];
+    if (glassBorder && gbWidth > 0 && frostedCardSlice) {
+      cardComposites.push({ input: frostedCardSlice, top: 0, left: 0 });
+    }
+    cardComposites.push({ input: roundedWindowBuffer, top: gbWidth, left: gbWidth });
+
+    const cardBuffer = await sharp({
+      create: {
+        width: cardW,
+        height: cardH,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      },
+    })
+      .composite(cardComposites)
+      .png()
+      .toBuffer();
+
+    const radX = (rotateX * Math.PI) / 180;
+    const radY = (rotateY * Math.PI) / 180;
+    const radZ = (rotateZ * Math.PI) / 180;
+    const a = Math.cos(radY) * Math.cos(radZ);
+    const b = Math.sin(radX) * Math.sin(radY) * Math.cos(radZ) - Math.cos(radX) * Math.sin(radZ);
+    const c = Math.cos(radY) * Math.sin(radZ);
+    const d = Math.sin(radX) * Math.sin(radY) * Math.sin(radZ) + Math.cos(radX) * Math.cos(radZ);
+
+    const affineCard = await sharp(cardBuffer)
+      .affine([a, b, c, d], {
+        background: '#00000000',
+        interpolator: sharp.interpolators.bicubic,
+      })
+      .toBuffer({ resolveWithObject: true });
+
+    activeCardW = affineCard.info.width;
+    activeCardH = affineCard.info.height;
+    activeCardX = Math.round((canvasW - activeCardW) / 2);
+    activeCardY = Math.round((canvasH - activeCardH) / 2);
+
+    try {
+      const alphaChannel = await sharp(affineCard.data).ensureAlpha().extractChannel(3).toBuffer();
+      const blackCard = await sharp({
+        create: {
+          width: activeCardW,
+          height: activeCardH,
+          channels: 4,
+          background: { r: 0, g: 0, b: 0, alpha: shadowOpacity / 100 },
+        },
+      })
+        .composite([{ input: alphaChannel, blend: 'dest-in' }])
+        .png()
+        .toBuffer();
+
+      const shadow3d = await sharp(blackCard)
+        .blur(Math.max(1, Math.min(100, scaledShadowBlur)))
+        .png()
+        .toBuffer();
+
+      finalLayers.push({
+        input: shadow3d,
+        top: Math.max(0, activeCardY + scaledShadowOffsetY),
+        left: Math.max(0, activeCardX + scaledShadowOffsetX),
+      });
+    } catch {
+      finalLayers.push({ input: shadowBuffer, top: 0, left: 0 });
+    }
+
+    finalLayers.push({
+      input: affineCard.data,
+      top: activeCardY,
+      left: activeCardX,
+    });
+  } else {
+    finalLayers.push({
+      input: shadowBuffer,
+      top: 0,
+      left: 0,
+    });
+    if (glassBorder && gbWidth > 0 && frostedCardSlice) {
+      finalLayers.push({
+        input: frostedCardSlice,
+        top: cardY,
+        left: cardX,
+      });
+    }
+    finalLayers.push({
+      input: roundedWindowBuffer,
+      top: cardY + gbWidth,
+      left: cardX + gbWidth,
+    });
+  }
 
   // Layer 4: Noise / Film Grain (if enabled)
   if ((noiseIntensity > 0 || grainIntensity > 0) && noiseTarget !== 'image') {
@@ -1241,7 +1361,7 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
       watermarkPlatform,
       watermarkPosition,
       watermarkTarget,
-      { x: cardX, y: cardY, w: cardW, h: cardH },
+      { x: activeCardX, y: activeCardY, w: activeCardW, h: activeCardH },
       watermarkOpacity,
       watermarkScaleVal,
       watermarkBlurVal,
@@ -1314,4 +1434,101 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
     format,
     sizeBytes: finalBuffer.length,
   };
+}
+
+/**
+ * Batch composites multiple screenshots into mockups using common or preset styling.
+ */
+export async function batchCompositeMockups(
+  options: BatchMockupOptions
+): Promise<BatchMockupItemResult[]> {
+  const { inputPaths, inputDir, outputDir, pattern, ...mockupConfig } = options;
+
+  if (!outputDir) {
+    throw new Error('outputDir is required for batch mockup generation');
+  }
+
+  const resolvedOutputDir = path.isAbsolute(outputDir)
+    ? outputDir
+    : path.resolve(process.cwd(), outputDir);
+
+  if (!fs.existsSync(resolvedOutputDir)) {
+    fs.mkdirSync(resolvedOutputDir, { recursive: true });
+  }
+
+  let filesToProcess: string[] = [];
+
+  if (inputPaths && Array.isArray(inputPaths) && inputPaths.length > 0) {
+    filesToProcess = inputPaths;
+  } else if (inputDir) {
+    const resolvedInputDir = path.isAbsolute(inputDir)
+      ? inputDir
+      : path.resolve(process.cwd(), inputDir);
+
+    if (!fs.existsSync(resolvedInputDir)) {
+      throw new Error(`inputDir does not exist: ${resolvedInputDir}`);
+    }
+
+    const validExts = new Set(['.png', '.jpg', '.jpeg', '.webp', '.PNG', '.JPG', '.JPEG', '.WEBP']);
+    const dirEntries = fs.readdirSync(resolvedInputDir);
+    let filterRegex: RegExp | null = null;
+    if (pattern) {
+      try {
+        filterRegex = new RegExp(pattern);
+      } catch {
+        filterRegex = null;
+      }
+    }
+
+    filesToProcess = dirEntries
+      .filter((file) => {
+        const ext = path.extname(file);
+        if (!validExts.has(ext)) return false;
+        if (filterRegex && !filterRegex.test(file)) return false;
+        return true;
+      })
+      .map((file) => path.join(resolvedInputDir, file));
+  } else {
+    throw new Error('Either inputPaths or inputDir must be provided for batch generation');
+  }
+
+  if (filesToProcess.length === 0) {
+    return [];
+  }
+
+  const format = mockupConfig.format || 'webp';
+  const results: BatchMockupItemResult[] = [];
+
+  for (const itemPath of filesToProcess) {
+    const parsed = path.parse(itemPath);
+    const outFilename = `${parsed.name}-mockup.${format === 'jpeg' ? 'jpg' : format}`;
+    const targetOutPath = path.join(resolvedOutputDir, outFilename);
+
+    try {
+      const res = await compositeMockup({
+        ...mockupConfig,
+        imagePath: itemPath,
+        outputPath: targetOutPath,
+      });
+
+      results.push({
+        inputPath: itemPath,
+        outputPath: res.outputPath,
+        width: res.width,
+        height: res.height,
+        format: res.format,
+        sizeBytes: res.sizeBytes,
+        success: true,
+      });
+    } catch (err: any) {
+      results.push({
+        inputPath: itemPath,
+        outputPath: targetOutPath,
+        success: false,
+        error: err?.message || String(err),
+      });
+    }
+  }
+
+  return results;
 }

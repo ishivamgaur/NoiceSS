@@ -11,7 +11,7 @@ import {
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
 
-import { compositeMockup } from './compositor.js';
+import { compositeMockup, batchCompositeMockups } from './compositor.js';
 import { generateWebsiteEmbed } from './embed.js';
 import { generateStudioUrl } from './url.js';
 import {
@@ -22,7 +22,7 @@ import {
   ALL_SOLID_COLORS,
   ALL_FILTERS,
 } from './presets.js';
-import type { GenerateMockupOptions, WebsiteEmbedOptions } from './types.js';
+import type { GenerateMockupOptions, WebsiteEmbedOptions, BatchMockupOptions } from './types.js';
 
 /**
  * NoiceSS Universal MCP Server
@@ -375,6 +375,72 @@ export function createNoiceServer() {
           },
         },
 
+        // ─── Batch: Generate Multiple Mockups ──────────────────
+        {
+          name: 'batch_generate_mockups',
+          description:
+            'Processes multiple screenshots in batch from a file list or directory, applying the same or preset styling. Writes all generated mockups to the specified output directory. Zero cloud costs: runs 100% locally with Sharp.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              inputPaths: {
+                type: 'array',
+                items: { type: 'string' },
+                description: 'List of image filepaths to process.',
+              },
+              inputDir: {
+                type: 'string',
+                description: 'Directory containing screenshots to process.',
+              },
+              outputDir: {
+                type: 'string',
+                description: 'Directory where generated mockups will be saved.',
+              },
+              pattern: {
+                type: 'string',
+                description: 'Optional filename regex pattern to filter files when using inputDir.',
+              },
+              preset: {
+                type: 'string',
+                description: 'Preset ID to apply to all mockups (e.g. "frosted-clean", "apple-sequoia", "3d-hero-angle").',
+                enum: ['frosted-clean', 'studio-minimal', 'apple-sequoia', '3d-hero-angle', 'monterey-dark', 'safari-minimal', 'tahoe-sunset', 'pure-obsidian', 'big-sur-3d'],
+              },
+              background: { type: 'string', description: 'Wallpaper, gradient, or color hex.' },
+              bgBlur: { description: 'Background blur radius or preset name.' },
+              aspectRatio: { type: 'string', description: 'Aspect ratio (e.g. "auto", "16:9", "4:3").' },
+              scale: { type: 'number', description: 'Image scale percentage (20-300).' },
+              radius: { type: 'number', description: 'Corner radius in pixels (0-40).' },
+              shadow: { type: 'number', description: 'Shadow depth (0-80).' },
+              glassBorder: { type: 'boolean', description: 'Enable frosted glass border.' },
+              showMacOsBar: { type: 'boolean', description: 'Show macOS window bar.' },
+              showBrowserBar: { type: 'boolean', description: 'Show browser URL bar.' },
+              perspective: {
+                type: 'string',
+                description: '3D perspective preset name.',
+                enum: ['front', 'isometric-left', 'isometric-right', 'elevated', 'skew-left', 'subtle', 'flat-lay'],
+              },
+              watermarkText: { type: 'string', description: 'Watermark text.' },
+              watermarkPlatform: {
+                type: 'string',
+                enum: ['x', 'github', 'instagram', 'linkedin', 'globe', 'none'],
+              },
+              format: {
+                type: 'string',
+                description: 'Output format ("webp", "png", "jpeg", "jpg").',
+                enum: ['webp', 'png', 'jpeg', 'jpg'],
+              },
+              quality: { type: 'number', description: 'Output quality 1-100.' },
+              exportScale: { type: 'number', description: 'Export scale multiplier (1, 2, 3 for 4K).' },
+              resolution: {
+                type: 'string',
+                description: 'Target resolution preset ("1080p", "2k", "4k", "8k").',
+                enum: ['1080p', '2k', '4k', '8k'],
+              },
+            },
+            required: ['outputDir'],
+          },
+        },
+
         // ─── Website Embed Code ───────────────────────────────
         {
           name: 'get_website_embed',
@@ -544,6 +610,50 @@ export function createNoiceServer() {
           return {
             isError: true,
             content: [{ type: 'text', text: `Failed to generate mockup: ${err?.message || String(err)}` }],
+          };
+        }
+      }
+
+      case 'batch_generate_mockups': {
+        const options = (args || {}) as unknown as BatchMockupOptions;
+        if (!options.outputDir) {
+          throw new McpError(ErrorCode.InvalidParams, 'outputDir is required');
+        }
+        if (!options.inputPaths && !options.inputDir) {
+          throw new McpError(ErrorCode.InvalidParams, 'Either inputPaths or inputDir must be provided');
+        }
+
+        try {
+          const results = await batchCompositeMockups(options);
+          const successful = results.filter((r) => r.success);
+          const failed = results.filter((r) => !r.success);
+
+          const lines = [
+            `✅ Batch Mockup Generation Complete!`,
+            `- Total processed: ${results.length}`,
+            `- Succeeded: ${successful.length}`,
+            `- Failed: ${failed.length}`,
+            `- Output directory: ${options.outputDir}`,
+            '',
+            '### Processed Items:',
+          ];
+
+          for (const item of results) {
+            if (item.success) {
+              const sizeKb = ((item.sizeBytes || 0) / 1024).toFixed(1);
+              lines.push(`- [OK] ${item.inputPath} -> ${item.outputPath} (${item.width}x${item.height}px, ${sizeKb} KB)`);
+            } else {
+              lines.push(`- [FAILED] ${item.inputPath} -> Error: ${item.error}`);
+            }
+          }
+
+          return {
+            content: [{ type: 'text', text: lines.join('\n') }],
+          };
+        } catch (err: any) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: `Failed to batch generate mockups: ${err?.message || String(err)}` }],
           };
         }
       }
