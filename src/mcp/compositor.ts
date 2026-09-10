@@ -17,23 +17,25 @@ export interface CompositorResult {
  * Loads an image from a local path, web URL, or base64 data URL.
  */
 export async function loadImageBuffer(source: string): Promise<Buffer> {
-  if (source.startsWith('data:')) {
-    const commaIdx = source.indexOf(',');
-    const base64Data = commaIdx !== -1 ? source.slice(commaIdx + 1) : source;
+  const cleanSource = source.trim().replace(/^["']|["']$/g, '');
+
+  if (cleanSource.startsWith('data:')) {
+    const commaIdx = cleanSource.indexOf(',');
+    const base64Data = commaIdx !== -1 ? cleanSource.slice(commaIdx + 1) : cleanSource;
     return Buffer.from(base64Data, 'base64');
   }
 
-  if (source.startsWith('http://') || source.startsWith('https://')) {
-    const res = await fetch(source);
+  if (cleanSource.startsWith('http://') || cleanSource.startsWith('https://')) {
+    const res = await fetch(cleanSource);
     if (!res.ok) {
-      throw new Error(`Failed to fetch image from ${source}: ${res.statusText}`);
+      throw new Error(`Failed to fetch image from ${cleanSource}: ${res.statusText}`);
     }
     const arrayBuf = await res.arrayBuffer();
     return Buffer.from(arrayBuf);
   }
 
   // Local filesystem path
-  const resolved = path.isAbsolute(source) ? source : path.resolve(process.cwd(), source);
+  const resolved = path.isAbsolute(cleanSource) ? cleanSource : path.resolve(process.cwd(), cleanSource);
   if (!fs.existsSync(resolved)) {
     throw new Error(`Image file does not exist at: ${resolved}`);
   }
@@ -41,12 +43,19 @@ export async function loadImageBuffer(source: string): Promise<Buffer> {
 }
 
 /**
- * Resolves wallpaper path from public/wallpapers/ directory
+ * Resolves wallpaper path from local disk or public/wallpapers/ directory
  */
 function resolveWallpaperPath(bgNameOrUrl: string): string | null {
-  const cleanName = bgNameOrUrl.replace(/^url\(["']?|["']?\)$/g, '').replace(/^\/wallpapers\//, '');
-  const candidate = cleanName.endsWith('.webp') ? cleanName : `${cleanName}.webp`;
+  const cleanName = bgNameOrUrl.replace(/^url\(["']?|["']?\)$/g, '').replace(/^\/wallpapers\//, '').trim().replace(/^["']|["']$/g, '');
 
+  // 1. Direct local file path
+  const directPath = path.isAbsolute(cleanName) ? cleanName : path.resolve(process.cwd(), cleanName);
+  if (fs.existsSync(directPath) && fs.statSync(directPath).isFile()) {
+    return directPath;
+  }
+
+  // 2. Preset in public/wallpapers
+  const candidate = cleanName.endsWith('.webp') ? cleanName : `${cleanName}.webp`;
   const possiblePaths = [
     path.resolve(process.cwd(), 'public', 'wallpapers', candidate),
     path.resolve(__dirname, '..', '..', 'public', 'wallpapers', candidate),
@@ -288,16 +297,20 @@ function createNoiseSvg(
 ): Buffer {
   const baseFreq = 0.65 + (grainIntensity / 100) * 0.8;
   const opacity = ((noiseIntensity + grainIntensity) / 200) * 0.45;
+  const tileSize = 300;
 
   const svg = `
-    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+    <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <filter id="noise" x="0" y="0" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="${baseFreq.toFixed(3)}" numOctaves="4" seed="42" stitchTiles="stitch" />
+        <filter id="noiseFilter" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="${baseFreq.toFixed(3)}" numOctaves="3" seed="42" stitchTiles="stitch" />
           <feColorMatrix type="saturate" values="0" />
         </filter>
+        <pattern id="noisePattern" width="${tileSize}" height="${tileSize}" patternUnits="userSpaceOnUse">
+          <rect width="${tileSize}" height="${tileSize}" filter="url(#noiseFilter)" />
+        </pattern>
       </defs>
-      <rect width="${width}" height="${height}" filter="url(#noise)" opacity="${opacity.toFixed(3)}" />
+      <rect width="${width}" height="${height}" fill="url(#noisePattern)" opacity="${opacity.toFixed(3)}" />
     </svg>
   `.trim();
 
@@ -463,6 +476,45 @@ async function createBackgroundCanvas(
     } else {
       bgBuffer = await sharp(wallpaperFile)
         .resize(targetWidth, targetHeight, { fit: 'cover', position: 'center' })
+        .png()
+        .toBuffer();
+    }
+  } else if (bg.startsWith('http://') || bg.startsWith('https://') || bg.startsWith('data:')) {
+    try {
+      const customBgBuffer = await loadImageBuffer(bg);
+      if (bgBlur && bgBlur > 0) {
+        const resScale = Math.max(1, targetWidth / 1560);
+        const effectiveBlur = Math.round(bgBlur * resScale);
+        const scaleFactor = 1 + Math.min(0.25, effectiveBlur / 100);
+        const scaledW = Math.round(targetWidth * scaleFactor);
+        const scaledH = Math.round(targetHeight * scaleFactor);
+
+        bgBuffer = await sharp(customBgBuffer)
+          .resize(scaledW, scaledH, { fit: 'cover', position: 'center' })
+          .blur(Math.max(0.3, Math.min(250, effectiveBlur)))
+          .extract({
+            left: Math.round((scaledW - targetWidth) / 2),
+            top: Math.round((scaledH - targetHeight) / 2),
+            width: targetWidth,
+            height: targetHeight,
+          })
+          .png()
+          .toBuffer();
+      } else {
+        bgBuffer = await sharp(customBgBuffer)
+          .resize(targetWidth, targetHeight, { fit: 'cover', position: 'center' })
+          .png()
+          .toBuffer();
+      }
+    } catch {
+      bgBuffer = await sharp({
+        create: {
+          width: targetWidth,
+          height: targetHeight,
+          channels: 4,
+          background: '#09090b',
+        },
+      })
         .png()
         .toBuffer();
     }
@@ -944,6 +996,7 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
   const asciiSize = mergedConfig.asciiSize ?? 16;
   const asciiOpacity = mergedConfig.asciiOpacity ?? 30;
   const asciiColor = mergedConfig.asciiColor ?? '#ffffff';
+  const asciiTarget = mergedConfig.asciiTarget ?? 'canvas';
 
   // Watermark
   const watermarkText = mergedConfig.watermark ?? mergedConfig.watermarkText;
@@ -1124,10 +1177,45 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
 
   // Mask inner window content with innerRadius
   const innerMaskBuffer = createRoundedMask(windowW, windowH, innerRadius);
-  const roundedWindowBuffer = await sharp(rawWindowBuffer)
+  let roundedWindowBuffer = await sharp(rawWindowBuffer)
     .composite([{ input: innerMaskBuffer, blend: 'dest-in' }])
     .png()
     .toBuffer();
+
+  // Apply Image-targeted Noise & Grain (matching studio page.tsx L4179-4195)
+  if ((noiseIntensity > 0 || grainIntensity > 0) && (noiseTarget === 'image' || noiseTarget === 'both')) {
+    const imageNoiseSvg = createNoiseSvg(windowW, windowH, noiseIntensity, grainIntensity);
+    try {
+      const imageNoiseBuffer = await sharp(imageNoiseSvg).png().toBuffer();
+      roundedWindowBuffer = await sharp(roundedWindowBuffer)
+        .composite([
+          { input: imageNoiseBuffer, blend: 'over' },
+          { input: innerMaskBuffer, blend: 'dest-in' },
+        ])
+        .png()
+        .toBuffer();
+    } catch {
+      // Gracefully continue
+    }
+  }
+
+  // Apply Image-targeted ASCII overlay (matching studio page.tsx L4199-4215)
+  if (asciiEnabled && asciiOpacity > 0 && (asciiTarget === 'image' || asciiTarget === 'both')) {
+    const char = ASCII_PATTERNS[asciiPattern] || '░';
+    const asciiImgSvg = createAsciiOverlaySvg(windowW, windowH, char, asciiSize, asciiOpacity, asciiColor);
+    try {
+      const asciiImgBuffer = await sharp(asciiImgSvg).png().toBuffer();
+      roundedWindowBuffer = await sharp(roundedWindowBuffer)
+        .composite([
+          { input: asciiImgBuffer, blend: 'over' },
+          { input: innerMaskBuffer, blend: 'dest-in' },
+        ])
+        .png()
+        .toBuffer();
+    } catch {
+      // Gracefully continue
+    }
+  }
 
   // 6. Canvas Dimensions (matching browser studio page.tsx L2250-2350)
   // Determine canvas dimensions: card occupies scaleFraction along the bounding dimension
@@ -1171,7 +1259,37 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
   );
 
   // 8. Background Canvas (wallpaper with bleed-protection, gradient, CURRENT_IMAGE, or solid)
-  const bgBuffer = await createBackgroundCanvas(canvasW, canvasH, background, bgBlur, processedImageBuffer);
+  let bgBuffer = await createBackgroundCanvas(canvasW, canvasH, background, bgBlur, processedImageBuffer);
+
+  // Apply Canvas-targeted Noise & Grain (matching studio page.tsx L4108-4125)
+  // When noiseTarget === 'canvas', noise is placed ONLY on the background behind the card
+  if ((noiseIntensity > 0 || grainIntensity > 0) && (noiseTarget === 'canvas' || noiseTarget === 'both')) {
+    const canvasNoiseSvg = createNoiseSvg(canvasW, canvasH, noiseIntensity, grainIntensity);
+    try {
+      const canvasNoiseBuffer = await sharp(canvasNoiseSvg).png().toBuffer();
+      bgBuffer = await sharp(bgBuffer)
+        .composite([{ input: canvasNoiseBuffer, blend: 'over' }])
+        .png()
+        .toBuffer();
+    } catch {
+      // Gracefully continue
+    }
+  }
+
+  // Apply Canvas-targeted ASCII overlay (matching studio page.tsx L4128-4136)
+  if (asciiEnabled && asciiOpacity > 0 && (asciiTarget === 'canvas' || asciiTarget === 'both')) {
+    const char = ASCII_PATTERNS[asciiPattern] || '░';
+    const asciiCanvasSvg = createAsciiOverlaySvg(canvasW, canvasH, char, asciiSize, asciiOpacity, asciiColor);
+    try {
+      const asciiCanvasBuffer = await sharp(asciiCanvasSvg).png().toBuffer();
+      bgBuffer = await sharp(bgBuffer)
+        .composite([{ input: asciiCanvasBuffer, blend: 'over' }])
+        .png()
+        .toBuffer();
+    } catch {
+      // Gracefully continue
+    }
+  }
 
   // 9. Assemble Layers in precise visual hierarchy
   const finalLayers: OverlayOptions[] = [];
@@ -1313,39 +1431,6 @@ export async function compositeMockup(options: GenerateMockupOptions): Promise<C
       top: cardY + gbWidth,
       left: cardX + gbWidth,
     });
-  }
-
-  // Layer 4: Noise / Film Grain (if enabled)
-  if ((noiseIntensity > 0 || grainIntensity > 0) && noiseTarget !== 'image') {
-    const noiseSvg = createNoiseSvg(canvasW, canvasH, noiseIntensity, grainIntensity);
-    try {
-      const noiseBuffer = await sharp(noiseSvg).png().toBuffer();
-      finalLayers.push({
-        input: noiseBuffer,
-        top: 0,
-        left: 0,
-        blend: 'over',
-      });
-    } catch {
-      // Gracefully continue
-    }
-  }
-
-  // Layer 5: ASCII / Pattern Overlay (if enabled)
-  if (asciiEnabled && asciiOpacity > 0) {
-    const char = ASCII_PATTERNS[asciiPattern] || '░';
-    const asciiSvg = createAsciiOverlaySvg(canvasW, canvasH, char, asciiSize, asciiOpacity, asciiColor);
-    try {
-      const asciiBuffer = await sharp(asciiSvg).png().toBuffer();
-      finalLayers.push({
-        input: asciiBuffer,
-        top: 0,
-        left: 0,
-        blend: 'over',
-      });
-    } catch {
-      // Gracefully continue
-    }
   }
 
   // 10. Composite Canvas

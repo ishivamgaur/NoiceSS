@@ -603,6 +603,8 @@ const renderAspectBox = (aspect: string) => {
 
 export default function StudioPage() {
   const [image, setImage] = useState<string | null>(null);
+  const [imageFileName, setImageFileName] = useState<string>('screenshot.png');
+  const [mcpStyleCopied, setMcpStyleCopied] = useState(false);
   const [imageDimensions, setImageDimensions] = useState({ w: 0, h: 0 });
   const [imageSelected, setImageSelected] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
@@ -1971,6 +1973,7 @@ export default function StudioPage() {
           if (e.clipboardData.items[i].type.indexOf('image') !== -1) {
             const blob = e.clipboardData.items[i].getAsFile();
             if (blob) {
+              setImageFileName('pasted-screenshot.png');
               const url = URL.createObjectURL(blob);
               loadImage(url);
               
@@ -1993,6 +1996,7 @@ export default function StudioPage() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      setImageFileName(file.name);
       const url = URL.createObjectURL(file);
       loadImage(url);
       
@@ -2003,6 +2007,26 @@ export default function StudioPage() {
         }
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith('image/')) {
+        setImageFileName(file.name);
+        const url = URL.createObjectURL(file);
+        loadImage(url);
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          if (ev.target?.result) {
+            try { localStorage.setItem('noicess_studio_image_base64', ev.target.result as string); } catch(err){}
+          }
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -2148,9 +2172,12 @@ export default function StudioPage() {
         ? background.replace(/^url\(["']?|["']?\)$/g, '').replace(/^\/wallpapers\//, '')
         : background;
 
+      const ext = exportFormat === 'jpeg' ? 'jpg' : exportFormat;
+      const baseName = imageFileName.replace(/\.[^/.]+$/, '') || 'screenshot';
+
       const mcpParams: Record<string, any> = {
-        imagePath: 'screenshot.png',
-        outputPath: `mockup.${exportFormat === 'jpeg' ? 'jpg' : exportFormat}`,
+        imagePath: imageFileName,
+        outputPath: `${baseName}-mockup.${ext}`,
         background: cleanBg,
         aspectRatio,
         scale,
@@ -2198,14 +2225,19 @@ export default function StudioPage() {
         mcpParams.watermarkScale = watermarkScale;
       }
 
-      if (noiseIntensity > 0) mcpParams.noiseIntensity = noiseIntensity;
-      if (grainIntensity > 0) mcpParams.grainIntensity = grainIntensity;
+      if (noiseIntensity > 0 || grainIntensity > 0) {
+        if (noiseIntensity > 0) mcpParams.noiseIntensity = noiseIntensity;
+        if (grainIntensity > 0) mcpParams.grainIntensity = grainIntensity;
+        mcpParams.noiseTarget = noiseTarget;
+      }
+
       if (asciiEnabled) {
         mcpParams.asciiEnabled = true;
         mcpParams.asciiPattern = asciiPattern;
         mcpParams.asciiSize = asciiSize;
         mcpParams.asciiOpacity = asciiOpacity;
         mcpParams.asciiColor = asciiColor;
+        mcpParams.asciiTarget = asciiTarget;
       }
 
       if (brightness !== 100) mcpParams.brightness = brightness;
@@ -2238,6 +2270,103 @@ export default function StudioPage() {
     } catch (err) {
       console.error('Failed to copy MCP call', err);
       toast.error('Copy Failed', { description: 'Could not copy MCP tool call.' });
+    }
+  };
+
+  const handleCopyMcpStyleOnly = () => {
+    try {
+      const cleanBg = background.startsWith('url(')
+        ? background.replace(/^url\(["']?|["']?\)$/g, '').replace(/^\/wallpapers\//, '')
+        : background;
+
+      const styleParams: Record<string, any> = {
+        background: cleanBg,
+        aspectRatio,
+        scale,
+        radius,
+        shadow,
+        shadowBlur,
+        shadowOpacity,
+        glassBorder,
+      };
+
+      if (glassBorder) {
+        styleParams.glassBorderWidth = glassBorderWidth;
+        styleParams.glassBorderOpacity = glassBorderOpacity;
+        styleParams.glassBorderBlur = glassBorderBlur;
+        styleParams.glassBorderColor = glassBorderColor;
+      }
+
+      if (showMacOsBar) {
+        styleParams.showMacOsBar = true;
+        if (showBrowserBar) {
+          styleParams.showBrowserBar = true;
+          styleParams.browserUrl = browserUrl;
+        } else if (windowTitle) {
+          styleParams.windowTitle = windowTitle;
+        }
+      }
+
+      if (perspective && perspective !== 'front') {
+        styleParams.perspective = perspective;
+        styleParams.rotateX = rotateX;
+        styleParams.rotateY = rotateY;
+        styleParams.rotateZ = rotateZ;
+      }
+
+      if (bgBlur > 0) styleParams.bgBlur = bgBlur;
+      if (imageBlur > 0) styleParams.imageBlur = imageBlur;
+
+      if (watermark) {
+        styleParams.watermarkText = watermark;
+        styleParams.watermarkPlatform = watermarkPlatform;
+        styleParams.watermarkPosition = watermarkPosition;
+        styleParams.watermarkTarget = watermarkTarget;
+        styleParams.watermarkOpacity = watermarkOpacity;
+        styleParams.watermarkBlur = watermarkBlur;
+        styleParams.watermarkScale = watermarkScale;
+      }
+
+      if (noiseIntensity > 0 || grainIntensity > 0) {
+        if (noiseIntensity > 0) styleParams.noiseIntensity = noiseIntensity;
+        if (grainIntensity > 0) styleParams.grainIntensity = grainIntensity;
+        styleParams.noiseTarget = noiseTarget;
+      }
+
+      if (asciiEnabled) {
+        styleParams.asciiEnabled = true;
+        styleParams.asciiPattern = asciiPattern;
+        styleParams.asciiSize = asciiSize;
+        styleParams.asciiOpacity = asciiOpacity;
+        styleParams.asciiColor = asciiColor;
+        styleParams.asciiTarget = asciiTarget;
+      }
+
+      if (brightness !== 100) styleParams.brightness = brightness;
+      if (contrast !== 100) styleParams.contrast = contrast;
+      if (saturation !== 100) styleParams.saturation = saturation;
+      if (hueRotate !== 0) styleParams.hueRotate = hueRotate;
+      if (filter !== 'none') styleParams.filter = filter;
+
+      styleParams.format = exportFormat;
+      styleParams.exportScale = exportScale;
+
+      navigator.clipboard.writeText(JSON.stringify(styleParams, null, 2));
+      setMcpStyleCopied(true);
+      setTimeout(() => setMcpStyleCopied(false), 2000);
+      toast('Copied Style Preset', {
+        description: 'Style parameters copied! Ready to use with any image.',
+        icon: '🎨',
+        style: {
+          background: 'rgba(20, 20, 20, 0.8)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          color: '#fff',
+        }
+      });
+    } catch (err) {
+      console.error('Failed to copy style preset', err);
+      toast.error('Copy Failed', { description: 'Could not copy style preset.' });
     }
   };
 
@@ -4050,6 +4179,8 @@ export default function StudioPage() {
           ref={workspaceRef}
           data-workspace-bg="true"
           className={`flex-grow overflow-hidden relative select-none touch-none ${isPanningWorkspace ? 'cursor-grabbing' : 'cursor-grab'}`}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={handleDrop}
           onPointerDown={handleWorkspacePointerDown}
           onPointerMove={handleWorkspacePointerMove}
           onPointerUp={handleWorkspacePointerUp}
@@ -5399,14 +5530,31 @@ export default function StudioPage() {
               </span>
             </div>
 
-            {/* 1-Click Copy MCP Tool Call */}
-            <button
-              onClick={handleCopyMcpCall}
-              className="w-full h-8 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-xs font-semibold flex items-center justify-center gap-1.5 text-zinc-300 hover:text-white transition-all active:scale-[0.98] cursor-pointer"
-            >
-              {mcpCopied ? <Check size={13} className="text-white" /> : <Terminal size={13} className="text-zinc-400" />}
-              <span>{mcpCopied ? 'MCP Tool Call Copied!' : 'Copy MCP Tool Call'}</span>
-            </button>
+            {/* 1-Click MCP Actions */}
+            <div className="flex flex-col gap-1.5">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={handleCopyMcpCall}
+                  className="h-8 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-xs font-semibold flex items-center justify-center gap-1.5 text-zinc-300 hover:text-white transition-all active:scale-[0.98] cursor-pointer"
+                  title="Copy full tool call with image path"
+                >
+                  {mcpCopied ? <Check size={13} className="text-white" /> : <Terminal size={13} className="text-zinc-400" />}
+                  <span className="truncate">{mcpCopied ? 'Call Copied!' : 'Copy MCP Call'}</span>
+                </button>
+
+                <button
+                  onClick={handleCopyMcpStyleOnly}
+                  className="h-8 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-xs font-semibold flex items-center justify-center gap-1.5 text-zinc-300 hover:text-white transition-all active:scale-[0.98] cursor-pointer"
+                  title="Copy styling parameters without file paths"
+                >
+                  {mcpStyleCopied ? <Check size={13} className="text-white" /> : <Sliders size={13} className="text-zinc-400" />}
+                  <span className="truncate">{mcpStyleCopied ? 'Styles Copied!' : 'Copy Styles Only'}</span>
+                </button>
+              </div>
+              <div className="px-1 text-[10px] text-zinc-500 text-center font-mono">
+                MCP supports local paths (e.g. C:/photo.png) and web URLs
+              </div>
+            </div>
 
             {/* Footer Action Buttons */}
             <div className="flex items-center gap-2 pt-0.5">

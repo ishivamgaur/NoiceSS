@@ -287,6 +287,11 @@ export function createNoiceServer() {
                 type: 'string',
                 description: 'ASCII character color hex. Default: "#ffffff".',
               },
+              asciiTarget: {
+                type: 'string',
+                description: 'Target layer for ASCII overlay: "canvas", "image", or "both". Default: "canvas".',
+                enum: ['canvas', 'image', 'both'],
+              },
 
               // --- Watermark & Badge ---
               watermark: {
