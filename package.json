@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "mcp": "node ./bin/noicess-mcp.mjs",
-    "test:mockup": "tsx scripts/test-mockup.ts"
+    "test:mockup": "tsx scripts/test-mockup.ts",
+    "gen:landing": "tsx scripts/fetch-landing-shots.ts"
   },
   "bin": {
     "noicess": "./bin/noicess-mcp.mjs",
