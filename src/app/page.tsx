@@ -619,6 +619,7 @@ function LogoNoise() {
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     const W = wrap.clientWidth;
     const H = wrap.clientHeight;
+    if (W === 0 || H === 0) return;
     canvas.width = W * dpr;
     canvas.height = H * dpr;
     ctx.scale(dpr, dpr);
