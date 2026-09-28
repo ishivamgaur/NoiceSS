@@ -1,0 +1,13 @@
+Photos served by Lorem Picsum (https://picsum.photos), sourced from Unsplash.
+Styled with the NoiceSS MCP compositor (scripts/fetch-landing-shots.ts).
+
+p-perspective.webp  16/9  iso  photo id 1011  by Roberto Nickson  https://picsum.photos/id/1011
+p-ascii.webp  16/9  ascii  photo id 1024  by Niko Virtanen  https://picsum.photos/id/1024
+p-chrome.webp  16/9  chrome  photo id 1013  by Cayton Heath  https://picsum.photos/id/1013
+p-noise.webp  16/9  noise  photo id 1020  by Adam Willoughby-Knox  https://picsum.photos/id/1020
+p-filter.webp  16/9  filter  photo id 1022  by Vashishtha Jogi  https://picsum.photos/id/1022
+p-watermark.webp  16/9  watermark  photo id 1025  by Matthew Wiebe  https://picsum.photos/id/1025
+p-glass.webp  16/9  glass  photo id 1012  by Scott Webb  https://picsum.photos/id/1012
+p-blur.webp  16/9  blur  photo id 1023  by William Hook  https://picsum.photos/id/1023
+p-flatlay.webp  16/9  flatlay  photo id 1014  by Oscar Keys  https://picsum.photos/id/1014
+p-banner.webp  21/9  chrome  photo id 1035  by Jared Erondu  https://picsum.photos/id/1035
